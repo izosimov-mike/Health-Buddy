@@ -80,7 +80,6 @@ export default function HomePage() {
       {/* Header */}
       <div className="bg-primary text-primary-foreground p-4 text-center">
         <h1 className="text-xl font-bold">Health Buddy</h1>
-        <p className="text-sm opacity-90">Твой помощник здоровья</p>
       </div>
 
       {/* Main Content */}

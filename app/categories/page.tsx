@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { CheckCircle, Circle, Dumbbell, Apple, Brain, ArrowLeft } from "lucide-react"
+import { CheckCircle, Circle, Dumbbell, Apple, Brain, ArrowLeft, Sparkles, Moon } from "lucide-react"
 import Link from "next/link"
 import { useHealthStore } from "@/lib/health-store"
 import { BottomNavigation } from "@/components/bottom-navigation"
@@ -48,6 +48,31 @@ const healthCategories = [
       { id: "h13", name: "Limit social media/screen time before bed", description: "supports better sleep and reduces overstimulation", points: 1 },
       { id: "h14", name: "Read a book for at least 10 minutes", description: "improves focus, relaxation, and learning", points: 1 },
       { id: "h15", name: "Learn something new", description: "Study a skill or hobby", points: 1 },
+    ],
+  },
+  {
+    id: "hygiene",
+    name: "Hygiene & Self-Care",
+    icon: Sparkles,
+    color: "bg-pink-500",
+    actions: [
+      { id: "h16", name: "Brush teeth (morning and evening)", description: "prevents cavities and gum disease", points: 1 },
+      { id: "h17", name: "Use dental floss or mouthwash", description: "floss removes plaque between teeth, mouthwash helps freshness", points: 1 },
+      { id: "h18", name: "Wash face / skincare routine", description: "keeps skin clean, fresh, and healthy", points: 1 },
+      { id: "h19", name: "Refreshing shower", description: "supports hygiene and helps body feel energized or relaxed", points: 1 },
+    ],
+  },
+  {
+    id: "sleep",
+    name: "Sleep & Routine",
+    icon: Moon,
+    color: "bg-indigo-500",
+    actions: [
+      { id: "h20", name: "Go to bed before 11:00 PM", description: "aligns with natural circadian rhythm for better rest", points: 1 },
+      { id: "h21", name: "Sleep at least 7–8 hours", description: "supports memory, immunity, and recovery", points: 1 },
+      { id: "h22", name: "Wake up without phone scrolling", description: "reduces stress and helps start the day with focus", points: 1 },
+      { id: "h23", name: "Avoid snoozing the alarm", description: "prevents sleep inertia and morning fatigue", points: 1 },
+      { id: "h24", name: "Prepare a calm sleep environment", description: "cool, dark, and quiet rooms promote deep sleep", points: 1 },
     ],
   },
 ]
