@@ -1,181 +1,163 @@
 "use client"
 
-import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
-import { Calendar, Flame } from "lucide-react"
-import { useHealthStore } from "@/lib/health-store"
-import { BottomNavigation } from "@/components/bottom-navigation"
+import { Heart, Trophy, Target, TrendingUp, Calendar, Users } from "lucide-react"
+import Link from "next/link"
+import { useEffect, useState } from "react"
+
+interface UserStats {
+  globalScore: number;
+  dailyScore: number;
+  currentStreak: number;
+  longestStreak: number;
+  level: number;
+  levelName: string;
+}
 
 export default function HomePage() {
-  const {
-    globalScore,
-    currentStreak,
-    longestStreak,
-    lastCheckIn,
-    dailyScore,
-    updateStreak,
-    setLastCheckIn,
-    updateDailyScore,
-    getCurrentCat,
-    getProgressToNextLevel,
-  } = useHealthStore()
-
-  const [isAnimating, setIsAnimating] = useState(false)
-  const [localDailyScore, setLocalDailyScore] = useState(0)
-
-  const currentCat = getCurrentCat()
+  const [stats, setStats] = useState<UserStats | null>(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const today = new Date().toISOString().split("T")[0]
-    const savedScore = localStorage.getItem(`daily-score-${today}`)
-    if (savedScore) {
-      const score = Number.parseInt(savedScore)
-      setLocalDailyScore(score)
-      updateDailyScore(score)
-    }
-  }, [updateDailyScore])
-
-  const handleDailyCheckIn = () => {
-    const today = new Date().toISOString().split("T")[0]
-    const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split("T")[0]
-
-    setIsAnimating(true)
-
-    let newStreak = 1
-    if (lastCheckIn === yesterday) {
-      newStreak = currentStreak + 1
-    } else if (lastCheckIn !== today) {
-      newStreak = 1
+    const fetchStats = async () => {
+      try {
+        const response = await fetch('/api/stats')
+        if (response.ok) {
+          const data = await response.json()
+          setStats(data)
+        }
+      } catch (error) {
+        console.error('Failed to fetch stats:', error)
+      } finally {
+        setLoading(false)
+      }
     }
 
-    const newLongestStreak = Math.max(longestStreak, newStreak)
-    updateStreak(newStreak, newLongestStreak)
-    setLastCheckIn(today)
+    fetchStats()
 
-    // Add bonus points for check-in
-    const bonusPoints = Math.min(newStreak, 7)
-    const newDailyScore = localDailyScore + bonusPoints
-    setLocalDailyScore(newDailyScore)
-    updateDailyScore(newDailyScore)
-    localStorage.setItem(`daily-score-${today}`, newDailyScore.toString())
+    // Refresh stats when page becomes visible
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        fetchStats()
+      }
+    }
 
-    setTimeout(() => {
-      setIsAnimating(false)
-    }, 1000)
-  }
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    
+    // Refresh stats every 30 seconds
+    const interval = setInterval(fetchStats, 30000)
 
-  const today = new Date().toISOString().split("T")[0]
-  const hasCheckedInToday = lastCheckIn === today
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+      clearInterval(interval)
+    }
+  }, [])
 
-  const getStreakBonus = () => {
-    if (hasCheckedInToday) return 0
-    return Math.min(currentStreak + 1, 7)
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background p-4 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading your health data...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
     <div className="min-h-screen bg-background pb-20">
       {/* Header */}
-      <div className="bg-primary text-primary-foreground p-4 text-center">
-        <h1 className="text-xl font-bold">Health Buddy</h1>
+      <div className="bg-primary text-primary-foreground p-6">
+        <div className="text-center">
+          <div className="text-4xl mb-3">💪</div>
+          <h1 className="text-2xl font-bold mb-1">Health Buddy</h1>
+          <p className="text-sm opacity-90">Your daily wellness companion</p>
+        </div>
       </div>
 
-      {/* Main Content */}
       <div className="p-4 space-y-6">
-        {/* Cat Display */}
-        <Card className="text-center">
-          <CardContent className="p-6">
-            <div
-              className={`text-8xl mb-4 transition-transform duration-500 ${isAnimating ? "scale-110" : "scale-100"}`}
-            >
-              {currentCat.emoji}
-            </div>
-            <h2 className="text-2xl font-bold text-foreground mb-2">{currentCat.name}</h2>
-            <Badge variant="secondary" className="mb-4">
-              {currentCat.level}
+        {/* Level Badge */}
+        {stats && (
+          <div className="text-center">
+            <Badge variant="secondary" className="text-lg px-4 py-2">
+              Level {stats.level} - {stats.levelName}
             </Badge>
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm text-muted-foreground">
-                <span>Progress to next level</span>
-                <span>{Math.round(getProgressToNextLevel())}%</span>
-              </div>
-              <Progress value={getProgressToNextLevel()} className="h-2" />
-            </div>
-          </CardContent>
-        </Card>
+          </div>
+        )}
 
-        {/* Daily Check-in */}
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-primary" />
-                <h3 className="text-lg font-semibold">Daily Check-in</h3>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="text-right">
-                  <div className="flex items-center gap-1">
-                    <Flame className="h-4 w-4 text-orange-500" />
-                    <span className="text-2xl font-bold text-primary">{currentStreak}</span>
-                  </div>
-                  <div className="text-xs text-muted-foreground">day streak</div>
-                </div>
-              </div>
-            </div>
-
-            {!hasCheckedInToday && (
-              <div className="mb-4 p-3 bg-accent/10 rounded-lg border border-accent/20">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Streak bonus:</span>
-                  <Badge variant="outline" className="text-accent border-accent">
-                    +{getStreakBonus()} points
-                  </Badge>
-                </div>
-              </div>
-            )}
-
-            <Button onClick={handleDailyCheckIn} disabled={hasCheckedInToday} className="w-full" size="lg">
-              {hasCheckedInToday ? "Checked in today!" : "Daily Check-in"}
-            </Button>
-          </CardContent>
-        </Card>
-
-        {/* Stats */}
+        {/* Stats Grid */}
         <div className="grid grid-cols-2 gap-4">
           <Card>
             <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-primary">{globalScore}</div>
-              <div className="text-sm text-muted-foreground">Total Points</div>
+              <Trophy className="h-8 w-8 text-yellow-500 mx-auto mb-2" />
+              <div className="text-2xl font-bold">{stats?.globalScore || 0}</div>
+              <div className="text-sm text-muted-foreground">Total Score</div>
             </CardContent>
           </Card>
+          
           <Card>
             <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-accent">{localDailyScore}</div>
-              <div className="text-sm text-muted-foreground">Today's Points</div>
+              <Target className="h-8 w-8 text-blue-500 mx-auto mb-2" />
+              <div className="text-2xl font-bold">{stats?.dailyScore || 0}</div>
+              <div className="text-sm text-muted-foreground">Today</div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardContent className="p-4 text-center">
+              <TrendingUp className="h-8 w-8 text-green-500 mx-auto mb-2" />
+              <div className="text-2xl font-bold">{stats?.currentStreak || 0}</div>
+              <div className="text-sm text-muted-foreground">Current Streak</div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardContent className="p-4 text-center">
+              <Calendar className="h-8 w-8 text-purple-500 mx-auto mb-2" />
+              <div className="text-2xl font-bold">{stats?.longestStreak || 0}</div>
+              <div className="text-sm text-muted-foreground">Best Streak</div>
             </CardContent>
           </Card>
         </div>
 
-        <Card>
-          <CardContent className="p-4">
-            <h3 className="font-semibold mb-3">Progress Summary</h3>
-            <div className="grid grid-cols-2 gap-4 text-center">
-              <div>
-                <div className="text-lg font-bold text-primary">{longestStreak}</div>
-                <div className="text-xs text-muted-foreground">Best Streak</div>
-              </div>
-              <div>
-                <div className="text-lg font-bold text-accent">{currentCat.level}</div>
-                <div className="text-xs text-muted-foreground">Current Level</div>
-              </div>
-            </div>
+        {/* Quick Actions */}
+        <div className="space-y-3">
+          <Link href="/categories">
+            <Button className="w-full" size="lg">
+              <Heart className="mr-2 h-5 w-5" />
+              Daily Health Actions
+            </Button>
+          </Link>
+          
+          <div className="grid grid-cols-2 gap-3">
+            <Link href="/stats">
+              <Button variant="outline" className="w-full" size="lg">
+                <TrendingUp className="mr-2 h-4 w-4" />
+                Stats
+              </Button>
+            </Link>
+            
+            <Link href="/leaderboard">
+              <Button variant="outline" className="w-full" size="lg">
+                <Users className="mr-2 h-4 w-4" />
+                Leaderboard
+              </Button>
+            </Link>
+          </div>
+        </div>
+
+        {/* Motivational Message */}
+        <Card className="bg-gradient-to-r from-blue-50 to-green-50 border-none">
+          <CardContent className="p-4 text-center">
+            <h3 className="font-semibold mb-2">Keep Going! 🌟</h3>
+            <p className="text-sm text-muted-foreground">
+              Every small action counts towards a healthier you.
+            </p>
           </CardContent>
         </Card>
       </div>
-
-      <BottomNavigation />
     </div>
   )
 }

@@ -4,123 +4,149 @@ import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { CheckCircle, Circle, Dumbbell, Apple, Brain, ArrowLeft, Sparkles, Moon } from "lucide-react"
+import { CheckCircle, Circle, Dumbbell, Apple, Brain, Heart, Users, ArrowLeft } from "lucide-react"
 import Link from "next/link"
-import { useHealthStore } from "@/lib/health-store"
-import { BottomNavigation } from "@/components/bottom-navigation"
 
-// Health categories and actions
-const healthCategories = [
-  {
-    id: "physical",
-    name: "Physical",
-    icon: Dumbbell,
-    color: "bg-blue-500",
-    actions: [
-      { id: "h1", name: "Morning exercise (5–10 minutes)", description: "boosts energy, improves circulation, and wakes up muscles", points: 1 },
-      { id: "h4", name: "Mini workout (push-ups, squats, plank)", description: "builds strength and supports joint health", points: 1 },
-      { id: "h5", name: "Stretching or yoga", description: "increases flexibility, reduces stiffness, and lowers stress", points: 1 },
-      { id: "h6", name: "Outdoor walk (7,000–10,000 steps)", description: "improves mood, supports cardiovascular health", points: 1 },
-      { id: "h7", name: "Short posture/desk breaks", description: "prevents back pain and eye strain during long sitting periods", points: 1 },
-    ],
-  },
-  {
-    id: "nutrition",
-    name: "Nutrition",
-    icon: Apple,
-    color: "bg-green-500",
-    actions: [
-      { id: "h2", name: "Start the day with water", description: "rehydrates the body and supports metabolism after sleep", points: 1 },
-      { id: "h8", name: "Stay hydrated throughout the day", description: "aim for enough water to keep energy, focus, and digestion balanced", points: 1 },
-      { id: "h9", name: "Eat vegetables and fruits daily", description: "ensure at least 2–3 servings for vitamins, minerals, and fiber", points: 1 },
-      { id: "h10", name: "Choose whole foods over processed ones", description: "improves nutrient intake and reduces sugar/fat overload", points: 1 },
-      { id: "h11", name: "Have a light dinner 2–3 hours before bed", description: "helps digestion and improves sleep quality", points: 1 },
-    ],
-  },
-  {
-    id: "mental",
-    name: "Mental",
-    icon: Brain,
-    color: "bg-purple-500",
-    actions: [
-      { id: "h3", name: "Meditation (5–10 minutes)", description: "reduces stress and improves focus", points: 1 },
-      { id: "h12", name: "Breathing exercises (2–5 minutes)", description: "calms the nervous system and lowers anxiety", points: 1 },
-      { id: "h13", name: "Limit social media/screen time before bed", description: "supports better sleep and reduces overstimulation", points: 1 },
-      { id: "h14", name: "Read a book for at least 10 minutes", description: "improves focus, relaxation, and learning", points: 1 },
-      { id: "h15", name: "Learn something new", description: "Study a skill or hobby", points: 1 },
-    ],
-  },
-  {
-    id: "hygiene",
-    name: "Hygiene & Self-Care",
-    icon: Sparkles,
-    color: "bg-pink-500",
-    actions: [
-      { id: "h16", name: "Brush teeth (morning and evening)", description: "prevents cavities and gum disease", points: 1 },
-      { id: "h17", name: "Use dental floss or mouthwash", description: "floss removes plaque between teeth, mouthwash helps freshness", points: 1 },
-      { id: "h18", name: "Wash face / skincare routine", description: "keeps skin clean, fresh, and healthy", points: 1 },
-      { id: "h19", name: "Refreshing shower", description: "supports hygiene and helps body feel energized or relaxed", points: 1 },
-    ],
-  },
-  {
-    id: "sleep",
-    name: "Sleep & Routine",
-    icon: Moon,
-    color: "bg-indigo-500",
-    actions: [
-      { id: "h20", name: "Go to bed before 11:00 PM", description: "aligns with natural circadian rhythm for better rest", points: 1 },
-      { id: "h21", name: "Sleep at least 7–8 hours", description: "supports memory, immunity, and recovery", points: 1 },
-      { id: "h22", name: "Wake up without phone scrolling", description: "reduces stress and helps start the day with focus", points: 1 },
-      { id: "h23", name: "Avoid snoozing the alarm", description: "prevents sleep inertia and morning fatigue", points: 1 },
-      { id: "h24", name: "Prepare a calm sleep environment", description: "cool, dark, and quiet rooms promote deep sleep", points: 1 },
-    ],
-  },
-]
+interface HealthAction {
+  id: string;
+  name: string;
+  description: string;
+  points: number;
+  categoryId: string;
+  completed?: boolean;
+}
+
+interface HealthCategory {
+  id: string;
+  name: string;
+  description: string;
+  actions?: HealthAction[];
+}
+
+// Category icons and colors mapping
+const categoryConfig: Record<string, { icon: any; color: string }> = {
+  'Physical': { icon: Dumbbell, color: 'bg-blue-500' },
+  'Nutrition': { icon: Apple, color: 'bg-green-500' },
+  'Mental': { icon: Brain, color: 'bg-purple-500' },
+  'Social': { icon: Users, color: 'bg-pink-500' },
+  'Emotional': { icon: Heart, color: 'bg-red-500' },
+  // Fallback for unknown categories
+  'default': { icon: Heart, color: 'bg-gray-500' }
+}
 
 export default function CategoriesPage() {
-  const { addCompletedAction } = useHealthStore()
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+  const [categories, setCategories] = useState<HealthCategory[]>([])
+  const [actions, setActions] = useState<HealthAction[]>([])
   const [completedActions, setCompletedActions] = useState<Set<string>>(new Set())
   const [dailyScore, setDailyScore] = useState(0)
+  const [loading, setLoading] = useState(false)
+  const [dataLoading, setDataLoading] = useState(true)
 
-  // Load completed actions from localStorage on mount
+  // Load categories and actions
   useEffect(() => {
-    const today = new Date().toISOString().split("T")[0]
-    const savedActions = localStorage.getItem(`completed-actions-${today}`)
-    if (savedActions) {
-      setCompletedActions(new Set(JSON.parse(savedActions)))
+    const loadData = async () => {
+      try {
+        const [categoriesRes, actionsRes] = await Promise.all([
+          fetch('/api/categories'),
+          fetch('/api/actions')
+        ])
+        
+        if (categoriesRes.ok && actionsRes.ok) {
+          const categoriesData = await categoriesRes.json()
+          const actionsData = await actionsRes.json()
+          
+          setCategories(categoriesData)
+          setActions(actionsData)
+          
+          // Set completed actions and calculate daily score
+          const completed = new Set(actionsData.filter((action: HealthAction) => action.completed).map((action: HealthAction) => action.id))
+          setCompletedActions(completed)
+          
+          const score = actionsData.reduce((total: number, action: HealthAction) => {
+            return action.completed ? total + action.points : total
+          }, 0)
+          setDailyScore(score)
+        }
+      } catch (error) {
+        console.error('Error loading data:', error)
+      } finally {
+        setDataLoading(false)
+      }
     }
 
-    const savedScore = localStorage.getItem(`daily-score-${today}`)
-    if (savedScore) {
-      setDailyScore(Number.parseInt(savedScore))
+    loadData()
+
+    // Refresh data when page becomes visible
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        loadData()
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
   }, [])
 
-  // Save completed actions to localStorage
-  const saveProgress = (actions: Set<string>, score: number) => {
-    const today = new Date().toISOString().split("T")[0]
-    localStorage.setItem(`completed-actions-${today}`, JSON.stringify([...actions]))
-    localStorage.setItem(`daily-score-${today}`, score.toString())
-  }
-
-  const handleClaimAction = (actionId: string, points: number) => {
-    const newCompletedActions = new Set(completedActions)
-    newCompletedActions.add(actionId)
-    const newScore = dailyScore + points
-
-    setCompletedActions(newCompletedActions)
-    setDailyScore(newScore)
-    addCompletedAction(actionId)
-    saveProgress(newCompletedActions, newScore)
+  const handleClaimAction = async (actionId: string, points: number) => {
+    if (completedActions.has(actionId)) return
+    
+    setLoading(true)
+    try {
+      const response = await fetch('/api/actions/complete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ actionId, completed: true })
+      })
+      
+      if (response.ok) {
+        setCompletedActions(prev => new Set([...prev, actionId]))
+        setDailyScore(prev => prev + points)
+        
+        // Refresh actions data to get updated completion status
+        const actionsRes = await fetch('/api/actions')
+        if (actionsRes.ok) {
+          const actionsData = await actionsRes.json()
+          setActions(actionsData)
+          
+          // Update completed actions set
+          const completed = new Set(actionsData.filter((action: HealthAction) => action.completed).map((action: HealthAction) => action.id))
+          setCompletedActions(completed)
+          
+          // Recalculate daily score from server data
+          const score = actionsData.reduce((total: number, action: HealthAction) => {
+            return action.completed ? total + action.points : total
+          }, 0)
+          setDailyScore(score)
+        }
+      }
+    } catch (error) {
+      console.error('Error completing action:', error)
+    } finally {
+      setLoading(false)
+    }
   }
 
   const isActionCompleted = (actionId: string) => completedActions.has(actionId)
+  
+  if (dataLoading) {
+    return (
+      <div className="min-h-screen bg-background p-4 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading categories...</p>
+        </div>
+      </div>
+    )
+  }
 
   // Category overview
   if (!selectedCategory) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background pb-20">
         {/* Header */}
         <div className="bg-primary text-primary-foreground p-4">
           <div className="flex items-center gap-3">
@@ -147,10 +173,10 @@ export default function CategoriesPage() {
 
           {/* Categories Grid */}
           <div className="space-y-4">
-            {healthCategories.map((category) => {
-              const completedCount = category.actions.filter((action) => isActionCompleted(action.id)).length
-              const totalCount = category.actions.length
-              const Icon = category.icon
+            {categories.map((category) => {
+              const categoryActions = actions.filter(action => action.categoryId === category.id)
+              const completedCount = categoryActions.filter((action) => isActionCompleted(action.id)).length
+              const totalCount = categoryActions.length
 
               return (
                 <Card
@@ -161,8 +187,11 @@ export default function CategoriesPage() {
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className={`p-3 rounded-full ${category.color} text-white`}>
-                          <Icon className="h-6 w-6" />
+                        <div className={`p-3 rounded-full ${categoryConfig[category.name]?.color || categoryConfig.default.color} text-white`}>
+                          {(() => {
+                            const IconComponent = categoryConfig[category.name]?.icon || categoryConfig.default.icon;
+                            return <IconComponent className="h-6 w-6" />;
+                          })()}
                         </div>
                         <div>
                           <h3 className="font-semibold text-lg">{category.name}</h3>
@@ -181,16 +210,15 @@ export default function CategoriesPage() {
             })}
           </div>
         </div>
-        <BottomNavigation />
       </div>
     )
   }
 
   // Category detail view
-  const category = healthCategories.find((cat) => cat.id === selectedCategory)
+  const category = categories.find((cat) => cat.id === selectedCategory)
   if (!category) return null
 
-  const Icon = category.icon
+  const categoryActions = actions.filter(action => action.categoryId === selectedCategory)
 
   return (
     <div className="min-h-screen bg-background pb-20">
@@ -205,8 +233,11 @@ export default function CategoriesPage() {
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <div className={`p-2 rounded-full ${category.color} text-white`}>
-            <Icon className="h-5 w-5" />
+          <div className={`p-2 rounded-full ${categoryConfig[category.name]?.color || categoryConfig.default.color} text-white`}>
+            {(() => {
+              const IconComponent = categoryConfig[category.name]?.icon || categoryConfig.default.icon;
+              return <IconComponent className="h-5 w-5" />;
+            })()}
           </div>
           <div>
             <h1 className="text-xl font-bold">{category.name}</h1>
@@ -217,7 +248,7 @@ export default function CategoriesPage() {
 
       {/* Actions List */}
       <div className="p-4 space-y-4">
-        {category.actions.map((action) => {
+        {categoryActions.map((action) => {
           const isCompleted = isActionCompleted(action.id)
 
           return (
@@ -242,11 +273,11 @@ export default function CategoriesPage() {
                   </div>
                   <Button
                     onClick={() => handleClaimAction(action.id, action.points)}
-                    disabled={isCompleted}
+                    disabled={isCompleted || loading}
                     size="sm"
                     className="shrink-0"
                   >
-                    {isCompleted ? "Claimed" : "Claim"}
+                    {isCompleted ? "Claimed" : loading ? "..." : "Claim"}
                   </Button>
                 </div>
               </CardContent>
@@ -254,7 +285,6 @@ export default function CategoriesPage() {
           )
         })}
       </div>
-      <BottomNavigation />
     </div>
   )
 }

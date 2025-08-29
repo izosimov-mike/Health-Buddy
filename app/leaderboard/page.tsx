@@ -5,16 +5,18 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Trophy, Medal, Award, ArrowLeft, Crown } from "lucide-react"
 import Link from "next/link"
-import { BottomNavigation } from "@/components/bottom-navigation"
+import { useEffect, useState } from "react"
 
-// Mock leaderboard data - user mentioned they'll develop this further
-const mockLeaderboardData = [
-  { id: 1, name: "Alex", score: 127, level: "Apprentice", streak: 6, rank: 1, avatar: "😸" },
-  { id: 2, name: "Maria", score: 89, level: "Explorer", streak: 4, rank: 2, avatar: "🐈" },
-  { id: 3, name: "John", score: 76, level: "Explorer", streak: 3, rank: 3, avatar: "🐱" },
-  { id: 4, name: "Sarah", score: 45, level: "Apprentice", streak: 2, rank: 4, avatar: "😸" },
-  { id: 5, name: "Mike", score: 23, level: "Apprentice", streak: 1, rank: 5, avatar: "😸" },
-]
+interface LeaderboardUser {
+  id: string;
+  name: string;
+  globalScore: number;
+  currentStreak: number;
+  level: number;
+  rank: number;
+  avatar: string;
+  levelName: string;
+}
 
 const getRankIcon = (rank: number) => {
   switch (rank) {
@@ -30,6 +32,27 @@ const getRankIcon = (rank: number) => {
 }
 
 export default function LeaderboardPage() {
+  const [leaderboardData, setLeaderboardData] = useState<LeaderboardUser[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchLeaderboard = async () => {
+      try {
+        const response = await fetch('/api/leaderboard');
+        if (response.ok) {
+          const data = await response.json();
+          setLeaderboardData(data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch leaderboard:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLeaderboard();
+  }, []);
+
   return (
     <div className="min-h-screen bg-background pb-20">
       {/* Header */}
@@ -51,55 +74,54 @@ export default function LeaderboardPage() {
       </div>
 
       <div className="p-4 space-y-4">
-        {/* Coming Soon Notice */}
-        <Card className="border-dashed border-2 border-muted-foreground/20">
-          <CardContent className="p-6 text-center">
-            <Trophy className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Leaderboard Coming Soon!</h3>
-            <p className="text-sm text-muted-foreground mb-4">
-              Connect with friends and compete in health challenges. This feature is under development.
-            </p>
-            <Badge variant="outline">In Development</Badge>
-          </CardContent>
-        </Card>
-
-        {/* Preview/Mock Leaderboard */}
+        {/* Real Leaderboard */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Trophy className="h-5 w-5" />
-              Preview Rankings
+              Health Champions
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            {mockLeaderboardData.map((user, index) => (
-              <div
-                key={user.id}
-                className={`flex items-center justify-between p-3 rounded-lg ${
-                  user.name === "Alex" ? "bg-primary/10 border border-primary/20" : "bg-muted/30"
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center justify-center w-8 h-8">{getRankIcon(user.rank)}</div>
-                  <div className="text-2xl">{user.avatar}</div>
-                  <div>
-                    <div className="font-semibold flex items-center gap-2">
-                      {user.name}
-                      {user.name === "Alex" && (
-                        <Badge variant="secondary" className="text-xs">
-                          You
-                        </Badge>
-                      )}
+            {loading ? (
+              <div className="text-center py-8">
+                <div className="text-muted-foreground">Loading leaderboard...</div>
+              </div>
+            ) : leaderboardData.length === 0 ? (
+              <div className="text-center py-8">
+                <Trophy className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <div className="text-muted-foreground">No users found</div>
+              </div>
+            ) : (
+              leaderboardData.map((user) => (
+                <div
+                  key={user.id}
+                  className={`flex items-center justify-between p-3 rounded-lg ${
+                    user.name === "Test User" ? "bg-primary/10 border border-primary/20" : "bg-muted/30"
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center justify-center w-8 h-8">{getRankIcon(user.rank)}</div>
+                    <div className="text-2xl">{user.avatar}</div>
+                    <div>
+                      <div className="font-semibold flex items-center gap-2">
+                        {user.name}
+                        {user.name === "Test User" && (
+                          <Badge variant="secondary" className="text-xs">
+                            You
+                          </Badge>
+                        )}
+                      </div>
+                      <div className="text-sm text-muted-foreground">{user.levelName}</div>
                     </div>
-                    <div className="text-sm text-muted-foreground">{user.level}</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="font-bold text-primary">{user.globalScore}</div>
+                    <div className="text-xs text-muted-foreground">{user.currentStreak} day streak</div>
                   </div>
                 </div>
-                <div className="text-right">
-                  <div className="font-bold text-primary">{user.score}</div>
-                  <div className="text-xs text-muted-foreground">{user.streak} day streak</div>
-                </div>
-              </div>
-            ))}
+              ))
+            )}
           </CardContent>
         </Card>
 
@@ -119,7 +141,6 @@ export default function LeaderboardPage() {
           </Card>
         </div>
       </div>
-      <BottomNavigation />
     </div>
   )
 }
