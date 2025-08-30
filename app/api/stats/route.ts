@@ -61,6 +61,9 @@ export async function GET(request: NextRequest) {
     // Get streak values from user data (managed by daily check-in)
     const currentStreak = user[0].currentStreak;
     const longestStreak = user[0].longestStreak;
+    
+    // Check if user has checked in today
+    const checkedInToday = user[0].lastCheckinDate === today;
 
     const userLevel = getUserLevel(user[0].globalScore);
     const levelProgress = getProgressToNextLevel(user[0].globalScore);
@@ -115,6 +118,7 @@ export async function GET(request: NextRequest) {
       currentStreak,
       longestStreak,
       streakBonus,
+      checkedInToday,
       dailyScore: todayProgress[0]?.totalScore || 0,
       todayScore: todayProgress[0]?.totalScore || 0,
       todayActions: todayProgress[0]?.completedActions || 0,
