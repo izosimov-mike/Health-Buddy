@@ -127,6 +127,16 @@ export default function HomePage() {
             <Badge variant="secondary" className="text-lg px-4 py-2">
               Level - {stats.levelName}
             </Badge>
+            
+            {/* Level Image */}
+            <div className="flex justify-center">
+              <img 
+                src={stats.levelName === 'Beginner' ? 'https://obosg0ykkt0zseow.public.blob.vercel-storage.com/1_Beginner.png' : ''} 
+                alt={`${stats.levelName} level`}
+                className="w-24 h-24 object-contain"
+              />
+            </div>
+            
             {stats.levelProgress.next && (
               <div className="max-w-xs mx-auto">
                 <div className="flex justify-between text-sm text-muted-foreground mb-1">
