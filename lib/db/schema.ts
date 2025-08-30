@@ -1,8 +1,30 @@
-import { pgTable, serial, integer, text, timestamp, boolean } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
+// Conditional imports based on environment
+let table: any, serial: any, integer: any, text: any, timestamp: any, boolean: any;
+
+if (process.env.NODE_ENV === 'production' || process.env.DATABASE_URL?.startsWith('postgres')) {
+  // PostgreSQL imports
+  const pgCore = require('drizzle-orm/pg-core');
+  table = pgCore.pgTable;
+  serial = pgCore.serial;
+  integer = pgCore.integer;
+  text = pgCore.text;
+  timestamp = pgCore.timestamp;
+  boolean = pgCore.boolean;
+} else {
+  // SQLite imports
+  const sqliteCore = require('drizzle-orm/sqlite-core');
+  table = sqliteCore.sqliteTable;
+  serial = sqliteCore.integer; // SQLite uses integer for auto-increment
+  integer = sqliteCore.integer;
+  text = sqliteCore.text;
+  timestamp = sqliteCore.integer; // SQLite stores timestamps as integers
+  boolean = sqliteCore.integer; // SQLite stores booleans as integers
+}
+
 // Users table
-export const users = pgTable('users', {
+export const users = table('users', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
   email: text('email').unique(),
@@ -16,7 +38,7 @@ export const users = pgTable('users', {
 });
 
 // Levels table
-export const levels = pgTable('levels', {
+export const levels = table('levels', {
   id: serial('id').primaryKey(),
   name: text('name').notNull(),
   minPoints: integer('min_points').notNull(),
@@ -25,7 +47,7 @@ export const levels = pgTable('levels', {
 });
 
 // Health categories table
-export const categories = pgTable('categories', {
+export const categories = table('categories', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
   icon: text('icon').notNull(),
@@ -34,7 +56,7 @@ export const categories = pgTable('categories', {
 });
 
 // Health actions table
-export const actions = pgTable('actions', {
+export const actions = table('actions', {
   id: text('id').primaryKey(),
   categoryId: text('category_id').references(() => categories.id),
   name: text('name').notNull(),
@@ -44,7 +66,7 @@ export const actions = pgTable('actions', {
 });
 
 // User daily progress table
-export const dailyProgress = pgTable('daily_progress', {
+export const dailyProgress = table('daily_progress', {
   id: serial('id').primaryKey(),
   userId: text('user_id').references(() => users.id),
   date: text('date').notNull(),
@@ -55,7 +77,7 @@ export const dailyProgress = pgTable('daily_progress', {
 });
 
 // User action completions table
-export const actionCompletions = pgTable('action_completions', {
+export const actionCompletions = table('action_completions', {
   id: serial('id').primaryKey(),
   userId: text('user_id').references(() => users.id),
   actionId: text('action_id').references(() => actions.id),

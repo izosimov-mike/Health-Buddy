@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
         longestStreak: newLongestStreak,
         globalScore: newGlobalScore,
         lastCheckinDate: today,
-        updatedAt: Date.now()
+        updatedAt: new Date()
       })
       .where(eq(users.id, userId));
 
@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
         totalScore: totalPoints,
         completedActions: 0,
         checkedIn: true,
-        createdAt: Date.now()
+        createdAt: new Date()
       });
     }
 

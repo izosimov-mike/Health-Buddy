@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
       if (existingCompletion.length > 0) {
         // Update existing completion
         completion = await db.update(actionCompletions)
-          .set({ completed, completedAt: Math.floor(Date.now() / 1000) })
+          .set({ completed, completedAt: new Date() })
           .where(eq(actionCompletions.id, existingCompletion[0].id))
           .returning();
       } else {
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
             actionId,
             date,
             completed,
-            completedAt: Math.floor(Date.now() / 1000),
+            completedAt: new Date(),
           })
           .returning();
       }
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
         await db.update(users)
           .set({ 
             globalScore: currentUser[0].globalScore + pointsChange,
-            updatedAt: Math.floor(Date.now() / 1000)
+            updatedAt: new Date()
           })
           .where(eq(users.id, userId));
       }
