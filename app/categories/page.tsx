@@ -177,17 +177,17 @@ export default function CategoriesPage() {
                   className="cursor-pointer hover:shadow-md transition-shadow"
                   onClick={() => setSelectedCategory(category.id)}
                 >
-                  <CardContent className="p-2">
-                    <div className="flex items-center gap-3">
-                      <div className={`p-2 rounded-full ${categoryConfig[category.name]?.color || categoryConfig.default.color} text-white`}>
+                  <CardContent className="px-1.5 py-1">
+                    <div className="flex items-center gap-2">
+                      <div className={`p-1.5 rounded-full ${categoryConfig[category.name]?.color || categoryConfig.default.color} text-white`}>
                         {(() => {
                           const IconComponent = categoryConfig[category.name]?.icon || categoryConfig.default.icon;
-                          return <IconComponent className="h-5 w-5" />;
+                          return <IconComponent className="h-4 w-4" />;
                         })()}
                       </div>
                       <div className="flex-1">
-                        <h3 className="font-semibold text-base">{category.name}</h3>
-                        <p className="text-xs text-muted-foreground">
+                        <h3 className="font-medium text-sm leading-tight">{category.name}</h3>
+                        <p className="text-xs text-muted-foreground leading-tight">
                           {completedCount}/{totalCount} completed
                         </p>
                       </div>
@@ -235,27 +235,27 @@ export default function CategoriesPage() {
       </div>
 
       {/* Actions List */}
-      <div className="p-3 space-y-3">
+      <div className="p-2 space-y-2">
         {categoryActions.map((action) => {
           const isCompleted = isActionCompleted(action.id)
 
           return (
             <Card key={action.id} className={isCompleted ? "bg-muted/50" : ""}>
-              <CardContent className="p-2">
-                <div className="flex items-start justify-between gap-3">
+              <CardContent className="px-1.5 py-1">
+                <div className="flex items-start justify-between gap-2">
                   <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-0.5">
+                    <div className="flex items-center gap-1.5 mb-0">
                       {isCompleted ? (
-                        <CheckCircle className="h-3.5 w-3.5 text-primary" />
+                        <CheckCircle className="h-3 w-3 text-primary" />
                       ) : (
-                        <Circle className="h-3.5 w-3.5 text-muted-foreground" />
+                        <Circle className="h-3 w-3 text-muted-foreground" />
                       )}
-                      <h3 className={`font-medium text-sm ${isCompleted ? "text-muted-foreground line-through" : ""}`}>
+                      <h3 className={`font-medium text-xs leading-tight ${isCompleted ? "text-muted-foreground line-through" : ""}`}>
                         {action.name}
                       </h3>
                     </div>
-                    <p className="text-xs text-muted-foreground mb-1.5">{action.description}</p>
-                    <Badge variant="outline" className="text-xs">
+                    <p className="text-xs text-muted-foreground mb-1 leading-tight">{action.description}</p>
+                    <Badge variant="outline" className="text-xs px-1 py-0">
                       +{action.points} point
                     </Badge>
                   </div>
