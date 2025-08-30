@@ -10,6 +10,7 @@ export const users = sqliteTable('users', {
   currentStreak: integer('current_streak').default(0),
   longestStreak: integer('longest_streak').default(0),
   level: integer('level').default(1),
+  lastCheckinDate: text('last_checkin_date'),
   createdAt: integer('created_at'),
   updatedAt: integer('updated_at'),
 });

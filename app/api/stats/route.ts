@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db, users, dailyProgress, actionCompletions, actions, categories } from '@/lib/db';
 import { eq, and, sql, desc } from 'drizzle-orm';
-import { getUserLevel } from '@/lib/utils';
+import { getUserLevel, getProgressToNextLevel, getStreakBonus } from '@/lib/utils';
 
 export async function GET(request: NextRequest) {
   const userId = 'user-1'; // Fixed user for demo
@@ -58,41 +58,13 @@ export async function GET(request: NextRequest) {
     ))
     .groupBy(categories.id, categories.name, categories.color);
 
-    // Calculate streak (consecutive days with at least one completed action)
-    const recentProgress = await db.select({
-      date: dailyProgress.date,
-      completedActions: dailyProgress.completedActions,
-    })
-    .from(dailyProgress)
-    .where(eq(dailyProgress.userId, userId))
-    .orderBy(desc(dailyProgress.date))
-    .limit(30);
-
-    let currentStreak = 0;
-    let longestStreak = 0;
-    let tempStreak = 0;
-    
-    for (const day of recentProgress) {
-      if (day.completedActions > 0) {
-        tempStreak++;
-        if (currentStreak === 0) currentStreak = tempStreak;
-        longestStreak = Math.max(longestStreak, tempStreak);
-      } else {
-        if (currentStreak === tempStreak) currentStreak = 0;
-        tempStreak = 0;
-      }
-    }
-
-    // Update user's streak in database
-    await db.update(users)
-      .set({ 
-        currentStreak,
-        longestStreak: Math.max(user[0].longestStreak, longestStreak),
-        updatedAt: Math.floor(Date.now() / 1000)
-      })
-      .where(eq(users.id, userId));
+    // Get streak values from user data (managed by daily check-in)
+    const currentStreak = user[0].currentStreak;
+    const longestStreak = user[0].longestStreak;
 
     const userLevel = getUserLevel(user[0].globalScore);
+    const levelProgress = getProgressToNextLevel(user[0].globalScore);
+    const streakBonus = getStreakBonus(currentStreak);
 
     // Create full week data (7 days) with proper day names
     const fullWeekData = [];
@@ -135,8 +107,14 @@ export async function GET(request: NextRequest) {
       ...user[0],
       level: userLevel.id,
       levelName: userLevel.name,
+      levelProgress: {
+        current: levelProgress.current,
+        next: levelProgress.next,
+        progress: levelProgress.progress
+      },
       currentStreak,
-      longestStreak: Math.max(user[0].longestStreak, longestStreak),
+      longestStreak,
+      streakBonus,
       dailyScore: todayProgress[0]?.totalScore || 0,
       todayScore: todayProgress[0]?.totalScore || 0,
       todayActions: todayProgress[0]?.completedActions || 0,

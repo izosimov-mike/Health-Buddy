@@ -75,7 +75,7 @@ const gameLevels = [
   { id: 1, name: "Beginner", minPoints: 0, maxPoints: 149 },
   { id: 2, name: "Apprentice", minPoints: 150, maxPoints: 299 },
   { id: 3, name: "Explorer", minPoints: 300, maxPoints: 449 },
-  { id: 4, name: "Achiever", minPoints: 450, maxPoints: 599 },
+  { id: 4, name: "Performer", minPoints: 450, maxPoints: 599 },
   { id: 5, name: "Champion", minPoints: 600, maxPoints: 749 },
   { id: 6, name: "Master", minPoints: 750, maxPoints: 899 },
   { id: 7, name: "Legend", minPoints: 900, maxPoints: 1049 },
