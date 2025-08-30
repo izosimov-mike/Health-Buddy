@@ -107,19 +107,19 @@ export default function HomePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background p-4 flex items-center justify-center">
+      <div className="min-h-screen bg-main p-4 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading your health data...</p>
+          <p className="text-white">Loading your health data...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-main pb-20">
       {/* Header */}
-      <div className="bg-primary text-primary-foreground py-2 px-4">
+      <div className="bg-main text-white py-4 px-4">
         <div className="text-center max-w-sm mx-auto">
           <h1 className="text-xl font-bold mb-0.5">Health Buddy</h1>
           <p className="text-xs opacity-90">Your daily wellness companion</p>
@@ -166,39 +166,42 @@ export default function HomePage() {
 
         {/* Stats Grid */}
         <div className="grid grid-cols-2 gap-3">
-          <Card>
+          <Card className="section-primary text-white border-0">
             <CardContent className="px-1.5 py-0.5 text-center">
-              <Trophy className="h-4 w-4 text-yellow-500 mx-auto mb-0" />
+              <Trophy className="h-4 w-4 text-yellow-300 mx-auto mb-0" />
               <div className="text-base font-bold">{stats?.globalScore || 0}</div>
-              <div className="text-xs text-muted-foreground leading-tight">Total Score</div>
+              <div className="text-xs opacity-90 leading-tight">Total Score</div>
             </CardContent>
           </Card>
           
-          <Card>
+          <Card className="section-primary text-white border-0">
             <CardContent className="px-1.5 py-0.5 text-center">
-              <Target className="h-4 w-4 text-blue-500 mx-auto mb-0" />
+              <Target className="h-4 w-4 text-blue-300 mx-auto mb-0" />
               <div className="text-base font-bold">{stats?.dailyScore || 0}</div>
-              <div className="text-xs text-muted-foreground leading-tight">Today Score</div>
+              <div className="text-xs opacity-90 leading-tight">Today Score</div>
             </CardContent>
           </Card>
         </div>
 
         {/* Daily Check-in Section */}
-        <Card>
+        <Card className="section-primary border-0">
           <CardContent className="px-1.5 py-1">
             <div className="text-center space-y-1.5">
-              <h3 className="text-sm font-medium leading-tight">Daily Check-in</h3>
+              <div className="flex items-center justify-center gap-1">
+                <h3 className="text-sm font-medium leading-tight text-white">Daily Check-in</h3>
+                <Calendar className="h-3 w-3 text-purple-400" />
+              </div>
               
-              <div className="bg-gray-50 rounded-lg p-1.5 space-y-1">
+              <div className="bg-black/20 backdrop-blur-sm rounded-lg p-1.5 space-y-1">
                 <div className="flex justify-between items-center">
-                  <span className="text-xs font-medium leading-tight">Current Streak:</span>
-                  <span className="text-sm font-bold text-green-600 leading-tight">{stats?.currentStreak || 0} days</span>
+                  <span className="text-xs font-medium leading-tight text-white opacity-90">Current Streak:</span>
+                  <span className="text-sm font-bold text-primary leading-tight">{stats?.currentStreak || 0} days</span>
                 </div>
                 
-                <div className="text-xs text-muted-foreground space-y-0 leading-tight">
+                <div className="text-xs text-white opacity-90 space-y-0 leading-tight">
                   <div>• Check-in: +1 point</div>
                   {(stats?.currentStreak ?? 0) >= 7 ? (
-                    <div className="text-green-600 font-medium">• Streak bonus: +{stats?.streakBonus || 0} points</div>
+                    <div className="text-green-400 font-medium">• Streak bonus: +{stats?.streakBonus || 0} points</div>
                   ) : (
                     <div>• Streak bonus starts at 7+ days</div>
                   )}
@@ -206,13 +209,13 @@ export default function HomePage() {
               </div>
               
               <Button 
-                className="w-full text-xs" 
-                size="sm" 
+                className={`w-full ${checkedInToday ? 'bg-[#241f53] text-white' : 'btn-gradient'}`} 
+                size="lg" 
                 variant={checkedInToday ? "default" : "outline"}
                 onClick={handleDailyCheckin}
                 disabled={checkingIn || checkedInToday}
               >
-                <CheckCircle className={`mr-1.5 h-3 w-3 ${checkedInToday ? 'text-green-500' : ''}`} />
+                <CheckCircle className={`mr-1.5 h-3 w-3 ${checkedInToday ? 'text-green-400' : ''}`} />
                 {checkingIn ? 'Checking in...' : checkedInToday ? '✓ Checked in' : 'Check-in'}
               </Button>
             </div>
@@ -222,8 +225,8 @@ export default function HomePage() {
         {/* Quick Actions */}
         <div className="space-y-3">
           <Link href="/categories">
-            <Button className="w-full" size="lg">
-              <CheckCircle className="mr-2 h-5 w-5" />
+            <Button className="w-full btn-gradient border-0 hover:shadow-lg transition-all duration-300 hover:scale-105" size="lg">
+              <CheckCircle className="mr-2 h-5 w-5 text-gray-700" />
               Daily Health Actions
             </Button>
           </Link>
