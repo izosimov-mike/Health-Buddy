@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Heart, Trophy, Target, Calendar } from "lucide-react"
 import Link from "next/link"
 import { useEffect, useState } from "react"
+import { useMiniKit } from '@coinbase/onchainkit/minikit'
 
 interface UserStats {
   globalScore: number;
@@ -23,10 +24,15 @@ interface UserStats {
 }
 
 export default function HomePage() {
+  const { setFrameReady, isFrameReady } = useMiniKit()
   const [stats, setStats] = useState<UserStats | null>(null)
   const [loading, setLoading] = useState(true)
   const [checkingIn, setCheckingIn] = useState(false)
   const [checkedInToday, setCheckedInToday] = useState(false)
+
+  useEffect(() => {
+    if (!isFrameReady) setFrameReady()
+  }, [isFrameReady, setFrameReady])
 
   useEffect(() => {
     const fetchStats = async () => {

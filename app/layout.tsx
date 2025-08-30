@@ -3,6 +3,7 @@ import { GeistSans } from 'geist/font/sans'
 import { GeistMono } from 'geist/font/mono'
 import { Analytics } from '@vercel/analytics/next'
 import BottomNavigation from '@/components/BottomNavigation'
+import { MiniKitContextProvider } from '@/providers/MiniKitProvider'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -19,11 +20,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable}`}>
-        <div className="pb-16">
-          {children}
-        </div>
-        <BottomNavigation />
-        <Analytics />
+        <MiniKitContextProvider>
+          <div className="pb-16">
+            {children}
+          </div>
+          <BottomNavigation />
+          <Analytics />
+        </MiniKitContextProvider>
       </body>
     </html>
   )
