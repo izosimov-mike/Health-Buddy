@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
-import { BottomNavigation } from '@/components/bottom-navigation'
+
 
 interface StatsData {
   globalScore: number
@@ -57,7 +57,7 @@ export default function StatsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-main pb-20">
+      <div className="bg-main">
         <div className="bg-main text-white p-4">
           <div className="flex items-center gap-3">
             <Link href="/">
@@ -83,7 +83,7 @@ export default function StatsPage() {
 
   if (!stats) {
     return (
-      <div className="min-h-screen bg-main pb-20">
+      <div className="bg-main">
         <div className="bg-main text-white p-4">
           <div className="flex items-center gap-3">
             <Link href="/">
@@ -107,7 +107,7 @@ export default function StatsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-main pb-20">
+    <div className="bg-main">
       {/* Header */}
       <div className="bg-main text-white py-4 px-4">
         <div className="flex items-center gap-3">
@@ -203,9 +203,9 @@ export default function StatsPage() {
               // Define different colors for category markers
               const categoryColors = {
                 'Physical Activity': 'bg-blue-500',
-                'Nutrition': 'bg-green-500', 
+                'Nutrition & Hydration': 'bg-green-500', 
                 'Mental Health': 'bg-purple-500',
-                'Sleep': 'bg-indigo-500',
+                'Sleep & Routine': 'bg-indigo-500',
                 'Social': 'bg-pink-500'
               }
               const colorClass = categoryColors[category.categoryName as keyof typeof categoryColors] || 'bg-gray-500'
@@ -237,7 +237,6 @@ export default function StatsPage() {
 
 
       </div>
-      <BottomNavigation />
     </div>
   )
 }

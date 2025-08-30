@@ -36,7 +36,7 @@ const BottomNavigation = () => {
   ]
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-2 z-50">
+    <div className="fixed bottom-0 left-0 right-0 bg-[#241f53] border-t border-purple-500/30 px-4 py-2 z-50">
       <div className="flex justify-around items-center max-w-md mx-auto">
         {navItems.map((item) => {
           const Icon = item.icon
@@ -47,8 +47,8 @@ const BottomNavigation = () => {
               className={cn(
                 'flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors',
                 item.active
-                  ? 'text-primary bg-primary/10'
-                  : 'text-muted-foreground hover:text-primary hover:bg-primary/5'
+                  ? 'text-white bg-white/20'
+                  : 'text-white/80 hover:text-white hover:bg-white/10'
               )}
             >
               <Icon className="h-5 w-5" />

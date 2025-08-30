@@ -21,6 +21,7 @@ interface UserStats {
     progress: number;
   };
   streakBonus: number;
+  checkedInToday: boolean;
 }
 
 export default function HomePage() {
@@ -41,6 +42,7 @@ export default function HomePage() {
         if (response.ok) {
           const data = await response.json()
           setStats(data)
+          setCheckedInToday(data.checkedInToday || false)
         }
       } catch (error) {
         console.error('Failed to fetch stats:', error)
@@ -91,6 +93,7 @@ export default function HomePage() {
         if (statsResponse.ok) {
           const updatedStats = await statsResponse.json()
           setStats(updatedStats)
+          setCheckedInToday(updatedStats.checkedInToday || true)
         }
       } else if (data.alreadyCheckedIn) {
         // Already checked in today
@@ -107,7 +110,7 @@ export default function HomePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-main p-4 flex items-center justify-center">
+      <div className="bg-main p-4 flex items-center justify-center h-96">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
           <p className="text-white">Loading your health data...</p>
@@ -117,7 +120,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-main pb-20">
+    <div className="bg-main">
       {/* Header */}
       <div className="bg-main text-white py-4 px-4">
         <div className="text-center max-w-sm mx-auto">
@@ -126,7 +129,7 @@ export default function HomePage() {
         </div>
       </div>
 
-      <div className="p-3 space-y-3">
+      <div className="p-4 space-y-6">
         {/* Level Badge */}
         {stats && (
           <div className="text-center space-y-1.5">
@@ -223,14 +226,16 @@ export default function HomePage() {
         </Card>
 
         {/* Quick Actions */}
-        <div className="space-y-3">
-          <Link href="/categories">
-            <Button className="w-full btn-gradient border-0 hover:shadow-lg transition-all duration-300 hover:scale-105" size="lg">
-              <CheckCircle className="mr-2 h-5 w-5 text-gray-700" />
-              Daily Health Actions
-            </Button>
-          </Link>
-        </div>
+        <Card className="section-primary border-0">
+          <CardContent className="px-1.5 py-1">
+            <Link href="/categories">
+              <Button className="w-full btn-gradient" size="lg">
+                <CheckCircle className="mr-1.5 h-3 w-3" />
+                Daily Health Actions
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
       </div>
     </div>
   )
