@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { CheckCircle, Circle, Dumbbell, Apple, Brain, Heart, Users, ArrowLeft } from "lucide-react"
+import { CheckCircle, Circle, Dumbbell, Apple, Brain, Heart, Users, ArrowLeft, Sparkles, Moon } from "lucide-react"
 import Link from "next/link"
 
 interface HealthAction {
@@ -25,11 +25,11 @@ interface HealthCategory {
 
 // Category icons and colors mapping
 const categoryConfig: Record<string, { icon: any; color: string }> = {
-  'Physical': { icon: Dumbbell, color: 'bg-blue-500' },
-  'Nutrition': { icon: Apple, color: 'bg-green-500' },
-  'Mental': { icon: Brain, color: 'bg-purple-500' },
-  'Social': { icon: Users, color: 'bg-pink-500' },
-  'Emotional': { icon: Heart, color: 'bg-red-500' },
+  'Physical Health': { icon: Dumbbell, color: 'bg-blue-500' },
+  'Nutrition & Hydration': { icon: Apple, color: 'bg-green-500' },
+  'Mental Health': { icon: Brain, color: 'bg-purple-500' },
+  'Hygiene & Self-Care': { icon: Sparkles, color: 'bg-pink-500' },
+  'Sleep & Routine': { icon: Moon, color: 'bg-indigo-500' },
   // Fallback for unknown categories
   'default': { icon: Heart, color: 'bg-gray-500' }
 }
@@ -253,20 +253,20 @@ export default function CategoriesPage() {
 
           return (
             <Card key={action.id} className={isCompleted ? "bg-muted/50" : ""}>
-              <CardContent className="p-4">
-                <div className="flex items-start justify-between gap-4">
+              <CardContent className="p-3">
+                <div className="flex items-start justify-between gap-3">
                   <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
+                    <div className="flex items-center gap-2 mb-1">
                       {isCompleted ? (
-                        <CheckCircle className="h-5 w-5 text-primary" />
+                        <CheckCircle className="h-4 w-4 text-primary" />
                       ) : (
-                        <Circle className="h-5 w-5 text-muted-foreground" />
+                        <Circle className="h-4 w-4 text-muted-foreground" />
                       )}
-                      <h3 className={`font-semibold ${isCompleted ? "text-muted-foreground line-through" : ""}`}>
+                      <h3 className={`font-medium text-sm ${isCompleted ? "text-muted-foreground line-through" : ""}`}>
                         {action.name}
                       </h3>
                     </div>
-                    <p className="text-sm text-muted-foreground mb-3">{action.description}</p>
+                    <p className="text-xs text-muted-foreground mb-2">{action.description}</p>
                     <Badge variant="outline" className="text-xs">
                       +{action.points} point
                     </Badge>

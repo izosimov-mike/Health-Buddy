@@ -3,7 +3,7 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Heart, Trophy, Target, Calendar } from "lucide-react"
+import { CheckCircle, Trophy, Target, Calendar } from "lucide-react"
 import Link from "next/link"
 import { useEffect, useState } from "react"
 import { useMiniKit } from '@coinbase/onchainkit/minikit'
@@ -119,14 +119,14 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-background pb-20">
       {/* Header */}
-      <div className="bg-primary text-primary-foreground p-6">
-        <div className="text-center">
+      <div className="bg-primary text-primary-foreground py-4 px-4">
+        <div className="text-center max-w-sm mx-auto">
           <h1 className="text-2xl font-bold mb-1">Health Buddy</h1>
           <p className="text-sm opacity-90">Your daily wellness companion</p>
         </div>
       </div>
 
-      <div className="p-4 space-y-6">
+      <div className="p-4 space-y-4">
         {/* Level Badge */}
         {stats && (
           <div className="text-center space-y-2">
@@ -139,7 +139,7 @@ export default function HomePage() {
               <img 
                 src={stats.levelName === 'Beginner' ? 'https://obosg0ykkt0zseow.public.blob.vercel-storage.com/1_Beginner.png' : ''} 
                 alt={`${stats.levelName} level`}
-                className="w-24 h-24 object-contain"
+                className="w-20 h-20 object-contain"
               />
             </div>
             
@@ -167,39 +167,18 @@ export default function HomePage() {
         {/* Stats Grid */}
         <div className="grid grid-cols-2 gap-4">
           <Card>
-            <CardContent className="p-4 text-center">
-              <Trophy className="h-8 w-8 text-yellow-500 mx-auto mb-2" />
-              <div className="text-2xl font-bold">{stats?.globalScore || 0}</div>
-              <div className="text-sm text-muted-foreground">Total Score</div>
+            <CardContent className="p-3 text-center">
+              <Trophy className="h-6 w-6 text-yellow-500 mx-auto mb-1" />
+              <div className="text-xl font-bold">{stats?.globalScore || 0}</div>
+              <div className="text-xs text-muted-foreground">Total Score</div>
             </CardContent>
           </Card>
           
           <Card>
-            <CardContent className="p-4 text-center">
-              <Target className="h-8 w-8 text-blue-500 mx-auto mb-2" />
-              <div className="text-2xl font-bold">{stats?.dailyScore || 0}</div>
-              <div className="text-sm text-muted-foreground">Today Score</div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-4 text-center">
-              <Heart className="h-8 w-8 text-red-500 mx-auto mb-2" />
-              <div className="text-lg font-bold">
-                {stats?.currentStreak || 0} days
-                {stats?.streakBonus ? (
-                  <span className="text-sm text-green-600 block">+{stats.streakBonus} bonus</span>
-                ) : null}
-              </div>
-              <div className="text-sm text-muted-foreground">Daily Check-in</div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-4 text-center">
-              <Calendar className="h-8 w-8 text-purple-500 mx-auto mb-2" />
-              <div className="text-2xl font-bold">{stats?.longestStreak || 0}</div>
-              <div className="text-sm text-muted-foreground">Best Streak</div>
+            <CardContent className="p-3 text-center">
+              <Target className="h-6 w-6 text-blue-500 mx-auto mb-1" />
+              <div className="text-xl font-bold">{stats?.dailyScore || 0}</div>
+              <div className="text-xs text-muted-foreground">Today Score</div>
             </CardContent>
           </Card>
         </div>
@@ -229,12 +208,12 @@ export default function HomePage() {
               <Button 
                 className="w-full" 
                 size="lg" 
-                variant={checkedInToday ? "secondary" : "outline"}
+                variant={checkedInToday ? "default" : "outline"}
                 onClick={handleDailyCheckin}
                 disabled={checkingIn || checkedInToday}
               >
-                <Heart className="mr-2 h-5 w-5" />
-                {checkingIn ? 'Checking in...' : checkedInToday ? 'Checked in today!' : 'Check-in Today'}
+                <CheckCircle className={`mr-2 h-5 w-5 ${checkedInToday ? 'text-green-500' : ''}`} />
+                {checkingIn ? 'Checking in...' : checkedInToday ? '✓ Checked in' : 'Check-in'}
               </Button>
             </div>
           </CardContent>
@@ -244,21 +223,11 @@ export default function HomePage() {
         <div className="space-y-3">
           <Link href="/categories">
             <Button className="w-full" size="lg">
-              <Heart className="mr-2 h-5 w-5" />
+              <CheckCircle className="mr-2 h-5 w-5" />
               Daily Health Actions
             </Button>
           </Link>
         </div>
-
-        {/* Motivational Message */}
-        <Card className="bg-gradient-to-r from-blue-50 to-green-50 border-none">
-          <CardContent className="p-4 text-center">
-            <h3 className="font-semibold mb-2">Keep Going! 🌟</h3>
-            <p className="text-sm text-muted-foreground">
-              Every small action counts towards a healthier you.
-            </p>
-          </CardContent>
-        </Card>
       </div>
     </div>
   )

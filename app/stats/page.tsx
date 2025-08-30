@@ -126,46 +126,46 @@ export default function StatsPage() {
         </div>
       </div>
 
-      <div className="p-4 space-y-6">
+      <div className="p-4 space-y-4">
         {/* Key Metrics */}
         <div className="grid grid-cols-2 gap-4">
           <Card>
-            <CardContent className="p-4 text-center">
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <Award className="h-5 w-5 text-primary" />
-                <span className="text-2xl font-bold text-primary">{stats.globalScore}</span>
+            <CardContent className="p-3 text-center">
+              <div className="flex items-center justify-center gap-2 mb-1">
+                <Award className="h-4 w-4 text-primary" />
+                <span className="text-xl font-bold text-primary">{stats.globalScore}</span>
               </div>
-              <div className="text-sm text-muted-foreground">Total Points</div>
+              <div className="text-xs text-muted-foreground">Total Points</div>
             </CardContent>
           </Card>
           <Card>
-            <CardContent className="p-4 text-center">
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <Flame className="h-5 w-5 text-orange-500" />
-                <span className="text-2xl font-bold text-primary">{stats.currentStreak}</span>
+            <CardContent className="p-3 text-center">
+              <div className="flex items-center justify-center gap-2 mb-1">
+                <Flame className="h-4 w-4 text-orange-500" />
+                <span className="text-xl font-bold text-primary">{stats.currentStreak}</span>
               </div>
-              <div className="text-sm text-muted-foreground">Current Streak</div>
+              <div className="text-xs text-muted-foreground">Current Streak</div>
             </CardContent>
           </Card>
         </div>
 
         {/* Weekly Progress Chart */}
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5" />
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <TrendingUp className="h-4 w-4" />
               Weekly Progress
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
+          <CardContent className="pt-2">
+            <div className="space-y-3">
               {stats.weeklyProgress && stats.weeklyProgress.length > 0 && (
                 <>
-                  <div className="flex justify-between text-sm text-muted-foreground">
+                  <div className="flex justify-between text-xs text-muted-foreground">
                     <span>Daily Average: {stats.dailyAverage} points</span>
                     <span>Total: {stats.totalWeekPoints} points</span>
                   </div>
-                  <div className="flex items-end justify-between gap-2 h-32">
+                  <div className="flex items-end justify-between gap-2 h-24">
                     {stats.weeklyProgress.map((day, index) => {
                       const maxPoints = Math.max(...stats.weeklyProgress.map(d => d.points))
                       return (
@@ -235,58 +235,58 @@ export default function StatsPage() {
 
         {/* Achievement Summary */}
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Activity className="h-5 w-5" />
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Activity className="h-4 w-4" />
               Achievements
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+          <CardContent className="space-y-3 pt-2">
+            <div className="grid grid-cols-2 gap-3">
               <div className="text-center">
-                <div className="text-2xl font-bold text-accent">{stats.longestStreak}</div>
-                <div className="text-sm text-muted-foreground">Best Streak</div>
+                <div className="text-xl font-bold text-accent">{stats.longestStreak}</div>
+                <div className="text-xs text-muted-foreground">Best Streak</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-accent">{stats.level}</div>
-                <div className="text-sm text-muted-foreground">{stats.levelName}</div>
+                <div className="text-xl font-bold text-accent">{stats.level}</div>
+                <div className="text-xs text-muted-foreground">{stats.levelName}</div>
               </div>
             </div>
 
-            <div className="pt-4 border-t">
-              <h4 className="font-semibold mb-3">Recent Milestones</h4>
+            <div className="pt-3 border-t">
+              <h4 className="font-medium mb-2 text-sm">Recent Milestones</h4>
               <div className="space-y-2">
-                <div className="flex items-center gap-3 p-2 bg-muted/30 rounded">
-                  <div className="text-lg">🏆</div>
+                <div className="flex items-center gap-2 p-2 bg-muted/30 rounded">
+                  <div className="text-sm">🏆</div>
                   <div>
-                    <div className="font-medium">Level Achievement</div>
-                    <div className="text-sm text-muted-foreground">Reached {stats.levelName} (Level {stats.level})</div>
+                    <div className="font-medium text-sm">Level Achievement</div>
+                    <div className="text-xs text-muted-foreground">Reached {stats.levelName} (Level {stats.level})</div>
                   </div>
                 </div>
                 {stats.currentStreak >= 3 && (
-                  <div className="flex items-center gap-3 p-2 bg-muted/30 rounded">
-                    <div className="text-lg">🔥</div>
+                  <div className="flex items-center gap-2 p-2 bg-muted/30 rounded">
+                    <div className="text-sm">🔥</div>
                     <div>
-                      <div className="font-medium">Daily Streak</div>
-                      <div className="text-sm text-muted-foreground">{stats.currentStreak} days in a row</div>
+                      <div className="font-medium text-sm">Daily Streak</div>
+                      <div className="text-xs text-muted-foreground">{stats.currentStreak} days in a row</div>
                     </div>
                   </div>
                 )}
                 {stats.longestStreak >= 7 && (
-                  <div className="flex items-center gap-3 p-2 bg-muted/30 rounded">
-                    <div className="text-lg">⭐</div>
+                  <div className="flex items-center gap-2 p-2 bg-muted/30 rounded">
+                    <div className="text-sm">⭐</div>
                     <div>
-                      <div className="font-medium">Best Streak Record</div>
-                      <div className="text-sm text-muted-foreground">{stats.longestStreak} days longest streak</div>
+                      <div className="font-medium text-sm">Best Streak Record</div>
+                      <div className="text-xs text-muted-foreground">{stats.longestStreak} days longest streak</div>
                     </div>
                   </div>
                 )}
                 {stats.totalWeekPoints >= 50 && (
-                  <div className="flex items-center gap-3 p-2 bg-muted/30 rounded">
-                    <div className="text-lg">💪</div>
+                  <div className="flex items-center gap-2 p-2 bg-muted/30 rounded">
+                    <div className="text-sm">💪</div>
                     <div>
-                      <div className="font-medium">Weekly Champion</div>
-                      <div className="text-sm text-muted-foreground">{stats.totalWeekPoints} points this week</div>
+                      <div className="font-medium text-sm">Weekly Champion</div>
+                      <div className="text-xs text-muted-foreground">{stats.totalWeekPoints} points this week</div>
                     </div>
                   </div>
                 )}
