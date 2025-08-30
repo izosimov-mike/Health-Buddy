@@ -218,7 +218,7 @@ export default function HomePage() {
                 
                 <div className="text-xs text-muted-foreground space-y-1">
                   <div>• Check-in: +1 point</div>
-                  {stats?.currentStreak >= 7 ? (
+                  {(stats?.currentStreak ?? 0) >= 7 ? (
                     <div className="text-green-600 font-medium">• Streak bonus: +{stats?.streakBonus || 0} points</div>
                   ) : (
                     <div>• Streak bonus starts at 7+ days</div>

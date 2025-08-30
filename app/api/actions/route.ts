@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
 
   try {
 
-    let query = db.select({
+    const baseQuery = db.select({
       id: actions.id,
       name: actions.name,
       description: actions.description,
@@ -22,11 +22,9 @@ export async function GET(request: NextRequest) {
     }).from(actions)
     .leftJoin(categories, eq(actions.categoryId, categories.id));
 
-    if (categoryId) {
-      query = query.where(eq(actions.categoryId, categoryId));
-    }
-
-    const actionsData = await query;
+    const actionsData = categoryId 
+      ? await baseQuery.where(eq(actions.categoryId, categoryId))
+      : await baseQuery;
 
     // Get completion status for the date
     const completions = await db.select()
@@ -36,9 +34,9 @@ export async function GET(request: NextRequest) {
         eq(actionCompletions.date, date)
       ));
 
-    const completionMap = new Map(completions.map(c => [c.actionId, c.completed]));
+    const completionMap = new Map(completions.map((c: typeof actionCompletions.$inferSelect) => [c.actionId, c.completed]));
     
-    return NextResponse.json(actionsData.map(action => ({
+    return NextResponse.json(actionsData.map((action: typeof actionsData[0]) => ({
       ...action,
       completed: completionMap.get(action.id) || false
     })));

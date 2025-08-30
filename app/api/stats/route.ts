@@ -74,7 +74,7 @@ export async function GET(request: NextRequest) {
       const dateStr = date.toISOString().split('T')[0];
       const dayName = date.toLocaleDateString('en', { weekday: 'short' });
       
-      const dayData = weeklyProgress.find(d => d.date === dateStr);
+      const dayData = weeklyProgress.find((d: typeof weeklyProgress[0]) => d.date === dateStr);
       fullWeekData.push({
         date: dateStr,
         day: dayName,
@@ -121,7 +121,7 @@ export async function GET(request: NextRequest) {
       weeklyProgress: fullWeekData,
       dailyAverage,
       totalWeekPoints,
-      categoryStats: categoryWeekStats.map(cat => {
+      categoryStats: categoryWeekStats.map((cat: typeof categoryWeekStats[0]) => {
         const dailyActions = Number(cat.totalActions);
         const weeklyGoal = dailyActions * 7;
         const completedWeekly = Number(cat.completedActions);

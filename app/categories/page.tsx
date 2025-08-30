@@ -60,7 +60,7 @@ export default function CategoriesPage() {
           setActions(actionsData)
           
           // Set completed actions and calculate daily score
-          const completed = new Set(actionsData.filter((action: HealthAction) => action.completed).map((action: HealthAction) => action.id))
+          const completed = new Set<string>(actionsData.filter((action: HealthAction) => action.completed).map((action: HealthAction) => action.id))
           setCompletedActions(completed)
           
           const score = actionsData.reduce((total: number, action: HealthAction) => {
@@ -113,7 +113,7 @@ export default function CategoriesPage() {
           setActions(actionsData)
           
           // Update completed actions set
-          const completed = new Set(actionsData.filter((action: HealthAction) => action.completed).map((action: HealthAction) => action.id))
+          const completed = new Set<string>(actionsData.filter((action: HealthAction) => action.completed).map((action: HealthAction) => action.id))
           setCompletedActions(completed)
           
           // Recalculate daily score from server data
