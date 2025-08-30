@@ -167,35 +167,35 @@ export default function HomePage() {
         {/* Stats Grid */}
         <div className="grid grid-cols-2 gap-3">
           <Card>
-            <CardContent className="px-2 py-1 text-center">
-              <Trophy className="h-5 w-5 text-yellow-500 mx-auto mb-0.5" />
-              <div className="text-lg font-bold">{stats?.globalScore || 0}</div>
-              <div className="text-xs text-muted-foreground">Total Score</div>
+            <CardContent className="px-1.5 py-0.5 text-center">
+              <Trophy className="h-4 w-4 text-yellow-500 mx-auto mb-0" />
+              <div className="text-base font-bold">{stats?.globalScore || 0}</div>
+              <div className="text-xs text-muted-foreground leading-tight">Total Score</div>
             </CardContent>
           </Card>
           
           <Card>
-            <CardContent className="px-2 py-1 text-center">
-              <Target className="h-5 w-5 text-blue-500 mx-auto mb-0.5" />
-              <div className="text-lg font-bold">{stats?.dailyScore || 0}</div>
-              <div className="text-xs text-muted-foreground">Today Score</div>
+            <CardContent className="px-1.5 py-0.5 text-center">
+              <Target className="h-4 w-4 text-blue-500 mx-auto mb-0" />
+              <div className="text-base font-bold">{stats?.dailyScore || 0}</div>
+              <div className="text-xs text-muted-foreground leading-tight">Today Score</div>
             </CardContent>
           </Card>
         </div>
 
         {/* Daily Check-in Section */}
         <Card>
-          <CardContent className="p-1.5">
-            <div className="text-center space-y-2">
-              <h3 className="text-base font-semibold">Daily Check-in</h3>
+          <CardContent className="px-1.5 py-1">
+            <div className="text-center space-y-1.5">
+              <h3 className="text-sm font-medium leading-tight">Daily Check-in</h3>
               
-              <div className="bg-gray-50 rounded-lg p-2 space-y-1.5">
+              <div className="bg-gray-50 rounded-lg p-1.5 space-y-1">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium">Current Streak:</span>
-                  <span className="text-base font-bold text-green-600">{stats?.currentStreak || 0} days</span>
+                  <span className="text-xs font-medium leading-tight">Current Streak:</span>
+                  <span className="text-sm font-bold text-green-600 leading-tight">{stats?.currentStreak || 0} days</span>
                 </div>
                 
-                <div className="text-xs text-muted-foreground space-y-0.5">
+                <div className="text-xs text-muted-foreground space-y-0 leading-tight">
                   <div>• Check-in: +1 point</div>
                   {(stats?.currentStreak ?? 0) >= 7 ? (
                     <div className="text-green-600 font-medium">• Streak bonus: +{stats?.streakBonus || 0} points</div>
@@ -206,13 +206,13 @@ export default function HomePage() {
               </div>
               
               <Button 
-                className="w-full" 
-                size="default" 
+                className="w-full text-xs" 
+                size="sm" 
                 variant={checkedInToday ? "default" : "outline"}
                 onClick={handleDailyCheckin}
                 disabled={checkingIn || checkedInToday}
               >
-                <CheckCircle className={`mr-2 h-4 w-4 ${checkedInToday ? 'text-green-500' : ''}`} />
+                <CheckCircle className={`mr-1.5 h-3 w-3 ${checkedInToday ? 'text-green-500' : ''}`} />
                 {checkingIn ? 'Checking in...' : checkedInToday ? '✓ Checked in' : 'Check-in'}
               </Button>
             </div>
