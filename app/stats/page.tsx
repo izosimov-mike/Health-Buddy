@@ -130,7 +130,7 @@ export default function StatsPage() {
         {/* Key Metrics */}
         <div className="grid grid-cols-2 gap-4">
           <Card>
-            <CardContent className="p-3 text-center">
+            <CardContent className="p-2 text-center">
               <div className="flex items-center justify-center gap-2 mb-1">
                 <Award className="h-4 w-4 text-primary" />
                 <span className="text-xl font-bold text-primary">{stats.globalScore}</span>
@@ -157,7 +157,7 @@ export default function StatsPage() {
               Weekly Progress
             </CardTitle>
           </CardHeader>
-          <CardContent className="pt-2">
+          <CardContent className="pt-1">
             <div className="space-y-3">
               {stats.weeklyProgress && stats.weeklyProgress.length > 0 && (
                 <>
@@ -198,7 +198,7 @@ export default function StatsPage() {
             </CardTitle>
             <p className="text-sm text-muted-foreground">Weekly completion rate by category</p>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-3">
             {stats.categoryStats?.map((category, index) => {
               // Define colors for categories
               const categoryColors = {
@@ -241,8 +241,8 @@ export default function StatsPage() {
               Achievements
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3 pt-2">
-            <div className="grid grid-cols-2 gap-3">
+          <CardContent className="space-y-2 pt-1">
+            <div className="grid grid-cols-2 gap-2">
               <div className="text-center">
                 <div className="text-xl font-bold text-accent">{stats.longestStreak}</div>
                 <div className="text-xs text-muted-foreground">Best Streak</div>

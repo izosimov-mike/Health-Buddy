@@ -177,7 +177,7 @@ export default function CategoriesPage() {
                   className="cursor-pointer hover:shadow-md transition-shadow"
                   onClick={() => setSelectedCategory(category.id)}
                 >
-                  <CardContent className="p-3">
+                  <CardContent className="p-2">
                     <div className="flex items-center gap-3">
                       <div className={`p-2 rounded-full ${categoryConfig[category.name]?.color || categoryConfig.default.color} text-white`}>
                         {(() => {
@@ -241,7 +241,7 @@ export default function CategoriesPage() {
 
           return (
             <Card key={action.id} className={isCompleted ? "bg-muted/50" : ""}>
-              <CardContent className="p-2.5">
+              <CardContent className="p-2">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-0.5">
