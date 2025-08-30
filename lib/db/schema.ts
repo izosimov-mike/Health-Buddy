@@ -1,8 +1,8 @@
-import { sqliteTable, integer, text, blob } from 'drizzle-orm/sqlite-core';
+import { pgTable, serial, integer, text, timestamp, boolean } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
 // Users table
-export const users = sqliteTable('users', {
+export const users = pgTable('users', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
   email: text('email').unique(),
@@ -11,57 +11,57 @@ export const users = sqliteTable('users', {
   longestStreak: integer('longest_streak').default(0),
   level: integer('level').default(1),
   lastCheckinDate: text('last_checkin_date'),
-  createdAt: integer('created_at'),
-  updatedAt: integer('updated_at'),
+  createdAt: timestamp('created_at'),
+  updatedAt: timestamp('updated_at'),
 });
 
 // Levels table
-export const levels = sqliteTable('levels', {
-  id: integer('id').primaryKey(),
+export const levels = pgTable('levels', {
+  id: serial('id').primaryKey(),
   name: text('name').notNull(),
   minPoints: integer('min_points').notNull(),
   maxPoints: integer('max_points'),
-  createdAt: integer('created_at'),
+  createdAt: timestamp('created_at'),
 });
 
 // Health categories table
-export const categories = sqliteTable('categories', {
+export const categories = pgTable('categories', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
   icon: text('icon').notNull(),
   color: text('color').notNull(),
-  createdAt: integer('created_at'),
+  createdAt: timestamp('created_at'),
 });
 
 // Health actions table
-export const actions = sqliteTable('actions', {
+export const actions = pgTable('actions', {
   id: text('id').primaryKey(),
   categoryId: text('category_id').references(() => categories.id),
   name: text('name').notNull(),
   description: text('description').notNull(),
   points: integer('points').default(1),
-  createdAt: integer('created_at'),
+  createdAt: timestamp('created_at'),
 });
 
 // User daily progress table
-export const dailyProgress = sqliteTable('daily_progress', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+export const dailyProgress = pgTable('daily_progress', {
+  id: serial('id').primaryKey(),
   userId: text('user_id').references(() => users.id),
   date: text('date').notNull(),
   totalScore: integer('total_score').default(0),
   completedActions: integer('completed_actions').default(0),
-  checkedIn: integer('checked_in', { mode: 'boolean' }).default(false),
-  createdAt: integer('created_at'),
+  checkedIn: boolean('checked_in').default(false),
+  createdAt: timestamp('created_at'),
 });
 
 // User action completions table
-export const actionCompletions = sqliteTable('action_completions', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+export const actionCompletions = pgTable('action_completions', {
+  id: serial('id').primaryKey(),
   userId: text('user_id').references(() => users.id),
   actionId: text('action_id').references(() => actions.id),
   date: text('date').notNull(),
-  completed: integer('completed', { mode: 'boolean' }).default(true),
-  completedAt: integer('completed_at'),
+  completed: boolean('completed').default(true),
+  completedAt: timestamp('completed_at'),
 });
 
 // Relations

@@ -2,8 +2,8 @@ import { defineConfig } from 'drizzle-kit';
 
 export default defineConfig({
   schema: './lib/db/schema.ts',
-  dialect: 'sqlite',
+  dialect: 'postgresql',
   dbCredentials: {
-    url: './health_buddy.db',
+    url: process.env.DATABASE_URL!,
   },
 });
