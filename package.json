@@ -10,7 +10,9 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
-    "db:seed": "tsx lib/db/seed.ts"
+    "db:seed": "tsx lib/db/seed.ts",
+    "db:init": "node scripts/vercel-init-db.js",
+    "db:init-prod": "node scripts/init-production-db.js"
   },
   "dependencies": {
     "@coinbase/onchainkit": "^0.38.19",
