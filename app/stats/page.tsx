@@ -57,11 +57,11 @@ export default function StatsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background pb-20">
-        <div className="bg-primary text-primary-foreground p-4">
+      <div className="min-h-screen bg-main pb-20">
+        <div className="bg-main text-white p-4">
           <div className="flex items-center gap-3">
             <Link href="/">
-              <Button variant="ghost" size="sm" className="text-primary-foreground hover:bg-primary-foreground/20">
+              <Button variant="ghost" size="sm" className="text-white hover:bg-white/20">
                 <ArrowLeft className="h-4 w-4" />
               </Button>
             </Link>
@@ -74,7 +74,7 @@ export default function StatsPage() {
         <div className="p-4">
           <div className="text-center py-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-            <p className="text-muted-foreground mt-2">Loading stats...</p>
+            <p className="text-white mt-2">Loading stats...</p>
           </div>
         </div>
       </div>
@@ -83,11 +83,11 @@ export default function StatsPage() {
 
   if (!stats) {
     return (
-      <div className="min-h-screen bg-background pb-20">
-        <div className="bg-primary text-primary-foreground p-4">
+      <div className="min-h-screen bg-main pb-20">
+        <div className="bg-main text-white p-4">
           <div className="flex items-center gap-3">
             <Link href="/">
-              <Button variant="ghost" size="sm" className="text-primary-foreground hover:bg-primary-foreground/20">
+              <Button variant="ghost" size="sm" className="text-white hover:bg-white/20">
                 <ArrowLeft className="h-4 w-4" />
               </Button>
             </Link>
@@ -99,7 +99,7 @@ export default function StatsPage() {
         </div>
         <div className="p-4">
           <div className="text-center py-8">
-            <p className="text-muted-foreground">No stats available</p>
+            <p className="text-white">No stats available</p>
           </div>
         </div>
       </div>
@@ -107,12 +107,12 @@ export default function StatsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-main pb-20">
       {/* Header */}
-      <div className="bg-primary text-primary-foreground py-2 px-4">
+      <div className="bg-main text-white py-4 px-4">
         <div className="flex items-center gap-3">
           <Link href="/">
-            <Button variant="ghost" size="sm" className="text-primary-foreground hover:bg-primary-foreground/20">
+            <Button variant="ghost" size="sm" className="text-white hover:bg-white/20">
               <ArrowLeft className="h-4 w-4" />
             </Button>
           </Link>
@@ -129,31 +129,31 @@ export default function StatsPage() {
       <div className="p-2 space-y-3">
         {/* Key Metrics */}
         <div className="grid grid-cols-2 gap-2">
-          <Card>
+          <Card className="section-primary text-white border-0">
             <CardContent className="px-1.5 py-1 text-center">
               <div className="flex items-center justify-center gap-1.5 mb-0">
-                <Award className="h-3 w-3 text-primary" />
-                <span className="text-base font-bold text-primary leading-tight">{stats.globalScore}</span>
+                <Award className="h-3 w-3 text-yellow-300" />
+                <span className="text-base font-bold leading-tight">{stats.globalScore}</span>
               </div>
-              <div className="text-xs text-muted-foreground leading-tight">Total Points</div>
+              <div className="text-xs opacity-90 leading-tight">Total Points</div>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="section-primary text-white border-0">
             <CardContent className="px-1.5 py-1 text-center">
               <div className="flex items-center justify-center gap-1.5 mb-0">
-                <Flame className="h-3 w-3 text-orange-500" />
-                <span className="text-base font-bold text-primary leading-tight">{stats.currentStreak}</span>
+                <Flame className="h-3 w-3 text-orange-300" />
+                <span className="text-base font-bold leading-tight">{stats.currentStreak}</span>
               </div>
-              <div className="text-xs text-muted-foreground leading-tight">Current Streak</div>
+              <div className="text-xs opacity-90 leading-tight">Current Streak</div>
             </CardContent>
           </Card>
         </div>
 
         {/* Weekly Progress Chart */}
-        <Card>
+        <Card className="section-primary border-0">
           <CardHeader className="pb-1">
-            <CardTitle className="flex items-center gap-1.5 text-sm">
-              <TrendingUp className="h-3 w-3" />
+            <CardTitle className="flex items-center gap-1.5 text-sm text-white">
+              <TrendingUp className="h-3 w-3 text-purple-400" />
               Weekly Progress
             </CardTitle>
           </CardHeader>
@@ -161,7 +161,7 @@ export default function StatsPage() {
             <div className="space-y-3">
               {stats.weeklyProgress && stats.weeklyProgress.length > 0 && (
                 <>
-                  <div className="flex justify-between text-xs text-muted-foreground">
+                  <div className="flex justify-between text-xs text-white opacity-90">
                     <span>Daily Average: {stats.dailyAverage} points</span>
                     <span>Total: {stats.totalWeekPoints} points</span>
                   </div>
@@ -170,15 +170,15 @@ export default function StatsPage() {
                       const maxPoints = Math.max(...stats.weeklyProgress.map(d => d.points))
                       return (
                         <div key={day.date} className="flex flex-col items-center gap-2 flex-1">
-                          <div className="text-xs text-muted-foreground">{day.points}</div>
+                          <div className="text-xs text-white opacity-90">{day.points}</div>
                           <div
-                            className="bg-primary rounded-t w-full min-h-[4px]"
+                            className="bg-gradient-to-t from-purple-500 to-purple-400 rounded-t w-full min-h-[4px]"
                             style={{
                               height: `${maxPoints > 0 ? (day.points / maxPoints) * 100 : 0}%`,
                               minHeight: day.points > 0 ? "8px" : "4px",
                             }}
                           />
-                          <div className="text-xs font-medium">{day.day}</div>
+                          <div className="text-xs font-medium text-white">{day.day}</div>
                         </div>
                       )
                     })}
@@ -190,17 +190,17 @@ export default function StatsPage() {
         </Card>
 
         {/* Category Progress */}
-        <Card>
+        <Card className="section-primary border-0">
           <CardHeader className="pb-1">
-            <CardTitle className="flex items-center gap-1.5 text-sm">
-              <Target className="h-3 w-3" />
+            <CardTitle className="flex items-center gap-1.5 text-sm text-white">
+              <Target className="h-3 w-3 text-purple-400" />
               Category Progress
             </CardTitle>
-            <p className="text-xs text-muted-foreground leading-tight">Weekly completion rate by category</p>
+            <p className="text-xs text-white opacity-90 leading-tight">Weekly completion rate by category</p>
           </CardHeader>
           <CardContent className="space-y-2">
             {stats.categoryStats?.map((category, index) => {
-              // Define colors for categories
+              // Define different colors for category markers
               const categoryColors = {
                 'Physical Activity': 'bg-blue-500',
                 'Nutrition': 'bg-green-500', 
@@ -215,15 +215,15 @@ export default function StatsPage() {
                   <div className="flex justify-between items-center">
                     <div className="flex items-center gap-2">
                       <div className={`w-3 h-3 rounded-full ${colorClass}`} />
-                      <span className="font-medium">{category.categoryName}</span>
+                      <span className="font-medium text-white">{category.categoryName}</span>
                     </div>
-                    <span className="text-sm text-muted-foreground">
+                    <span className="text-sm text-white opacity-90">
                       {category.completedActions}/{category.totalActions} actions
                     </span>
                   </div>
                   <Progress value={category.weeklyCompletionRate} className="h-2" />
                   <div className="text-right">
-                    <Badge variant="outline" className="text-xs">
+                    <Badge variant="outline" className="text-xs border-purple-400/50 text-purple-400">
                       {category.weeklyCompletionRate}% this week
                     </Badge>
                   </div>
@@ -233,67 +233,7 @@ export default function StatsPage() {
           </CardContent>
         </Card>
 
-        {/* Achievement Summary */}
-        <Card>
-          <CardHeader className="pb-1">
-            <CardTitle className="flex items-center gap-1.5 text-sm">
-              <Activity className="h-3 w-3" />
-              Achievements
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-1.5 pt-0">
-            <div className="grid grid-cols-2 gap-1.5">
-              <div className="text-center">
-                <div className="text-base font-bold text-accent leading-tight">{stats.longestStreak}</div>
-                <div className="text-xs text-muted-foreground leading-tight">Best Streak</div>
-              </div>
-              <div className="text-center">
-                <div className="text-base font-bold text-accent leading-tight">{stats.level}</div>
-                <div className="text-xs text-muted-foreground leading-tight">{stats.levelName}</div>
-              </div>
-            </div>
 
-            <div className="pt-2 border-t">
-              <h4 className="font-medium mb-1.5 text-xs">Recent Milestones</h4>
-              <div className="space-y-1.5">
-                <div className="flex items-center gap-1.5 p-1.5 bg-muted/30 rounded">
-                  <div className="text-xs">🏆</div>
-                  <div>
-                    <div className="font-medium text-xs leading-tight">Level Achievement</div>
-                    <div className="text-xs text-muted-foreground leading-tight">Reached {stats.levelName} (Level {stats.level})</div>
-                  </div>
-                </div>
-                {stats.currentStreak >= 3 && (
-                  <div className="flex items-center gap-1.5 p-1.5 bg-muted/30 rounded">
-                    <div className="text-xs">🔥</div>
-                    <div>
-                      <div className="font-medium text-xs leading-tight">Daily Streak</div>
-                      <div className="text-xs text-muted-foreground leading-tight">{stats.currentStreak} days in a row</div>
-                    </div>
-                  </div>
-                )}
-                {stats.longestStreak >= 7 && (
-                  <div className="flex items-center gap-1.5 p-1.5 bg-muted/30 rounded">
-                    <div className="text-xs">⭐</div>
-                    <div>
-                      <div className="font-medium text-xs leading-tight">Best Streak Record</div>
-                      <div className="text-xs text-muted-foreground leading-tight">{stats.longestStreak} days longest streak</div>
-                    </div>
-                  </div>
-                )}
-                {stats.totalWeekPoints >= 50 && (
-                  <div className="flex items-center gap-1.5 p-1.5 bg-muted/30 rounded">
-                    <div className="text-xs">💪</div>
-                    <div>
-                      <div className="font-medium text-xs leading-tight">Weekly Champion</div>
-                      <div className="text-xs text-muted-foreground leading-tight">{stats.totalWeekPoints} points this week</div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
 
 
       </div>

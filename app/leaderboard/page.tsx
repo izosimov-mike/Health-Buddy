@@ -54,12 +54,12 @@ export default function LeaderboardPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-main pb-20">
       {/* Header */}
-      <div className="bg-primary text-primary-foreground py-2 px-4">
+      <div className="bg-main text-white py-2 px-4">
         <div className="flex items-center gap-3">
           <Link href="/">
-            <Button variant="ghost" size="sm" className="text-primary-foreground hover:bg-primary-foreground/20">
+            <Button variant="ghost" size="sm" className="text-white hover:bg-white/20">
               <ArrowLeft className="h-4 w-4" />
             </Button>
           </Link>

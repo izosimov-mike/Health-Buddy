@@ -23,15 +23,15 @@ interface HealthCategory {
   actions?: HealthAction[];
 }
 
-// Category icons and colors mapping
-const categoryConfig: Record<string, { icon: any; color: string }> = {
-  'Physical Health': { icon: Dumbbell, color: 'bg-blue-500' },
-  'Nutrition & Hydration': { icon: Apple, color: 'bg-green-500' },
-  'Mental Health': { icon: Brain, color: 'bg-purple-500' },
-  'Hygiene & Self-Care': { icon: Sparkles, color: 'bg-pink-500' },
-  'Sleep & Routine': { icon: Moon, color: 'bg-indigo-500' },
+// Category icons and gradient mapping
+const categoryConfig: Record<string, { icon: any; gradient: string }> = {
+  'Physical Health': { icon: Dumbbell, gradient: 'gradient-card-2' },
+  'Nutrition & Hydration': { icon: Apple, gradient: 'gradient-card-3' },
+  'Mental Health': { icon: Brain, gradient: 'gradient-card-1' },
+  'Hygiene & Self-Care': { icon: Sparkles, gradient: 'gradient-card-6' },
+  'Sleep & Routine': { icon: Moon, gradient: 'gradient-card-4' },
   // Fallback for unknown categories
-  'default': { icon: Heart, color: 'bg-gray-500' }
+  'default': { icon: Heart, gradient: 'gradient-card-5' }
 }
 
 export default function CategoriesPage() {
@@ -134,10 +134,10 @@ export default function CategoriesPage() {
   
   if (dataLoading) {
     return (
-      <div className="min-h-screen bg-background p-4 flex items-center justify-center">
+      <div className="min-h-screen bg-main p-4 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading categories...</p>
+          <p className="text-white">Loading categories...</p>
         </div>
       </div>
     )
@@ -146,12 +146,12 @@ export default function CategoriesPage() {
   // Category overview
   if (!selectedCategory) {
     return (
-      <div className="min-h-screen bg-background pb-20">
+      <div className="min-h-screen bg-main pb-20">
         {/* Header */}
-        <div className="bg-primary text-primary-foreground py-2 px-4">
+        <div className="bg-main text-white py-4 px-4">
           <div className="flex items-center gap-3">
             <Link href="/">
-              <Button variant="ghost" size="sm" className="text-primary-foreground hover:bg-primary-foreground/20">
+              <Button variant="ghost" size="sm" className="text-white hover:bg-white/20">
                 <ArrowLeft className="h-4 w-4" />
               </Button>
             </Link>
@@ -174,12 +174,12 @@ export default function CategoriesPage() {
               return (
                 <Card
                   key={category.id}
-                  className="cursor-pointer hover:shadow-md transition-shadow"
+                  className="cursor-pointer hover:shadow-lg transition-all duration-300 hover:scale-105 section-primary text-white border-0"
                   onClick={() => setSelectedCategory(category.id)}
                 >
                   <CardContent className="px-1.5 py-1">
                     <div className="flex items-center gap-2">
-                      <div className={`p-1.5 rounded-full ${categoryConfig[category.name]?.color || categoryConfig.default.color} text-white`}>
+                      <div className="p-1.5 rounded-full bg-white/20 backdrop-blur-sm text-white">
                         {(() => {
                           const IconComponent = categoryConfig[category.name]?.icon || categoryConfig.default.icon;
                           return <IconComponent className="h-4 w-4" />;
@@ -187,7 +187,7 @@ export default function CategoriesPage() {
                       </div>
                       <div className="flex-1">
                         <h3 className="font-medium text-sm leading-tight">{category.name}</h3>
-                        <p className="text-xs text-muted-foreground leading-tight">
+                        <p className="text-xs opacity-90 leading-tight">
                           {completedCount}/{totalCount} completed
                         </p>
                       </div>
@@ -209,19 +209,19 @@ export default function CategoriesPage() {
   const categoryActions = actions.filter(action => action.categoryId === selectedCategory)
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-main pb-20">
       {/* Header */}
-      <div className="bg-primary text-primary-foreground py-2 px-4">
+      <div className="bg-main text-white py-4 px-4">
         <div className="flex items-center gap-3">
           <Button
             variant="ghost"
             size="sm"
-            className="text-primary-foreground hover:bg-primary-foreground/20"
+            className="text-white hover:bg-white/20"
             onClick={() => setSelectedCategory(null)}
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <div className={`p-1.5 rounded-full ${categoryConfig[category.name]?.color || categoryConfig.default.color} text-white`}>
+          <div className="p-1.5 rounded-full bg-white/20 backdrop-blur-sm text-white">
             {(() => {
               const IconComponent = categoryConfig[category.name]?.icon || categoryConfig.default.icon;
               return <IconComponent className="h-4 w-4" />;
@@ -240,22 +240,22 @@ export default function CategoriesPage() {
           const isCompleted = isActionCompleted(action.id)
 
           return (
-            <Card key={action.id} className={isCompleted ? "bg-muted/50" : ""}>
+            <Card key={action.id} className="section-primary border-0">
               <CardContent className="px-1.5 py-1">
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1">
                     <div className="flex items-center gap-1.5 mb-0">
                       {isCompleted ? (
-                        <CheckCircle className="h-3 w-3 text-primary" />
+                        <CheckCircle className="h-3 w-3 text-green-400" />
                       ) : (
-                        <Circle className="h-3 w-3 text-muted-foreground" />
+                        <Circle className="h-3 w-3 text-purple-400" />
                       )}
-                      <h3 className={`font-medium text-xs leading-tight ${isCompleted ? "text-muted-foreground line-through" : ""}`}>
+                      <h3 className={`font-medium text-xs leading-tight text-white ${isCompleted ? "text-green-400 line-through" : ""}`}>
                         {action.name}
                       </h3>
                     </div>
-                    <p className="text-xs text-muted-foreground mb-1 leading-tight">{action.description}</p>
-                    <Badge variant="outline" className="text-xs px-1 py-0">
+                    <p className="text-xs text-white opacity-90 mb-1 leading-tight">{action.description}</p>
+                    <Badge variant="outline" className="text-xs px-1 py-0 border-purple-400/50 text-purple-400">
                       +{action.points} point
                     </Badge>
                   </div>
@@ -263,7 +263,7 @@ export default function CategoriesPage() {
                     onClick={() => handleClaimAction(action.id, action.points)}
                     disabled={isCompleted || loading}
                     size="sm"
-                    className="shrink-0"
+                    className={`shrink-0 ${isCompleted ? 'bg-green-500/20 text-green-400 border-green-500/30' : 'bg-purple-600 hover:bg-purple-700 text-white'}`}
                   >
                     {isCompleted ? "Claimed" : loading ? "..." : "Claim"}
                   </Button>

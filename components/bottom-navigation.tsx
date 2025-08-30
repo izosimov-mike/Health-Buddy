@@ -16,7 +16,7 @@ export function BottomNavigation() {
   const pathname = usePathname()
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border">
+    <div className="fixed bottom-0 left-0 right-0 bg-[#241f53] border-t border-purple-500/30">
       <div className="flex justify-around py-2">
         {navigationItems.map((item) => {
           const Icon = item.icon
@@ -27,10 +27,10 @@ export function BottomNavigation() {
               <Button
                 variant="ghost"
                 size="sm"
-                className={`flex-col gap-1 h-auto py-2 ${isActive ? "text-primary bg-primary/10" : ""}`}
+                className={`flex-col gap-1 h-auto py-2 text-white hover:bg-white/20 transition-all duration-300 ${isActive ? "bg-white/20 scale-110" : ""}`}
               >
-                <Icon className="h-5 w-5" />
-                <span className="text-xs">{item.label}</span>
+                <Icon className="h-5 w-5 text-white" />
+                <span className={`text-xs text-white ${isActive ? "font-medium" : "opacity-80"}`}>{item.label}</span>
               </Button>
             </Link>
           )
