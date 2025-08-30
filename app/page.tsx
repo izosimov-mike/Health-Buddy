@@ -167,7 +167,7 @@ export default function HomePage() {
         {/* Stats Grid */}
         <div className="grid grid-cols-2 gap-3">
           <Card>
-            <CardContent className="p-2 text-center">
+            <CardContent className="px-2 py-1 text-center">
               <Trophy className="h-5 w-5 text-yellow-500 mx-auto mb-0.5" />
               <div className="text-lg font-bold">{stats?.globalScore || 0}</div>
               <div className="text-xs text-muted-foreground">Total Score</div>
@@ -175,7 +175,7 @@ export default function HomePage() {
           </Card>
           
           <Card>
-            <CardContent className="p-2 text-center">
+            <CardContent className="px-2 py-1 text-center">
               <Target className="h-5 w-5 text-blue-500 mx-auto mb-0.5" />
               <div className="text-lg font-bold">{stats?.dailyScore || 0}</div>
               <div className="text-xs text-muted-foreground">Today Score</div>
@@ -185,7 +185,7 @@ export default function HomePage() {
 
         {/* Daily Check-in Section */}
         <Card>
-          <CardContent className="p-3">
+          <CardContent className="p-1.5">
             <div className="text-center space-y-2">
               <h3 className="text-base font-semibold">Daily Check-in</h3>
               
