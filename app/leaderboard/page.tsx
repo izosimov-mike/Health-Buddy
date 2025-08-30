@@ -56,7 +56,7 @@ export default function LeaderboardPage() {
   return (
     <div className="min-h-screen bg-background pb-20">
       {/* Header */}
-      <div className="bg-primary text-primary-foreground p-4">
+      <div className="bg-primary text-primary-foreground py-2 px-4">
         <div className="flex items-center gap-3">
           <Link href="/">
             <Button variant="ghost" size="sm" className="text-primary-foreground hover:bg-primary-foreground/20">
@@ -64,10 +64,10 @@ export default function LeaderboardPage() {
             </Button>
           </Link>
           <div className="flex items-center gap-2">
-            <Trophy className="h-6 w-6" />
+            <Trophy className="h-5 w-5" />
             <div>
-              <h1 className="text-xl font-bold">Leaderboard</h1>
-              <p className="text-sm opacity-90">Health Champions</p>
+              <h1 className="text-lg font-bold">Leaderboard</h1>
+              <p className="text-xs opacity-90">Health Champions</p>
             </div>
           </div>
         </div>
@@ -125,21 +125,7 @@ export default function LeaderboardPage() {
           </CardContent>
         </Card>
 
-        {/* Features Coming Soon */}
-        <div className="grid grid-cols-1 gap-4">
-          <Card className="opacity-60">
-            <CardContent className="p-4 text-center">
-              <h4 className="font-semibold mb-2">Weekly Challenges</h4>
-              <p className="text-sm text-muted-foreground">Compete in themed health challenges</p>
-            </CardContent>
-          </Card>
-          <Card className="opacity-60">
-            <CardContent className="p-4 text-center">
-              <h4 className="font-semibold mb-2">Friend System</h4>
-              <p className="text-sm text-muted-foreground">Add friends and share progress</p>
-            </CardContent>
-          </Card>
-        </div>
+
       </div>
     </div>
   )
