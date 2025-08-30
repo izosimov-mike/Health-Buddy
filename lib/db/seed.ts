@@ -97,7 +97,7 @@ export async function seedDatabase() {
     // Insert levels
     await db.insert(levels).values(gameLevels.map(level => ({
       ...level,
-      createdAt: Math.floor(Date.now() / 1000)
+      createdAt: new Date()
     }))).onConflictDoNothing();
     console.log('✅ Levels seeded');
     
@@ -110,8 +110,8 @@ export async function seedDatabase() {
       currentStreak: 0,
       longestStreak: 0,
       level: 1,
-      createdAt: Math.floor(Date.now() / 1000),
-      updatedAt: Math.floor(Date.now() / 1000),
+      createdAt: new Date(),
+      updatedAt: new Date(),
     }).onConflictDoNothing();
     console.log('✅ Test user created');
     
