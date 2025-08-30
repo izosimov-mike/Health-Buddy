@@ -148,7 +148,7 @@ export default function CategoriesPage() {
     return (
       <div className="min-h-screen bg-background pb-20">
         {/* Header */}
-        <div className="bg-primary text-primary-foreground p-4">
+        <div className="bg-primary text-primary-foreground py-2 px-4">
           <div className="flex items-center gap-3">
             <Link href="/">
               <Button variant="ghost" size="sm" className="text-primary-foreground hover:bg-primary-foreground/20">
@@ -156,20 +156,13 @@ export default function CategoriesPage() {
               </Button>
             </Link>
             <div>
-              <h1 className="text-xl font-bold">Categories</h1>
-              <p className="text-sm opacity-90">Choose your health actions</p>
+              <h1 className="text-lg font-bold">Categories</h1>
+              <p className="text-xs opacity-90">Choose your health actions</p>
             </div>
           </div>
         </div>
 
-        {/* Daily Score */}
-        <div className="p-4">
-          <Card className="mb-6">
-            <CardContent className="p-4 text-center">
-              <div className="text-3xl font-bold text-primary mb-2">{dailyScore}</div>
-              <div className="text-sm text-muted-foreground">Points earned today</div>
-            </CardContent>
-          </Card>
+        <div className="p-3">
 
           {/* Categories Grid */}
           <div className="space-y-4">
@@ -184,24 +177,19 @@ export default function CategoriesPage() {
                   className="cursor-pointer hover:shadow-md transition-shadow"
                   onClick={() => setSelectedCategory(category.id)}
                 >
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className={`p-3 rounded-full ${categoryConfig[category.name]?.color || categoryConfig.default.color} text-white`}>
-                          {(() => {
-                            const IconComponent = categoryConfig[category.name]?.icon || categoryConfig.default.icon;
-                            return <IconComponent className="h-6 w-6" />;
-                          })()}
-                        </div>
-                        <div>
-                          <h3 className="font-semibold text-lg">{category.name}</h3>
-                          <p className="text-sm text-muted-foreground">
-                            {completedCount}/{totalCount} completed
-                          </p>
-                        </div>
+                  <CardContent className="p-3">
+                    <div className="flex items-center gap-3">
+                      <div className={`p-2 rounded-full ${categoryConfig[category.name]?.color || categoryConfig.default.color} text-white`}>
+                        {(() => {
+                          const IconComponent = categoryConfig[category.name]?.icon || categoryConfig.default.icon;
+                          return <IconComponent className="h-5 w-5" />;
+                        })()}
                       </div>
-                      <div className="text-right">
-                        <Badge variant={completedCount > 0 ? "default" : "secondary"}>+{completedCount} pts</Badge>
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-base">{category.name}</h3>
+                        <p className="text-xs text-muted-foreground">
+                          {completedCount}/{totalCount} completed
+                        </p>
                       </div>
                     </div>
                   </CardContent>
@@ -223,7 +211,7 @@ export default function CategoriesPage() {
   return (
     <div className="min-h-screen bg-background pb-20">
       {/* Header */}
-      <div className="bg-primary text-primary-foreground p-4">
+      <div className="bg-primary text-primary-foreground py-2 px-4">
         <div className="flex items-center gap-3">
           <Button
             variant="ghost"
@@ -233,40 +221,40 @@ export default function CategoriesPage() {
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <div className={`p-2 rounded-full ${categoryConfig[category.name]?.color || categoryConfig.default.color} text-white`}>
+          <div className={`p-1.5 rounded-full ${categoryConfig[category.name]?.color || categoryConfig.default.color} text-white`}>
             {(() => {
               const IconComponent = categoryConfig[category.name]?.icon || categoryConfig.default.icon;
-              return <IconComponent className="h-5 w-5" />;
+              return <IconComponent className="h-4 w-4" />;
             })()}
           </div>
           <div>
-            <h1 className="text-xl font-bold">{category.name}</h1>
-            <p className="text-sm opacity-90">Daily health actions</p>
+            <h1 className="text-lg font-bold">{category.name}</h1>
+            <p className="text-xs opacity-90">Daily health actions</p>
           </div>
         </div>
       </div>
 
       {/* Actions List */}
-      <div className="p-4 space-y-4">
+      <div className="p-3 space-y-3">
         {categoryActions.map((action) => {
           const isCompleted = isActionCompleted(action.id)
 
           return (
             <Card key={action.id} className={isCompleted ? "bg-muted/50" : ""}>
-              <CardContent className="p-3">
+              <CardContent className="p-2.5">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
+                    <div className="flex items-center gap-2 mb-0.5">
                       {isCompleted ? (
-                        <CheckCircle className="h-4 w-4 text-primary" />
+                        <CheckCircle className="h-3.5 w-3.5 text-primary" />
                       ) : (
-                        <Circle className="h-4 w-4 text-muted-foreground" />
+                        <Circle className="h-3.5 w-3.5 text-muted-foreground" />
                       )}
                       <h3 className={`font-medium text-sm ${isCompleted ? "text-muted-foreground line-through" : ""}`}>
                         {action.name}
                       </h3>
                     </div>
-                    <p className="text-xs text-muted-foreground mb-2">{action.description}</p>
+                    <p className="text-xs text-muted-foreground mb-1.5">{action.description}</p>
                     <Badge variant="outline" className="text-xs">
                       +{action.points} point
                     </Badge>

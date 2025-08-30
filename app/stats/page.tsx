@@ -109,7 +109,7 @@ export default function StatsPage() {
   return (
     <div className="min-h-screen bg-background pb-20">
       {/* Header */}
-      <div className="bg-primary text-primary-foreground p-4">
+      <div className="bg-primary text-primary-foreground py-2 px-4">
         <div className="flex items-center gap-3">
           <Link href="/">
             <Button variant="ghost" size="sm" className="text-primary-foreground hover:bg-primary-foreground/20">
@@ -117,10 +117,10 @@ export default function StatsPage() {
             </Button>
           </Link>
           <div className="flex items-center gap-2">
-            <BarChart3 className="h-6 w-6" />
+            <BarChart3 className="h-5 w-5" />
             <div>
-              <h1 className="text-xl font-bold">Statistics</h1>
-              <p className="text-sm opacity-90">Your health journey</p>
+              <h1 className="text-lg font-bold">Statistics</h1>
+              <p className="text-xs opacity-90">Your health journey</p>
             </div>
           </div>
         </div>

@@ -119,18 +119,18 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-background pb-20">
       {/* Header */}
-      <div className="bg-primary text-primary-foreground py-4 px-4">
+      <div className="bg-primary text-primary-foreground py-2 px-4">
         <div className="text-center max-w-sm mx-auto">
-          <h1 className="text-2xl font-bold mb-1">Health Buddy</h1>
-          <p className="text-sm opacity-90">Your daily wellness companion</p>
+          <h1 className="text-xl font-bold mb-0.5">Health Buddy</h1>
+          <p className="text-xs opacity-90">Your daily wellness companion</p>
         </div>
       </div>
 
-      <div className="p-4 space-y-4">
+      <div className="p-3 space-y-3">
         {/* Level Badge */}
         {stats && (
-          <div className="text-center space-y-2">
-            <Badge variant="secondary" className="text-lg px-4 py-2">
+          <div className="text-center space-y-1.5">
+            <Badge variant="secondary" className="text-sm px-3 py-1">
               Level - {stats.levelName}
             </Badge>
             
@@ -139,23 +139,23 @@ export default function HomePage() {
               <img 
                 src={stats.levelName === 'Beginner' ? 'https://obosg0ykkt0zseow.public.blob.vercel-storage.com/1_Beginner.png' : ''} 
                 alt={`${stats.levelName} level`}
-                className="w-20 h-20 object-contain"
+                className="w-16 h-16 object-contain"
               />
             </div>
             
             {stats.levelProgress.next && (
               <div className="max-w-xs mx-auto">
-                <div className="flex justify-between text-sm text-muted-foreground mb-1">
+                <div className="flex justify-between text-xs text-muted-foreground mb-1">
                   <span>Progress to next level</span>
                   <span>{Math.round(stats.levelProgress.progress)}%</span>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
+                <div className="w-full bg-gray-200 rounded-full h-1.5">
                   <div 
-                    className="bg-primary h-2 rounded-full transition-all duration-300" 
+                    className="bg-primary h-1.5 rounded-full transition-all duration-300" 
                     style={{ width: `${stats.levelProgress.progress}%` }}
                   ></div>
                 </div>
-                <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                <div className="flex justify-between text-xs text-muted-foreground mt-0.5">
                   <span>{stats.levelProgress.current}</span>
                   <span>{stats.levelProgress.next}</span>
                 </div>
@@ -165,19 +165,19 @@ export default function HomePage() {
         )}
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-3">
           <Card>
-            <CardContent className="p-3 text-center">
-              <Trophy className="h-6 w-6 text-yellow-500 mx-auto mb-1" />
-              <div className="text-xl font-bold">{stats?.globalScore || 0}</div>
+            <CardContent className="p-2 text-center">
+              <Trophy className="h-5 w-5 text-yellow-500 mx-auto mb-0.5" />
+              <div className="text-lg font-bold">{stats?.globalScore || 0}</div>
               <div className="text-xs text-muted-foreground">Total Score</div>
             </CardContent>
           </Card>
           
           <Card>
-            <CardContent className="p-3 text-center">
-              <Target className="h-6 w-6 text-blue-500 mx-auto mb-1" />
-              <div className="text-xl font-bold">{stats?.dailyScore || 0}</div>
+            <CardContent className="p-2 text-center">
+              <Target className="h-5 w-5 text-blue-500 mx-auto mb-0.5" />
+              <div className="text-lg font-bold">{stats?.dailyScore || 0}</div>
               <div className="text-xs text-muted-foreground">Today Score</div>
             </CardContent>
           </Card>
@@ -185,17 +185,17 @@ export default function HomePage() {
 
         {/* Daily Check-in Section */}
         <Card>
-          <CardContent className="p-4">
-            <div className="text-center space-y-3">
-              <h3 className="text-lg font-semibold">Daily Check-in</h3>
+          <CardContent className="p-3">
+            <div className="text-center space-y-2">
+              <h3 className="text-base font-semibold">Daily Check-in</h3>
               
-              <div className="bg-gray-50 rounded-lg p-3 space-y-2">
+              <div className="bg-gray-50 rounded-lg p-2 space-y-1.5">
                 <div className="flex justify-between items-center">
                   <span className="text-sm font-medium">Current Streak:</span>
-                  <span className="text-lg font-bold text-green-600">{stats?.currentStreak || 0} days</span>
+                  <span className="text-base font-bold text-green-600">{stats?.currentStreak || 0} days</span>
                 </div>
                 
-                <div className="text-xs text-muted-foreground space-y-1">
+                <div className="text-xs text-muted-foreground space-y-0.5">
                   <div>• Check-in: +1 point</div>
                   {(stats?.currentStreak ?? 0) >= 7 ? (
                     <div className="text-green-600 font-medium">• Streak bonus: +{stats?.streakBonus || 0} points</div>
@@ -207,12 +207,12 @@ export default function HomePage() {
               
               <Button 
                 className="w-full" 
-                size="lg" 
+                size="default" 
                 variant={checkedInToday ? "default" : "outline"}
                 onClick={handleDailyCheckin}
                 disabled={checkingIn || checkedInToday}
               >
-                <CheckCircle className={`mr-2 h-5 w-5 ${checkedInToday ? 'text-green-500' : ''}`} />
+                <CheckCircle className={`mr-2 h-4 w-4 ${checkedInToday ? 'text-green-500' : ''}`} />
                 {checkingIn ? 'Checking in...' : checkedInToday ? '✓ Checked in' : 'Check-in'}
               </Button>
             </div>
