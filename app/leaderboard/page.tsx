@@ -39,7 +39,7 @@ const getRankIcon = (rank: number) => {
 export default function LeaderboardPage() {
   const [leaderboardData, setLeaderboardData] = useState<LeaderboardUser[]>([]);
   const [loading, setLoading] = useState(true);
-  const { viewProfile } = useViewProfile();
+  const viewProfile = useViewProfile();
 
   const handleViewProfile = async (fid: number) => {
     try {
