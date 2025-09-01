@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { users, dailyProgress } from '@/lib/db/schema';
 import { eq, and } from 'drizzle-orm';
+import { getStreakBonus } from '@/lib/utils';
 
 export async function POST(request: NextRequest) {
   try {
@@ -50,11 +51,8 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Calculate streak bonus points
-    let streakBonus = 0;
-    if (newCurrentStreak >= 7) {
-      streakBonus = Math.floor(newCurrentStreak / 7);
-    }
+    // Calculate streak bonus points using unified system
+    const streakBonus = getStreakBonus(newCurrentStreak);
 
     const totalPoints = 1 + streakBonus; // 1 base point + streak bonus
     const newGlobalScore = userData.globalScore + totalPoints;
