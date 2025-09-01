@@ -1,12 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db, actions, categories, actionCompletions } from '@/lib/db';
+import { db, actions, categories, actionCompletions, users } from '@/lib/db';
 import { eq, and } from 'drizzle-orm';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const categoryId = searchParams.get('categoryId');
-  const userId = 'user-1'; // Fixed user for demo
+  const fid = searchParams.get('fid');
   const date = searchParams.get('date') || new Date().toISOString().split('T')[0];
+
+  if (!fid) {
+    return NextResponse.json({ error: 'Farcaster ID is required' }, { status: 400 });
+  }
+
+  // Get user by FID to get userId
+  const user = await db.select().from(users).where(eq(users.farcasterFid, fid)).limit(1);
+  if (user.length === 0) {
+    return NextResponse.json({ error: 'User not found' }, { status: 404 });
+  }
+  const userId = user[0].id;
 
   try {
 

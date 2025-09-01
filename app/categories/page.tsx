@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { CheckCircle, Circle, Dumbbell, Apple, Brain, Heart, Users, ArrowLeft, Sparkles, Moon } from "lucide-react"
 import Link from "next/link"
+import { useMiniKit } from '@coinbase/onchainkit/minikit'
+import { FarcasterAuth } from '@/components/FarcasterAuth'
 
 interface HealthAction {
   id: string;
@@ -35,6 +37,7 @@ const categoryConfig: Record<string, { icon: any; gradient: string }> = {
 }
 
 export default function CategoriesPage() {
+  const { context } = useMiniKit()
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [categories, setCategories] = useState<HealthCategory[]>([])
   const [actions, setActions] = useState<HealthAction[]>([])
@@ -42,14 +45,27 @@ export default function CategoriesPage() {
   const [dailyScore, setDailyScore] = useState(0)
   const [loading, setLoading] = useState(false)
   const [dataLoading, setDataLoading] = useState(true)
+  const [userFid, setUserFid] = useState<string | null>(null)
+
+  // Get user FID from context
+  useEffect(() => {
+    if (context?.user?.fid) {
+      setUserFid(context.user.fid.toString())
+    }
+  }, [context])
 
   // Load categories and actions
   useEffect(() => {
+    if (!userFid) {
+      setDataLoading(false)
+      return
+    }
+
     const loadData = async () => {
       try {
         const [categoriesRes, actionsRes] = await Promise.all([
           fetch('/api/categories'),
-          fetch('/api/actions')
+          fetch(`/api/actions?fid=${userFid}`)
         ])
         
         if (categoriesRes.ok && actionsRes.ok) {
@@ -89,17 +105,17 @@ export default function CategoriesPage() {
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
-  }, [])
+  }, [userFid])
 
   const handleClaimAction = async (actionId: string, points: number) => {
-    if (completedActions.has(actionId)) return
+    if (completedActions.has(actionId) || !userFid) return
     
     setLoading(true)
     try {
       const response = await fetch('/api/actions/complete', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ actionId, completed: true })
+        body: JSON.stringify({ actionId, completed: true, fid: userFid })
       })
       
       if (response.ok) {
@@ -107,7 +123,7 @@ export default function CategoriesPage() {
         setDailyScore(prev => prev + points)
         
         // Refresh actions data to get updated completion status
-        const actionsRes = await fetch('/api/actions')
+        const actionsRes = await fetch(`/api/actions?fid=${userFid}`)
         if (actionsRes.ok) {
           const actionsData = await actionsRes.json()
           setActions(actionsData)
@@ -131,6 +147,36 @@ export default function CategoriesPage() {
   }
 
   const isActionCompleted = (actionId: string) => completedActions.has(actionId)
+
+  const handleAuthSuccess = async (userData: any) => {
+    console.log('Authentication successful:', userData)
+    const fid = userData.fid?.toString()
+    setUserFid(fid)
+  }
+
+  // Show auth screen if not authenticated
+  if (!context?.user?.fid) {
+    return (
+      <div className="bg-main min-h-screen">
+        <div className="bg-main text-white py-4 px-4">
+          <div className="flex items-center gap-3">
+            <Link href="/">
+              <Button variant="ghost" size="sm" className="text-white hover:bg-white/20">
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+            </Link>
+            <div>
+              <h1 className="text-lg font-bold">Categories</h1>
+              <p className="text-xs opacity-90">Connect to access health actions</p>
+            </div>
+          </div>
+        </div>
+        <div className="p-4">
+          <FarcasterAuth onAuthSuccess={handleAuthSuccess} />
+        </div>
+      </div>
+    )
+  }
   
   if (dataLoading) {
     return (
