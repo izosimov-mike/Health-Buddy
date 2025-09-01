@@ -181,39 +181,38 @@ export default function HomePage() {
 
       <div className="p-4 space-y-6">
         {/* Level Badge */}
-        {stats && (
+        {(stats || !context?.user?.fid) && (
           <div className="text-center space-y-1.5">
             <Badge variant="secondary" className="text-sm px-3 py-1">
-              Level - {stats.levelName}
+              Level {stats?.level || 1} - {stats?.levelName || 'Beginner'}
             </Badge>
             
             {/* Level Image */}
             <div className="flex justify-center">
               <img 
-                src={stats.levelName === 'Beginner' ? 'https://obosg0ykkt0zseow.public.blob.vercel-storage.com/1_Beginner.png' : ''} 
-                alt={`${stats.levelName} level`}
+                src={(stats?.levelName || 'Beginner') === 'Beginner' ? '/images/1_Beginner.png' : '/images/1_Beginner.png'} 
+                alt={`${stats?.levelName || 'Beginner'} level`}
                 className="w-16 h-16 object-contain"
               />
             </div>
             
-            {stats.levelProgress.next && (
-              <div className="max-w-xs mx-auto">
-                <div className="flex justify-between text-xs text-muted-foreground mb-1">
-                  <span>Progress to next level</span>
-                  <span>{Math.round(stats.levelProgress.progress)}%</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-1.5">
-                  <div 
-                    className="bg-primary h-1.5 rounded-full transition-all duration-300" 
-                    style={{ width: `${stats.levelProgress.progress}%` }}
-                  ></div>
-                </div>
-                <div className="flex justify-between text-xs text-muted-foreground mt-0.5">
-                  <span>{stats.levelProgress.current}</span>
-                  <span>{stats.levelProgress.next}</span>
-                </div>
+            {/* Progress Bar */}
+            <div className="max-w-xs mx-auto">
+              <div className="flex justify-between text-xs text-muted-foreground mb-1">
+                <span>Progress to next level</span>
+                <span>{Math.round(stats?.levelProgress?.progress || 0)}%</span>
               </div>
-            )}
+              <div className="w-full bg-gray-200 rounded-full h-1.5">
+                <div 
+                  className="bg-primary h-1.5 rounded-full transition-all duration-300" 
+                  style={{ width: `${stats?.levelProgress?.progress || 0}%` }}
+                ></div>
+              </div>
+              <div className="flex justify-between text-xs text-muted-foreground mt-0.5">
+                <span>{stats?.levelProgress?.current || 0}</span>
+                <span>{stats?.levelProgress?.next || 100}</span>
+              </div>
+            </div>
           </div>
         )}
 
