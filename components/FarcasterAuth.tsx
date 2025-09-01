@@ -8,7 +8,7 @@ interface FarcasterAuthProps {
 }
 
 export function FarcasterAuth({ onAuthSuccess }: FarcasterAuthProps) {
-  const { signIn } = useAuthenticate();
+  const { user, authenticate } = useAuthenticate();
   const { context } = useMiniKit();
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [isMiniApp, setIsMiniApp] = useState(false);
@@ -27,16 +27,33 @@ export function FarcasterAuth({ onAuthSuccess }: FarcasterAuthProps) {
     checkMiniAppEnvironment();
   }, []);
 
+  // Автоматическая загрузка данных аутентифицированного пользователя
   useEffect(() => {
-    if (context?.user?.fid) {
+    if (user?.fid) {
+      // Используем данные из useAuthenticate для безопасности
+      onAuthSuccess({
+        fid: user.fid,
+        signature: user.signature,
+        message: user.message,
+        // Дополнительные данные из context для UX
+        displayName: context?.user?.displayName,
+        username: context?.user?.username,
+        pfpUrl: context?.user?.pfpUrl
+      });
+    } else if (context?.user?.fid && !user) {
+      // Если есть контекст, но нет аутентификации, используем контекст для UX
       onAuthSuccess(context.user);
     }
-  }, [context?.user, onAuthSuccess]);
+  }, [user, context?.user, onAuthSuccess]);
 
   const handleAuthenticate = async () => {
     try {
       setIsAuthenticating(true);
-      await signIn();
+      const authenticatedUser = await authenticate();
+      if (authenticatedUser) {
+        // Данные будут автоматически обработаны в useEffect
+        console.log('Authentication successful:', authenticatedUser);
+      }
     } catch (err) {
       console.error('Authentication failed:', err);
     } finally {
@@ -46,17 +63,25 @@ export function FarcasterAuth({ onAuthSuccess }: FarcasterAuthProps) {
 
   // В MiniApp окружении всегда показываем кнопку подключения
   if (isMiniApp) {
+    const isAuthenticated = user?.fid || context?.user?.fid;
+    const displayName = context?.user?.displayName || context?.user?.username || 'User';
+    
     return (
       <div className="text-center p-6">
         <h2 className="text-xl font-bold mb-4 text-gray-800">
-          {context?.user?.fid ? 'Wallet Connected' : 'Connect Your Wallet'}
+          {isAuthenticated ? 'Wallet Connected' : 'Connect Your Wallet'}
         </h2>
-        {context?.user?.fid ? (
+        {isAuthenticated ? (
           <div className="mb-4">
-            <div className="text-green-600 mb-2">✓ Authenticated</div>
+            <div className="text-green-600 mb-2">✓ {user?.fid ? 'Authenticated & Verified' : 'Connected'}</div>
             <div className="text-sm text-gray-600">
-              Welcome, {context.user?.displayName || context.user?.username || 'User'}!
+              Welcome, {displayName}!
             </div>
+            {user?.fid && (
+              <div className="text-xs text-gray-500 mt-1">
+                FID: {user.fid} | Verified Identity
+              </div>
+            )}
           </div>
         ) : (
           <p className="text-gray-600 mb-6">
@@ -64,7 +89,7 @@ export function FarcasterAuth({ onAuthSuccess }: FarcasterAuthProps) {
           </p>
         )}
         
-        {!context?.user?.fid && (
+        {!isAuthenticated && (
           <button
             onClick={handleAuthenticate}
             disabled={isAuthenticating}
@@ -85,13 +110,21 @@ export function FarcasterAuth({ onAuthSuccess }: FarcasterAuthProps) {
   }
 
   // В обычном браузере показываем стандартную логику
-  if (context?.user?.fid) {
+  const isAuthenticated = user?.fid || context?.user?.fid;
+  const displayName = context?.user?.displayName || context?.user?.username || 'User';
+  
+  if (isAuthenticated) {
     return (
       <div className="text-center p-4">
-        <div className="text-green-600 mb-2">✓ Authenticated</div>
+        <div className="text-green-600 mb-2">✓ {user?.fid ? 'Authenticated & Verified' : 'Connected'}</div>
         <div className="text-sm text-gray-600">
-          Welcome, {context.user?.displayName || context.user?.username || 'User'}!
+          Welcome, {displayName}!
         </div>
+        {user?.fid && (
+          <div className="text-xs text-gray-500 mt-1">
+            FID: {user.fid} | Verified Identity
+          </div>
+        )}
       </div>
     );
   }

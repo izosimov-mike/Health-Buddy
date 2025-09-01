@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
-import { useMiniKit, useAuthenticate } from '@coinbase/onchainkit/minikit'
+import { useMiniKit, useAuthenticate, useViewProfile } from '@coinbase/onchainkit/minikit'
 import { FarcasterAuth } from '@/components/FarcasterAuth'
 
 
@@ -37,10 +37,22 @@ interface StatsData {
 
 export default function StatsPage() {
  const { setFrameReady, isFrameReady, context } = useMiniKit()
-  const { signIn } = useAuthenticate()
+  const { user, authenticate } = useAuthenticate()
+  const { viewProfile } = useViewProfile()
   const [stats, setStats] = useState<StatsData | null>(null)
   const [loading, setLoading] = useState(true)
   const [userFid, setUserFid] = useState<string | null>(null)
+
+  const handleViewProfile = async () => {
+    const fid = user?.fid || context?.user?.fid
+    if (fid) {
+      try {
+        await viewProfile({ fid })
+      } catch (error) {
+        console.error('Failed to view profile:', error)
+      }
+    }
+  }
 
   // Initialize frame readiness
   useEffect(() => {
@@ -179,6 +191,66 @@ export default function StatsPage() {
       </div>
 
       <div className="p-2 space-y-3">
+        {/* Farcaster Profile Section */}
+        {(user?.fid || context?.user?.fid) && (
+          <Card className="section-primary border-0">
+            <CardContent className="p-3">
+              <div className="flex items-center gap-3">
+                {/* Profile Picture */}
+                <div className="relative">
+                  {context?.user?.pfpUrl ? (
+                    <img 
+                      src={context.user.pfpUrl} 
+                      alt={context.user.displayName || context.user.username || 'User'}
+                      className="w-12 h-12 rounded-full object-cover border-2 border-purple-300"
+                    />
+                  ) : (
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white font-bold text-lg">
+                      {(context?.user?.displayName || context?.user?.username || 'U')[0].toUpperCase()}
+                    </div>
+                  )}
+                  <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-purple-500 rounded-full flex items-center justify-center">
+                    <Activity className="w-3 h-3 text-white" />
+                  </div>
+                </div>
+                
+                {/* Profile Info */}
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h3 className="text-white font-semibold text-base">
+                      {context?.user?.displayName || context?.user?.username || 'Farcaster User'}
+                    </h3>
+                    <Badge variant="outline" className="text-xs text-purple-300 border-purple-300">
+                      FC
+                    </Badge>
+                  </div>
+                  <div className="text-sm text-white/70">
+                    {context?.user?.username && `@${context.user.username}`}
+                    <span className="ml-2 text-xs text-purple-300">
+                      FID: {user?.fid || context?.user?.fid}
+                    </span>
+                  </div>
+                  {user?.fid && (
+                    <div className="text-xs text-green-300 mt-1">
+                      ✓ Verified Identity
+                    </div>
+                  )}
+                </div>
+                
+                {/* View Profile Button */}
+                <Button
+                  onClick={handleViewProfile}
+                  variant="outline"
+                  size="sm"
+                  className="text-purple-300 border-purple-300 hover:bg-purple-300 hover:text-purple-900"
+                >
+                  View Profile
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+        
         {/* Key Metrics */}
         <div className="grid grid-cols-2 gap-2">
           <Card className="section-primary text-white border-0">
