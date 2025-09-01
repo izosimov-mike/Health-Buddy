@@ -26,6 +26,7 @@ if (process.env.NODE_ENV === 'production' || process.env.DATABASE_URL?.startsWit
 // Users table
 export const users = table('users', {
   id: text('id').primaryKey(),
+  farcasterFid: text('farcaster_fid').unique(),
   name: text('name').notNull(),
   email: text('email').unique(),
   globalScore: integer('global_score').default(0),

@@ -7,6 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
+import { useMiniKit } from '@farcaster/miniapp-sdk'
+import FarcasterAuth from '@/components/FarcasterAuth'
 
 
 interface StatsData {
@@ -34,13 +36,26 @@ interface StatsData {
 }
 
 export default function StatsPage() {
+  const { isAuthenticated, user } = useMiniKit()
   const [stats, setStats] = useState<StatsData | null>(null)
   const [loading, setLoading] = useState(true)
+  const [userFid, setUserFid] = useState<string | null>(null)
 
   useEffect(() => {
+    if (isAuthenticated && user) {
+      setUserFid(user.fid?.toString() || null)
+    }
+  }, [isAuthenticated, user])
+
+  useEffect(() => {
+    if (!isAuthenticated || !userFid) {
+      setLoading(false)
+      return
+    }
+
     const fetchStats = async () => {
       try {
-        const response = await fetch('/api/stats')
+        const response = await fetch(`/api/stats?fid=${userFid}`)
         if (response.ok) {
           const data = await response.json()
           setStats(data)
@@ -53,7 +68,36 @@ export default function StatsPage() {
     }
 
     fetchStats()
-  }, [])
+  }, [isAuthenticated, userFid])
+
+  const handleAuthSuccess = (userData: any) => {
+    console.log('Authentication successful:', userData)
+    setUserFid(userData.fid?.toString() || null)
+  }
+
+  // Show auth screen if not authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className="bg-main min-h-screen">
+        <div className="bg-main text-white p-4">
+          <div className="flex items-center gap-3">
+            <Link href="/">
+              <Button variant="ghost" size="sm" className="text-white hover:bg-white/20">
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+            </Link>
+            <div>
+              <h1 className="text-xl font-bold">Statistics</h1>
+              <p className="text-sm opacity-90">Your health journey</p>
+            </div>
+          </div>
+        </div>
+        <div className="p-4">
+          <FarcasterAuth onAuthSuccess={handleAuthSuccess} />
+        </div>
+      </div>
+    )
+  }
 
   if (loading) {
     return (
