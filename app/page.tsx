@@ -141,8 +141,15 @@ export default function HomePage() {
     }
   }, [context])
 
-  // Show auth screen if not authenticated
-  if (!context?.user?.fid) {
+  // Проверяем MiniApp окружение
+  const isMiniApp = typeof window !== 'undefined' && (
+    navigator.userAgent.toLowerCase().includes('farcaster') ||
+    window.location.hostname.includes('warpcast') ||
+    (window as any).farcaster
+  );
+
+  // Show auth screen if not authenticated or in MiniApp without proper setup
+  if (!context?.user?.fid || (isMiniApp && !userFid)) {
     return (
       <div className="bg-main min-h-screen">
         <div className="bg-main text-white py-4 px-4">
