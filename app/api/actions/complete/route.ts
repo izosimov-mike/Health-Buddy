@@ -65,7 +65,8 @@ export async function POST(request: NextRequest) {
       if (!action || action.length === 0) {
         return NextResponse.json({ error: 'Action not found' }, { status: 404 });
       }
-      const pointsChange = completed ? action[0].points : -action[0].points;
+      const actionData = action[0];
+      const pointsChange = completed ? actionData.points : -actionData.points;
       
       // Update user's global score
       const currentUser = await db.select().from(users).where(eq(users.id, userId)).limit(1);
