@@ -8,7 +8,7 @@ interface FarcasterAuthProps {
 }
 
 export function FarcasterAuth({ onAuthSuccess }: FarcasterAuthProps) {
-  const { user, authenticate } = useAuthenticate();
+  const { signIn } = useAuthenticate();
   const { context } = useMiniKit();
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [isMiniApp, setIsMiniApp] = useState(false);
@@ -29,30 +29,24 @@ export function FarcasterAuth({ onAuthSuccess }: FarcasterAuthProps) {
 
   // Автоматическая загрузка данных аутентифицированного пользователя
   useEffect(() => {
-    if (user?.fid) {
-      // Используем данные из useAuthenticate для безопасности
+    if (context?.user?.fid) {
+      // Используем данные из context для аутентификации
       onAuthSuccess({
-        fid: user.fid,
-        signature: user.signature,
-        message: user.message,
-        // Дополнительные данные из context для UX
-        displayName: context?.user?.displayName,
-        username: context?.user?.username,
-        pfpUrl: context?.user?.pfpUrl
+        fid: context.user.fid,
+        displayName: context.user.displayName,
+        username: context.user.username,
+        pfpUrl: context.user.pfpUrl
       });
-    } else if (context?.user?.fid && !user) {
-      // Если есть контекст, но нет аутентификации, используем контекст для UX
-      onAuthSuccess(context.user);
     }
-  }, [user, context?.user, onAuthSuccess]);
+  }, [context?.user, onAuthSuccess]);
 
   const handleAuthenticate = async () => {
     try {
       setIsAuthenticating(true);
-      const authenticatedUser = await authenticate();
-      if (authenticatedUser) {
+      const result = await signIn();
+      if (result) {
         // Данные будут автоматически обработаны в useEffect
-        console.log('Authentication successful:', authenticatedUser);
+        console.log('Authentication successful:', result);
       }
     } catch (err) {
       console.error('Authentication failed:', err);
@@ -63,7 +57,7 @@ export function FarcasterAuth({ onAuthSuccess }: FarcasterAuthProps) {
 
   // В MiniApp окружении всегда показываем кнопку подключения
   if (isMiniApp) {
-    const isAuthenticated = user?.fid || context?.user?.fid;
+    const isAuthenticated = context?.user?.fid;
     const displayName = context?.user?.displayName || context?.user?.username || 'User';
     
     return (
@@ -73,13 +67,13 @@ export function FarcasterAuth({ onAuthSuccess }: FarcasterAuthProps) {
         </h2>
         {isAuthenticated ? (
           <div className="mb-4">
-            <div className="text-green-600 mb-2">✓ {user?.fid ? 'Authenticated & Verified' : 'Connected'}</div>
+            <div className="text-green-600 mb-2">✓ {context?.user?.fid ? 'Authenticated & Verified' : 'Connected'}</div>
             <div className="text-sm text-gray-600">
               Welcome, {displayName}!
             </div>
-            {user?.fid && (
+            {context?.user?.fid && (
               <div className="text-xs text-gray-500 mt-1">
-                FID: {user.fid} | Verified Identity
+                FID: {context.user.fid} | Verified Identity
               </div>
             )}
           </div>
@@ -110,19 +104,19 @@ export function FarcasterAuth({ onAuthSuccess }: FarcasterAuthProps) {
   }
 
   // В обычном браузере показываем стандартную логику
-  const isAuthenticated = user?.fid || context?.user?.fid;
+  const isAuthenticated = context?.user?.fid;
   const displayName = context?.user?.displayName || context?.user?.username || 'User';
   
   if (isAuthenticated) {
     return (
       <div className="text-center p-4">
-        <div className="text-green-600 mb-2">✓ {user?.fid ? 'Authenticated & Verified' : 'Connected'}</div>
+        <div className="text-green-600 mb-2">✓ {context?.user?.fid ? 'Authenticated & Verified' : 'Connected'}</div>
         <div className="text-sm text-gray-600">
           Welcome, {displayName}!
         </div>
-        {user?.fid && (
+        {context?.user?.fid && (
           <div className="text-xs text-gray-500 mt-1">
-            FID: {user.fid} | Verified Identity
+            FID: {context.user.fid} | Verified Identity
           </div>
         )}
       </div>
