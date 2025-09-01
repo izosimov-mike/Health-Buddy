@@ -4,15 +4,50 @@ import { eq, and, sql, desc } from 'drizzle-orm';
 import { getUserLevel, getProgressToNextLevel, getStreakBonus } from '@/lib/utils';
 
 export async function GET(request: NextRequest) {
-  const userId = 'user-1'; // Fixed user for demo
+  const { searchParams } = new URL(request.url);
+  const fid = searchParams.get('fid');
+
+  if (!fid) {
+    return NextResponse.json({ error: 'Farcaster ID is required' }, { status: 400 });
+  }
 
   try {
-
-    // Get user basic stats
-    const user = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+    // Get user basic stats by Farcaster ID
+    const user = await db.select().from(users).where(eq(users.farcasterFid, fid)).limit(1);
     if (user.length === 0) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      // Create new user if not exists
+      const newUserId = `farcaster-${fid}`;
+      await db.insert(users).values({
+        id: newUserId,
+        farcasterFid: fid,
+        name: `User ${fid}`,
+        globalScore: 0,
+        currentStreak: 0,
+        longestStreak: 0,
+        level: 1,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+      
+      // Return default stats for new user
+      return NextResponse.json({
+        globalScore: 0,
+        dailyScore: 0,
+        currentStreak: 0,
+        longestStreak: 0,
+        level: 1,
+        levelName: 'Beginner',
+        levelProgress: {
+          current: 0,
+          next: 100,
+          progress: 0
+        },
+        streakBonus: 0,
+        checkedInToday: false
+      });
     }
+    
+    const userId = user[0].id;
 
     const today = new Date().toISOString().split('T')[0];
     

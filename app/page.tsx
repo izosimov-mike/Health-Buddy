@@ -6,7 +6,8 @@ import { Badge } from "@/components/ui/badge"
 import { CheckCircle, Trophy, Target, Calendar } from "lucide-react"
 import Link from "next/link"
 import { useEffect, useState } from "react"
-import { useMiniKit } from '@coinbase/onchainkit/minikit'
+import { useMiniKit } from '@farcaster/miniapp-sdk'
+import FarcasterAuth from '@/components/FarcasterAuth'
 
 interface UserStats {
   globalScore: number;
@@ -25,20 +26,28 @@ interface UserStats {
 }
 
 export default function HomePage() {
-  const { setFrameReady, isFrameReady } = useMiniKit()
+  const { isAuthenticated, user, context } = useMiniKit()
   const [stats, setStats] = useState<UserStats | null>(null)
   const [loading, setLoading] = useState(true)
   const [checkingIn, setCheckingIn] = useState(false)
   const [checkedInToday, setCheckedInToday] = useState(false)
+  const [userFid, setUserFid] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!isFrameReady) setFrameReady()
-  }, [isFrameReady, setFrameReady])
+    if (isAuthenticated && user) {
+      setUserFid(user.fid?.toString() || null)
+    }
+  }, [isAuthenticated, user])
 
   useEffect(() => {
+    if (!isAuthenticated || !userFid) {
+      setLoading(false)
+      return
+    }
+
     const fetchStats = async () => {
       try {
-        const response = await fetch('/api/stats')
+        const response = await fetch(`/api/stats?fid=${userFid}`)
         if (response.ok) {
           const data = await response.json()
           setStats(data)
@@ -69,10 +78,10 @@ export default function HomePage() {
       document.removeEventListener('visibilitychange', handleVisibilityChange)
       clearInterval(interval)
     }
-  }, [])
+  }, [isAuthenticated, userFid])
 
   const handleDailyCheckin = async () => {
-    if (checkingIn || checkedInToday) return
+    if (checkingIn || checkedInToday || !userFid) return
     
     setCheckingIn(true)
     try {
@@ -81,7 +90,7 @@ export default function HomePage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ userId: 'user-1' })
+        body: JSON.stringify({ fid: userFid })
       })
       
       const data = await response.json()
@@ -89,7 +98,7 @@ export default function HomePage() {
       if (response.ok) {
         // Success - refresh stats
         setCheckedInToday(true)
-        const statsResponse = await fetch('/api/stats')
+        const statsResponse = await fetch(`/api/stats?fid=${userFid}`)
         if (statsResponse.ok) {
           const updatedStats = await statsResponse.json()
           setStats(updatedStats)
@@ -106,6 +115,39 @@ export default function HomePage() {
     } finally {
       setCheckingIn(false)
     }
+  }
+
+  const handleAuthSuccess = (userData: any) => {
+    console.log('Authentication successful:', userData)
+    setUserFid(userData.fid?.toString() || null)
+  }
+
+  // Validate MiniKit context
+  useEffect(() => {
+    if (context) {
+      console.log('MiniKit context available:', {
+        client: context.client,
+        location: context.location,
+        user: context.user
+      })
+    }
+  }, [context])
+
+  // Show auth screen if not authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className="bg-main min-h-screen">
+        <div className="bg-main text-white py-4 px-4">
+          <div className="text-center max-w-sm mx-auto">
+            <h1 className="text-xl font-bold mb-0.5">Health Buddy</h1>
+            <p className="text-xs opacity-90">Your daily wellness companion</p>
+          </div>
+        </div>
+        <div className="p-4">
+          <FarcasterAuth onAuthSuccess={handleAuthSuccess} />
+        </div>
+      </div>
+    )
   }
 
   if (loading) {
