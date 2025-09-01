@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { CheckCircle, Trophy, Target, Calendar } from "lucide-react"
 import Link from "next/link"
 import { useEffect, useState } from "react"
-import { useMiniKit, useAuthenticate } from '@coinbase/onchainkit/minikit'
+import { sdk } from '@farcaster/miniapp-sdk'
 import { FarcasterAuth } from '@/components/FarcasterAuth'
 
 interface UserStats {
@@ -26,26 +26,30 @@ interface UserStats {
 }
 
 export default function HomePage() {
-  const { setFrameReady, isFrameReady, context } = useMiniKit()
-  const { signIn } = useAuthenticate()
   const [stats, setStats] = useState<UserStats | null>(null)
   const [loading, setLoading] = useState(true)
   const [checkingIn, setCheckingIn] = useState(false)
   const [checkedInToday, setCheckedInToday] = useState(false)
   const [userFid, setUserFid] = useState<string | null>(null)
+  const [context, setContext] = useState<any>(null)
 
-  // Initialize frame readiness
+  // Initialize frame readiness and get context
   useEffect(() => {
-    if (!isFrameReady) {
-      setFrameReady()
+    const initializeApp = async () => {
+      try {
+        await sdk.actions.ready()
+        const userContext = await sdk.context
+        setContext(userContext)
+        if (userContext?.user?.fid) {
+          setUserFid(userContext.user.fid.toString())
+        }
+      } catch (error) {
+        console.error('Failed to initialize app:', error)
+      }
     }
-  }, [setFrameReady, isFrameReady])
-
-  useEffect(() => {
-    if (context?.user?.fid) {
-      setUserFid(context.user.fid.toString())
-    }
-  }, [context])
+    
+    initializeApp()
+  }, [])
 
   useEffect(() => {
     if (!context?.user?.fid || !userFid) {
@@ -174,7 +178,7 @@ export default function HomePage() {
   );
 
   // Show auth screen if not authenticated or in MiniApp without proper setup
-  if (!context?.user?.fid || (isMiniApp && !userFid)) {
+  if (!userFid || !context?.user?.fid) {
     return (
       <div className="bg-main min-h-screen">
         <div className="bg-main text-white py-4 px-4">
@@ -213,11 +217,10 @@ export default function HomePage() {
 
       <div className="p-4 space-y-6">
         {/* Level Badge */}
-        {(stats || !context?.user?.fid) && (
-          <div className="text-center space-y-1.5">
-            <Badge variant="secondary" className="text-sm px-3 py-1">
-              Level {stats?.level || 1} - {stats?.levelName || 'Beginner'}
-            </Badge>
+        <div className="text-center space-y-1.5">
+          <Badge variant="secondary" className="text-sm px-3 py-1">
+            Level {stats?.level || 1} - {stats?.levelName || 'Beginner'}
+          </Badge>
             
             {/* Level Image */}
             <div className="flex justify-center">
@@ -246,7 +249,6 @@ export default function HomePage() {
               </div>
             </div>
           </div>
-        )}
 
         {/* Stats Grid */}
         <div className="grid grid-cols-2 gap-3">

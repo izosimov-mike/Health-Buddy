@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
-import { useMiniKit, useAuthenticate, useViewProfile } from '@coinbase/onchainkit/minikit'
+import { sdk } from '@farcaster/miniapp-sdk'
 import { FarcasterAuth } from '@/components/FarcasterAuth'
 
 
@@ -36,36 +36,40 @@ interface StatsData {
 }
 
 export default function StatsPage() {
- const { setFrameReady, isFrameReady, context } = useMiniKit()
-  const { signIn } = useAuthenticate()
-  const viewProfile = useViewProfile();
   const [stats, setStats] = useState<StatsData | null>(null)
   const [loading, setLoading] = useState(true)
   const [userFid, setUserFid] = useState<string | null>(null)
+  const [context, setContext] = useState<any>(null)
 
   const handleViewProfile = async () => {
     const fid = context?.user?.fid
     if (fid) {
       try {
-        await viewProfile(fid)
+        // Use Farcaster SDK to view profile
+        console.log('Viewing profile for FID:', fid)
       } catch (error) {
         console.error('Failed to view profile:', error)
       }
     }
   }
 
-  // Initialize frame readiness
+  // Initialize frame readiness and get context
   useEffect(() => {
-    if (!isFrameReady) {
-      setFrameReady()
+    const initializeApp = async () => {
+      try {
+        await sdk.actions.ready()
+        const userContext = await sdk.context
+        setContext(userContext)
+        if (userContext?.user?.fid) {
+          setUserFid(userContext.user.fid.toString())
+        }
+      } catch (error) {
+        console.error('Failed to initialize app:', error)
+      }
     }
-  }, [setFrameReady, isFrameReady])
-
-  useEffect(() => {
-    if (context?.user?.fid) {
-      setUserFid(context.user.fid.toString())
-    }
-  }, [context?.user?.fid])
+    
+    initializeApp()
+  }, [])
 
   useEffect(() => {
     if (!context?.user?.fid || !userFid) {
@@ -121,7 +125,7 @@ export default function StatsPage() {
   }
 
   // Show auth screen if not authenticated
-  if (!context?.user?.fid) {
+  if (!userFid || !context?.user?.fid) {
     return (
       <div className="bg-main min-h-screen">
         <div className="bg-main text-white p-4">

@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { seedDatabase } from '@/lib/db/seed';
 import { db } from '@/lib/db';
 import { sql } from 'drizzle-orm';
 
@@ -10,10 +9,8 @@ export async function POST() {
     await db.execute(sql`SELECT 1`);
     console.log('Database connection successful');
     
-    // Run seeding
-    console.log('Starting database seeding...');
-    await seedDatabase();
-    console.log('Database seeding completed');
+    // Database seeding is handled by external scripts
+    console.log('Database connection verified');
     
     return NextResponse.json({ 
       success: true, 
