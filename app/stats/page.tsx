@@ -90,9 +90,37 @@ export default function StatsPage() {
     fetchStats()
   }, [context?.user?.fid, userFid])
 
-  const handleAuthSuccess = (userData: any) => {
+  const handleAuthSuccess = async (userData: any) => {
     console.log('Authentication successful:', userData)
-    setUserFid(userData.fid?.toString() || null)
+    const fid = userData.fid?.toString()
+    setUserFid(fid)
+    
+    // Автоматически создаем/обновляем пользователя в базе данных
+    if (fid && userData) {
+      try {
+        const response = await fetch('/api/users', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name: userData.displayName || userData.username || `User ${fid}`,
+            fid: parseInt(fid),
+            farcasterUsername: userData.username,
+            farcasterDisplayName: userData.displayName,
+            farcasterPfpUrl: userData.pfpUrl
+          })
+        })
+        
+        if (response.ok) {
+          console.log('User saved to database successfully')
+        } else {
+          console.log('User might already exist in database')
+        }
+      } catch (error) {
+        console.error('Failed to save user to database:', error)
+      }
+    }
   }
 
   // Show auth screen if not authenticated
