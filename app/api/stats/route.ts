@@ -157,6 +157,7 @@ export async function GET(request: NextRequest) {
       longestStreak,
       streakBonus,
       checkedInToday,
+      globalScore: user[0].globalScore,
       dailyScore: todayProgress[0]?.totalScore || 0,
       todayScore: todayProgress[0]?.totalScore || 0,
       todayActions: todayProgress[0]?.completedActions || 0,

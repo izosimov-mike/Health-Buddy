@@ -173,9 +173,6 @@ export default function CategoriesPage() {
           },
           body: JSON.stringify({
             fid: parseInt(fid),
-            farcasterUsername: userData.username,
-            farcasterDisplayName: userData.displayName,
-            farcasterPfpUrl: userData.pfpUrl,
             name: userData.displayName || userData.username || `User ${fid}`
           }),
         })

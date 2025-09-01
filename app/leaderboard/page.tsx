@@ -62,19 +62,33 @@ export default function LeaderboardPage() {
           let currentUser = null;
           if (context?.user?.fid) {
             const userFid = context.user.fid.toString();
-            // Find user by matching farcasterFid in database
+            // Get user stats
             const userResponse = await fetch(`/api/stats?fid=${userFid}`);
             if (userResponse.ok) {
               const userData = await userResponse.json();
-              // Find user's rank in the full leaderboard
+              // Find user's rank in the full leaderboard by farcasterFid
               const fullLeaderboardResponse = await fetch('/api/leaderboard?limit=1000');
               if (fullLeaderboardResponse.ok) {
                 const fullData = await fullLeaderboardResponse.json();
-                const userIndex = fullData.findIndex((u: LeaderboardUser) => u.id === userData.user?.id);
+                const userIndex = fullData.findIndex((u: LeaderboardUser) => u.fid?.toString() === userFid);
                 if (userIndex !== -1) {
                   currentUser = {
                     ...fullData[userIndex],
-                    rank: userIndex + 1
+                    rank: userIndex + 1,
+                    globalScore: userData.globalScore || 0
+                  };
+                } else {
+                  // User not in top leaderboard, create entry with stats data
+                  currentUser = {
+                    id: `farcaster-${userFid}`,
+                    name: userData.name || `User ${userFid}`,
+                    globalScore: userData.globalScore || 0,
+                    currentStreak: userData.currentStreak || 0,
+                    level: userData.level || 1,
+                    rank: fullData.length + 1,
+                    avatar: '',
+                    levelName: userData.levelName || 'Beginner',
+                    fid: parseInt(userFid)
                   };
                 }
               }
