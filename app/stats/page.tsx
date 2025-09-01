@@ -37,14 +37,14 @@ interface StatsData {
 
 export default function StatsPage() {
  const { setFrameReady, isFrameReady, context } = useMiniKit()
-  const { user, authenticate } = useAuthenticate()
+  const { signIn } = useAuthenticate()
   const viewProfile = useViewProfile();
   const [stats, setStats] = useState<StatsData | null>(null)
   const [loading, setLoading] = useState(true)
   const [userFid, setUserFid] = useState<string | null>(null)
 
   const handleViewProfile = async () => {
-    const fid = user?.fid || context?.user?.fid
+    const fid = context?.user?.fid
     if (fid) {
       try {
         await viewProfile(fid)
@@ -192,7 +192,7 @@ export default function StatsPage() {
 
       <div className="p-2 space-y-3">
         {/* Farcaster Profile Section */}
-        {(user?.fid || context?.user?.fid) && (
+        {context?.user?.fid && (
           <Card className="section-primary border-0">
             <CardContent className="p-3">
               <div className="flex items-center gap-3">
@@ -227,10 +227,10 @@ export default function StatsPage() {
                   <div className="text-sm text-white/70">
                     {context?.user?.username && `@${context.user.username}`}
                     <span className="ml-2 text-xs text-purple-300">
-                      FID: {user?.fid || context?.user?.fid}
+                      FID: {context?.user?.fid}
                     </span>
                   </div>
-                  {user?.fid && (
+                  {context?.user?.fid && (
                     <div className="text-xs text-green-300 mt-1">
                       ✓ Verified Identity
                     </div>
