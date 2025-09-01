@@ -2,6 +2,39 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db, users } from '@/lib/db';
 import { eq } from 'drizzle-orm';
 
+// Mock data for local development when DATABASE_URL is not set
+const mockUsers = [
+  {
+    id: '1',
+    name: 'John Doe',
+    email: 'john@example.com',
+    globalScore: 100,
+    currentStreak: 5,
+    longestStreak: 10,
+    level: 2,
+    farcasterFid: '12345',
+    fid: 12345,
+    farcasterUsername: 'johndoe',
+    farcasterDisplayName: 'John Doe',
+    farcasterPfpUrl: 'https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/12345/original',
+    createdAt: new Date(),
+    updatedAt: new Date()
+  }
+];
+
+let useMockData = false;
+
+// Check if database is available
+try {
+  if (!process.env.DATABASE_URL) {
+    useMockData = true;
+    console.log('Using mock data for local development');
+  }
+} catch (error) {
+  useMockData = true;
+  console.log('Database not available, using mock data');
+}
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -26,20 +59,28 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { name, email } = body;
+    const { name, email, fid, farcasterUsername, farcasterDisplayName, farcasterPfpUrl } = body;
 
     if (!name) {
       return NextResponse.json({ error: 'Name is required' }, { status: 400 });
     }
 
-    const newUser = await db.insert(users).values({
+    const userData: any = {
       name,
       email,
       globalScore: 0,
       currentStreak: 0,
       longestStreak: 0,
       level: 1,
-    }).returning();
+    };
+
+    // Add Farcaster data if provided
+    if (fid) userData.fid = fid;
+    if (farcasterUsername) userData.farcasterUsername = farcasterUsername;
+    if (farcasterDisplayName) userData.farcasterDisplayName = farcasterDisplayName;
+    if (farcasterPfpUrl) userData.farcasterPfpUrl = farcasterPfpUrl;
+
+    const newUser = await db.insert(users).values(userData).returning();
 
     return NextResponse.json(newUser[0], { status: 201 });
   } catch (error) {
