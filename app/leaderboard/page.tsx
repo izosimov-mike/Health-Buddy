@@ -115,146 +115,131 @@ export default function LeaderboardPage() {
       </div>
 
       <div className="p-4 space-y-4">
-        {/* Current User Rank */}
-        {currentUserRank && context?.user && (
-          <Card className="border-2 border-purple-200 bg-gradient-to-r from-purple-50 to-blue-50">
-            <CardContent className="p-4">
+        {/* Current User Profile */}
+        {context?.user && (
+          <Card className="mb-6 bg-gradient-to-r from-primary/10 to-purple-100 border-primary/20">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Trophy className="w-5 h-5 text-primary" />
+                Your Profile
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  {/* User Rank */}
-                  <div className="flex items-center justify-center w-10 h-10 bg-purple-500 text-white rounded-full font-bold text-lg">
-                    #{currentUserRank.rank}
-                  </div>
-                  
-                  {/* User Avatar */}
+                <div className="flex items-center gap-4">
                   <div className="relative">
                     {context.user.pfpUrl ? (
                       <img 
                         src={context.user.pfpUrl} 
                         alt={context.user.displayName || context.user.username || 'User'}
-                        className="w-12 h-12 rounded-full object-cover border-2 border-purple-300"
+                        className="w-16 h-16 rounded-full object-cover border-3 border-primary/30"
                       />
                     ) : (
-                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white font-bold text-lg">
-                        {(context.user.displayName || context.user.username || 'U')[0].toUpperCase()}
+                      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center text-white font-bold text-xl">
+                        {context.user.displayName ? context.user.displayName[0].toUpperCase() : 'U'}
                       </div>
                     )}
-                    <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                    <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-primary rounded-full flex items-center justify-center">
                       <User className="w-3 h-3 text-white" />
                     </div>
                   </div>
                   
-                  {/* User Info */}
                   <div>
-                    <div className="font-bold text-lg text-gray-800">
-                      {context.user.displayName || context.user.username || 'Farcaster User'}
+                    <div className="font-bold text-xl">
+                      {context.user.displayName || context.user.username || 'User'}
                     </div>
-                    <div className="text-sm text-gray-600">
-                      {context.user.username && `@${context.user.username}`}
+                    <div className="text-base text-muted-foreground">
+                      @{context.user.username || 'username'}
+                    </div>
+                    <div className="text-sm text-primary font-medium">
+                      FID: {context.user.fid}
                     </div>
                   </div>
                 </div>
                 
-                {/* User Score */}
                 <div className="text-right">
-                  <div className="text-2xl font-bold text-purple-600">{currentUserRank.globalScore}</div>
-                  <div className="text-sm text-gray-500">points</div>
+                  {currentUserRank && (
+                    <>
+                      <div className="font-bold text-3xl text-primary">
+                        {currentUserRank.globalScore}
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        Total Score
+                      </div>
+                      <div className="text-xs text-primary font-medium mt-1">
+                        Rank #{currentUserRank.rank}
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             </CardContent>
           </Card>
         )}
 
-        {/* TOP-10 Leaderboard */}
+        {/* Top 10 Leaderboard */}
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Trophy className="h-5 w-5" />
-              Health Champions
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Trophy className="w-4 h-4" />
+              Top 10 Players
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="space-y-2">
             {loading ? (
-              <div className="text-center py-8">
-                <div className="text-muted-foreground">Loading leaderboard...</div>
+              <div className="flex items-center justify-center py-6">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
               </div>
             ) : leaderboardData.length === 0 ? (
-              <div className="text-center py-8">
-                <Trophy className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <div className="text-muted-foreground">No users found</div>
+              <div className="text-center py-6 text-sm text-muted-foreground">
+                No leaderboard data available
               </div>
             ) : (
               leaderboardData.map((user) => {
-                // Check if this is the current user
-                const isCurrentUser = context?.user?.fid && 
-                  (user.fid === context.user.fid || 
-                   (context.user.fid.toString() === user.id?.replace('farcaster-', '')));
-                
                 return (
                   <div
                     key={user.id}
-                    className={`flex items-center justify-between p-3 rounded-lg transition-colors ${
-                      isCurrentUser ? "bg-primary/10 border border-primary/20" : "bg-muted/30 hover:bg-muted/50"
-                    } ${user.fid ? 'cursor-pointer' : ''}`}
+                    className={`flex items-center justify-between p-2 rounded-md transition-colors bg-muted/20 hover:bg-muted/40 ${
+                      user.fid ? 'cursor-pointer' : ''
+                    }`}
                     onClick={() => user.fid && handleViewProfile(user.fid)}
                   >
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center justify-center w-8 h-8">{getRankIcon(user.rank)}</div>
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center justify-center w-6 h-6 text-xs font-bold">
+                        {getRankIcon(user.rank)}
+                      </div>
                       
-                      {/* Profile Picture - use MiniKit data for current user */}
                       <div className="relative">
-                        {isCurrentUser && context?.user?.pfpUrl ? (
-                          <img 
-                            src={context.user.pfpUrl} 
-                            alt={context.user.displayName || context.user.username || user.name}
-                            className="w-10 h-10 rounded-full object-cover border-2 border-purple-200"
-                          />
-                        ) : (
-                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white font-bold">
-                            {isCurrentUser && context?.user?.displayName 
-                              ? context.user.displayName[0].toUpperCase() 
-                              : user.name[0].toUpperCase()}
-                          </div>
-                        )}
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white font-bold text-xs">
+                          {user.name[0].toUpperCase()}
+                        </div>
                         {user.fid && (
-                          <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-purple-500 rounded-full flex items-center justify-center">
-                            <User className="w-2 h-2 text-white" />
+                          <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-purple-500 rounded-full flex items-center justify-center">
+                            <User className="w-1.5 h-1.5 text-white" />
                           </div>
                         )}
                       </div>
                       
                       <div>
-                        <div className="font-semibold flex items-center gap-2">
-                          {isCurrentUser && context?.user?.displayName 
-                            ? context.user.displayName 
-                            : user.name}
-                          {isCurrentUser && (
-                            <Badge variant="secondary" className="text-xs">
-                              You
-                            </Badge>
-                          )}
+                        <div className="text-sm font-medium flex items-center gap-1">
+                          {user.name}
                           {user.fid && (
-                            <Badge variant="outline" className="text-xs text-purple-600 border-purple-200">
+                            <Badge variant="outline" className="text-xs px-1 py-0 text-purple-600 border-purple-200">
                               FC
                             </Badge>
                           )}
                         </div>
-                        <div className="text-sm text-muted-foreground">
-                          {isCurrentUser && context?.user?.username 
-                            ? `@${context.user.username}` 
-                            : user.levelName}
+                        <div className="text-xs text-muted-foreground">
+                          {user.levelName}
                           {user.fid && (
-                            <span className="ml-2 text-xs text-purple-500">FID: {user.fid}</span>
+                            <span className="ml-1 text-purple-500">FID: {user.fid}</span>
                           )}
                         </div>
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="font-bold text-primary">{user.globalScore}</div>
-                      <div className="text-xs text-muted-foreground">{user.currentStreak} day streak</div>
-                      {user.fid && (
-                        <div className="text-xs text-purple-500 mt-1">Click to view profile</div>
-                      )}
+                      <div className="text-sm font-bold text-primary">{user.globalScore}</div>
+                      <div className="text-xs text-muted-foreground">points</div>
                     </div>
                   </div>
                 );
