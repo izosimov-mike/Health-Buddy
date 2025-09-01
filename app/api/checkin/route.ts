@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
       
       if (daysDiff === 1) {
         // Consecutive day - increment streak
-        newCurrentStreak = userData.currentStreak + 1;
+        newCurrentStreak = (userData.currentStreak ?? 0) + 1;
       } else if (daysDiff > 1) {
         // Streak broken - reset to 1
         newCurrentStreak = 1;
@@ -54,8 +54,8 @@ export async function POST(request: NextRequest) {
     const streakBonus = getStreakBonus(newCurrentStreak);
 
     const totalPoints = 1 + streakBonus; // 1 base point + streak bonus
-    const newGlobalScore = userData.globalScore + totalPoints;
-    const newLongestStreak = Math.max(userData.longestStreak, newCurrentStreak);
+    const newGlobalScore = (userData.globalScore ?? 0) + totalPoints;
+    const newLongestStreak = Math.max(userData.longestStreak ?? 0, newCurrentStreak);
 
     // Update user data
     await db.update(users)
