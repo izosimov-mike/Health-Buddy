@@ -8,16 +8,16 @@ export async function GET(request: NextRequest) {
   const fid = searchParams.get('fid');
   const date = searchParams.get('date') || new Date().toISOString().split('T')[0];
 
-  if (!fid) {
-    return NextResponse.json({ error: 'Farcaster ID is required' }, { status: 400 });
+  let userId = null;
+  
+  // Get user by FID if provided
+  if (fid) {
+    const user = await db.select().from(users).where(eq(users.farcasterFid, fid)).limit(1);
+    if (user.length === 0) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+    userId = user[0].id;
   }
-
-  // Get user by FID to get userId
-  const user = await db.select().from(users).where(eq(users.farcasterFid, fid)).limit(1);
-  if (user.length === 0) {
-    return NextResponse.json({ error: 'User not found' }, { status: 404 });
-  }
-  const userId = user[0].id;
 
   try {
 
@@ -37,15 +37,18 @@ export async function GET(request: NextRequest) {
       ? await baseQuery.where(eq(actions.categoryId, categoryId))
       : await baseQuery;
 
-    // Get completion status for the date
-    const completions = await db.select()
-      .from(actionCompletions)
-      .where(and(
-        eq(actionCompletions.userId, userId),
-        eq(actionCompletions.date, date)
-      ));
-
-    const completionMap = new Map(completions.map((c: typeof actionCompletions.$inferSelect) => [c.actionId, c.completed]));
+    // Get completion status for the date (only if user is authenticated)
+    let completionMap = new Map();
+    
+    if (userId) {
+      const completions = await db.select()
+        .from(actionCompletions)
+        .where(and(
+          eq(actionCompletions.userId, userId),
+          eq(actionCompletions.date, date)
+        ));
+      completionMap = new Map(completions.map((c: typeof actionCompletions.$inferSelect) => [c.actionId, c.completed]));
+    }
     
     return NextResponse.json(actionsData.map((action: typeof actionsData[0]) => ({
       ...action,
