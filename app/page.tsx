@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { CheckCircle, Trophy, Target, Calendar } from "lucide-react"
 import Link from "next/link"
 import { useEffect, useState } from "react"
-import { useMiniKit } from '@farcaster/miniapp-sdk'
+import { useMiniKit } from '@coinbase/onchainkit/minikit'
 import FarcasterAuth from '@/components/FarcasterAuth'
 
 interface UserStats {

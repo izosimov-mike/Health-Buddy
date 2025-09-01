@@ -1,6 +1,6 @@
 'use client';
 
-import { useAuthenticate, useMiniKit } from '@farcaster/miniapp-sdk';
+import { useAuthenticate, useMiniKit } from '@coinbase/onchainkit/minikit';
 import { useEffect, useState } from 'react';
 
 interface FarcasterAuthProps {
