@@ -62,6 +62,9 @@ export async function POST(request: NextRequest) {
       }
 
       // Update user's global score and daily progress
+      if (!action || action.length === 0) {
+        return NextResponse.json({ error: 'Action not found' }, { status: 404 });
+      }
       const pointsChange = completed ? action[0].points : -action[0].points;
       
       // Update user's global score
