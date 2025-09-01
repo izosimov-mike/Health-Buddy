@@ -91,12 +91,14 @@ export async function POST(request: NextRequest) {
         .limit(1);
 
       if (existingDailyProgress.length > 0) {
+        const currentTotalScore = existingDailyProgress[0].totalScore ?? 0;
+        const currentCompletedActions = existingDailyProgress[0].completedActions ?? 0;
         await db.update(dailyProgress)
           .set({
-            totalScore: existingDailyProgress[0].totalScore + pointsChange,
+            totalScore: currentTotalScore + pointsChange,
             completedActions: completed 
-              ? existingDailyProgress[0].completedActions + 1
-              : Math.max(0, existingDailyProgress[0].completedActions - 1)
+              ? currentCompletedActions + 1
+              : Math.max(0, currentCompletedActions - 1)
           })
           .where(eq(dailyProgress.id, existingDailyProgress[0].id));
       } else {
@@ -104,7 +106,7 @@ export async function POST(request: NextRequest) {
           .values({
             userId,
             date,
-            totalScore: completed ? action[0].points : 0,
+            totalScore: completed ? points : 0,
             completedActions: completed ? 1 : 0,
             checkedIn: false,
           });
