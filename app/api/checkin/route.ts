@@ -78,10 +78,11 @@ export async function POST(request: NextRequest) {
 
     if (existingProgress.length > 0) {
       // Update existing entry
+      const currentTotalScore = existingProgress[0].totalScore ?? 0;
       await db.update(dailyProgress)
         .set({
           checkedIn: true,
-          totalScore: existingProgress[0].totalScore + totalPoints
+          totalScore: currentTotalScore + totalPoints
         })
         .where(and(
           eq(dailyProgress.userId, userId),

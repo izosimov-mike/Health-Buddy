@@ -94,14 +94,15 @@ export async function GET(request: NextRequest) {
     .groupBy(categories.id, categories.name, categories.color);
 
     // Get streak values from user data (managed by daily check-in)
-    const currentStreak = user[0].currentStreak;
-    const longestStreak = user[0].longestStreak;
+    const currentStreak = user[0].currentStreak ?? 0;
+    const longestStreak = user[0].longestStreak ?? 0;
     
     // Check if user has checked in today
     const checkedInToday = user[0].lastCheckinDate === today;
 
-    const userLevel = getUserLevel(user[0].globalScore);
-    const levelProgress = getProgressToNextLevel(user[0].globalScore);
+    const globalScore = user[0].globalScore ?? 0;
+    const userLevel = getUserLevel(globalScore);
+    const levelProgress = getProgressToNextLevel(globalScore);
     const streakBonus = getStreakBonus(currentStreak);
 
     // Create full week data (7 days) with proper day names
@@ -157,7 +158,7 @@ export async function GET(request: NextRequest) {
       longestStreak,
       streakBonus,
       checkedInToday,
-      globalScore: user[0].globalScore,
+      globalScore: globalScore,
       dailyScore: todayProgress[0]?.totalScore || 0,
       todayScore: todayProgress[0]?.totalScore || 0,
       todayActions: todayProgress[0]?.completedActions || 0,
