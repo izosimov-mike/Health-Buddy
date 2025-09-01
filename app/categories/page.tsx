@@ -113,14 +113,19 @@ export default function CategoriesPage() {
   }, [userFid])
 
   const handleClaimAction = async (actionId: string, points: number) => {
-    if (completedActions.has(actionId) || !userFid) return
+    if (completedActions.has(actionId)) return
     
     setLoading(true)
     try {
+      const requestBody = { actionId, completed: true }
+      if (userFid) {
+        requestBody.fid = userFid
+      }
+      
       const response = await fetch('/api/actions/complete', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ actionId, completed: true, fid: userFid })
+        body: JSON.stringify(requestBody)
       })
       
       if (response.ok) {
@@ -128,7 +133,8 @@ export default function CategoriesPage() {
         setDailyScore(prev => prev + points)
         
         // Refresh actions data to get updated completion status
-        const actionsRes = await fetch(`/api/actions?fid=${userFid}`)
+        const actionsUrl = userFid ? `/api/actions?fid=${userFid}` : '/api/actions'
+        const actionsRes = await fetch(actionsUrl)
         if (actionsRes.ok) {
           const actionsData = await actionsRes.json()
           setActions(actionsData)
