@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
 
     // Add rank and avatar to each user
     const leaderboard = leaderboardData.map((user: typeof leaderboardData[0], index: number) => {
-      const userLevel = getUserLevel(user.globalScore);
+      const userLevel = getUserLevel(user.globalScore ?? 0);
       return {
         ...user,
         rank: index + 1,
