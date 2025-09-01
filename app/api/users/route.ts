@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
 
     // Проверяем существует ли пользователь с таким FID
     if (fid) {
-      const existingUser = await db.select().from(users).where(eq(users.fid, fid)).limit(1);
+      const existingUser = await db.select().from(users).where(eq(users.farcasterFid, fid.toString())).limit(1);
       if (existingUser.length > 0) {
         // Обновляем существующего пользователя с новыми данными Farcaster
         const updateData: any = {
@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
         
         const updatedUser = await db.update(users)
           .set(updateData)
-          .where(eq(users.fid, fid))
+          .where(eq(users.farcasterFid, fid.toString()))
           .returning();
           
         return NextResponse.json(updatedUser[0], { status: 200 });

@@ -5,9 +5,19 @@ import { eq, and } from 'drizzle-orm';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { actionId, completed = true } = body;
-    const userId = 'user-1'; // Fixed user for demo
+    const { actionId, completed = true, fid } = body;
     const date = new Date().toISOString().split('T')[0];
+
+    if (!fid) {
+      return NextResponse.json({ error: 'Farcaster ID is required' }, { status: 400 });
+    }
+
+    // Get user by FID to get userId
+    const user = await db.select().from(users).where(eq(users.farcasterFid, fid)).limit(1);
+    if (user.length === 0) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+    const userId = user[0].id;
 
     if (!actionId) {
       return NextResponse.json({ error: 'Action ID is required' }, { status: 400 });
