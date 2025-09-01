@@ -65,17 +65,47 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Name is required' }, { status: 400 });
     }
 
+    // Проверяем существует ли пользователь с таким FID
+    if (fid) {
+      const existingUser = await db.select().from(users).where(eq(users.fid, fid)).limit(1);
+      if (existingUser.length > 0) {
+        // Обновляем существующего пользователя с новыми данными Farcaster
+        const updateData: any = {
+          name,
+          updatedAt: new Date()
+        };
+        
+        if (email) updateData.email = email;
+        if (farcasterUsername) updateData.farcasterUsername = farcasterUsername;
+        if (farcasterDisplayName) updateData.farcasterDisplayName = farcasterDisplayName;
+        if (farcasterPfpUrl) updateData.farcasterPfpUrl = farcasterPfpUrl;
+        
+        const updatedUser = await db.update(users)
+          .set(updateData)
+          .where(eq(users.fid, fid))
+          .returning();
+          
+        return NextResponse.json(updatedUser[0], { status: 200 });
+      }
+    }
+
     const userData: any = {
+      id: fid ? `farcaster-${fid}` : undefined,
       name,
       email,
       globalScore: 0,
       currentStreak: 0,
       longestStreak: 0,
       level: 1,
+      createdAt: new Date(),
+      updatedAt: new Date()
     };
 
     // Add Farcaster data if provided
-    if (fid) userData.fid = fid;
+    if (fid) {
+      userData.fid = fid;
+      userData.farcasterFid = fid.toString();
+    }
     if (farcasterUsername) userData.farcasterUsername = farcasterUsername;
     if (farcasterDisplayName) userData.farcasterDisplayName = farcasterDisplayName;
     if (farcasterPfpUrl) userData.farcasterPfpUrl = farcasterPfpUrl;
