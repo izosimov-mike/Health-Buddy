@@ -12,10 +12,7 @@ export async function GET(request: NextRequest) {
       globalScore: users.globalScore,
       currentStreak: users.currentStreak,
       level: users.level,
-      fid: users.fid,
-      farcasterUsername: users.farcasterUsername,
-      farcasterDisplayName: users.farcasterDisplayName,
-      farcasterPfpUrl: users.farcasterPfpUrl,
+      fid: users.farcasterFid,
     })
     .from(users)
     .orderBy(desc(users.globalScore))

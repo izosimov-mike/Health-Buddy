@@ -144,10 +144,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       ...user[0],
       // Farcaster profile data
-      fid: user[0].fid,
-      farcasterUsername: user[0].farcasterUsername,
-      farcasterDisplayName: user[0].farcasterDisplayName,
-      farcasterPfpUrl: user[0].farcasterPfpUrl,
+      fid: user[0].farcasterFid,
       // Level and progress data
       level: userLevel.id,
       levelName: userLevel.name,
