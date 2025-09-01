@@ -57,13 +57,17 @@ export default function CategoriesPage() {
   // Load categories and actions
   useEffect(() => {
     const loadData = async () => {
+      if (!userFid) {
+        setDataLoading(false)
+        return
+      }
+      
       try {
-        // Always load categories
+        // Load categories
         const categoriesRes = await fetch('/api/categories')
         
-        // Load actions with FID if available, otherwise load without FID for testing
-        const actionsUrl = userFid ? `/api/actions?fid=${userFid}` : '/api/actions'
-        const actionsRes = await fetch(actionsUrl)
+        // Load actions with FID
+        const actionsRes = await fetch(`/api/actions?fid=${userFid}`)
         
         if (categoriesRes.ok && actionsRes.ok) {
           const categoriesData = await categoriesRes.json()
@@ -113,14 +117,11 @@ export default function CategoriesPage() {
   }, [userFid])
 
   const handleClaimAction = async (actionId: string, points: number) => {
-    if (completedActions.has(actionId)) return
+    if (completedActions.has(actionId) || !userFid) return
     
     setLoading(true)
     try {
-      const requestBody: { actionId: string; completed: boolean; fid?: string } = { actionId, completed: true }
-      if (userFid) {
-        requestBody.fid = userFid
-      }
+      const requestBody = { actionId, completed: true, fid: userFid }
       
       const response = await fetch('/api/actions/complete', {
         method: 'POST',
@@ -133,8 +134,7 @@ export default function CategoriesPage() {
         setDailyScore(prev => prev + points)
         
         // Refresh actions data to get updated completion status
-        const actionsUrl = userFid ? `/api/actions?fid=${userFid}` : '/api/actions'
-        const actionsRes = await fetch(actionsUrl)
+        const actionsRes = await fetch(`/api/actions?fid=${userFid}`)
         if (actionsRes.ok) {
           const actionsData = await actionsRes.json()
           setActions(actionsData)
@@ -162,6 +162,34 @@ export default function CategoriesPage() {
   const handleAuthSuccess = async (userData: any) => {
     console.log('Authentication successful:', userData)
     const fid = userData.fid?.toString()
+    
+    if (fid) {
+      try {
+        // Автоматически создаем или обновляем пользователя в базе данных
+        const response = await fetch('/api/users', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            fid: parseInt(fid),
+            farcasterUsername: userData.username,
+            farcasterDisplayName: userData.displayName,
+            farcasterPfpUrl: userData.pfpUrl,
+            name: userData.displayName || userData.username || `User ${fid}`
+          }),
+        })
+        
+        if (response.ok) {
+          console.log('User created/updated successfully')
+        } else {
+          console.error('Failed to create/update user:', response.status)
+        }
+      } catch (error) {
+        console.error('Error creating/updating user:', error)
+      }
+    }
+    
     setUserFid(fid)
   }
 
@@ -170,29 +198,29 @@ export default function CategoriesPage() {
   console.log('User FID from context:', context?.user?.fid)
   console.log('UserFid state:', userFid)
 
-  // Show auth screen if not authenticated (temporarily disabled for debugging)
-  // if (!context?.user?.fid) {
-  //   return (
-  //     <div className="bg-main min-h-screen">
-  //       <div className="bg-main text-white py-4 px-4">
-  //         <div className="flex items-center gap-3">
-  //           <Link href="/">
-  //             <Button variant="ghost" size="sm" className="text-white hover:bg-white/20">
-  //               <ArrowLeft className="h-4 w-4" />
-  //             </div>
-  //           </Link>
-  //           <div>
-  //             <h1 className="text-lg font-bold">Categories</h1>
-  //             <p className="text-xs opacity-90">Connect to access health actions</p>
-  //           </div>
-  //         </div>
-  //       </div>
-  //       <div className="p-4">
-  //         <FarcasterAuth onAuthSuccess={handleAuthSuccess} />
-  //       </div>
-  //     </div>
-  //   )
-  // }
+  // Show auth screen if not authenticated
+  if (!context?.user?.fid) {
+    return (
+      <div className="bg-main min-h-screen">
+        <div className="bg-main text-white py-4 px-4">
+          <div className="flex items-center gap-3">
+            <Link href="/">
+              <Button variant="ghost" size="sm" className="text-white hover:bg-white/20">
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+            </Link>
+            <div>
+              <h1 className="text-lg font-bold">Categories</h1>
+              <p className="text-xs opacity-90">Connect to access health actions</p>
+            </div>
+          </div>
+        </div>
+        <div className="p-4">
+          <FarcasterAuth onAuthSuccess={handleAuthSuccess} />
+        </div>
+      </div>
+    )
+  }
   
   if (dataLoading) {
     return (

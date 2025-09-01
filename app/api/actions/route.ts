@@ -12,10 +12,21 @@ export async function GET(request: NextRequest) {
   
   // Get user by FID if provided
   if (fid) {
-    const user = await db.select().from(users).where(eq(users.farcasterFid, fid)).limit(1);
+    // Try both farcasterFid (text) and fid (integer) fields
+    let user = await db.select().from(users).where(eq(users.farcasterFid, fid)).limit(1);
+    
+    if (user.length === 0) {
+      // Try searching by integer fid field
+      const fidAsInt = parseInt(fid);
+      if (!isNaN(fidAsInt)) {
+        user = await db.select().from(users).where(eq(users.fid, fidAsInt)).limit(1);
+      }
+    }
+    
     if (user.length === 0) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
+    
     userId = user[0].id;
   }
 

@@ -8,17 +8,26 @@ export async function POST(request: NextRequest) {
     const { actionId, completed = true, fid } = body;
     const date = new Date().toISOString().split('T')[0];
 
-    // For testing without authentication, use a default test user
-    let userId = 'user-1'; // Default test user ID
-    
-    if (fid) {
-      // Get user by FID if provided
-      const user = await db.select().from(users).where(eq(users.farcasterFid, fid)).limit(1);
-      if (user.length === 0) {
-        return NextResponse.json({ error: 'User not found' }, { status: 404 });
-      }
-      userId = user[0].id;
+    if (!fid) {
+      return NextResponse.json({ error: 'Farcaster ID is required' }, { status: 400 });
     }
+
+    // Get user by FID - try both farcasterFid (text) and fid (integer) fields
+    let user = await db.select().from(users).where(eq(users.farcasterFid, fid)).limit(1);
+    
+    if (user.length === 0) {
+      // Try searching by integer fid field
+      const fidAsInt = parseInt(fid);
+      if (!isNaN(fidAsInt)) {
+        user = await db.select().from(users).where(eq(users.fid, fidAsInt)).limit(1);
+      }
+    }
+    
+    if (user.length === 0) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+    
+    const userId = user[0].id;
 
     if (!actionId) {
       return NextResponse.json({ error: 'Action ID is required' }, { status: 400 });
