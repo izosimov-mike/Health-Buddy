@@ -36,8 +36,8 @@ interface StatsData {
 }
 
 export default function StatsPage() {
- const { setFrameReady, isFrameReady } = useMiniKit()
- const { isAuthenticated, user } = useAuthenticate()
+ const { setFrameReady, isFrameReady, context } = useMiniKit()
+  const { signIn } = useAuthenticate()
   const [stats, setStats] = useState<StatsData | null>(null)
   const [loading, setLoading] = useState(true)
   const [userFid, setUserFid] = useState<string | null>(null)
@@ -50,13 +50,13 @@ export default function StatsPage() {
   }, [setFrameReady, isFrameReady])
 
   useEffect(() => {
-    if (isAuthenticated && user) {
-      setUserFid(user.fid?.toString() || null)
+    if (context?.user?.fid) {
+      setUserFid(context.user.fid.toString())
     }
-  }, [isAuthenticated, user])
+  }, [context?.user?.fid])
 
   useEffect(() => {
-    if (!isAuthenticated || !userFid) {
+    if (!context?.user?.fid || !userFid) {
       setLoading(false)
       return
     }
@@ -76,7 +76,7 @@ export default function StatsPage() {
     }
 
     fetchStats()
-  }, [isAuthenticated, userFid])
+  }, [context?.user?.fid, userFid])
 
   const handleAuthSuccess = (userData: any) => {
     console.log('Authentication successful:', userData)
@@ -84,7 +84,7 @@ export default function StatsPage() {
   }
 
   // Show auth screen if not authenticated
-  if (!isAuthenticated) {
+  if (!context?.user?.fid) {
     return (
       <div className="bg-main min-h-screen">
         <div className="bg-main text-white p-4">

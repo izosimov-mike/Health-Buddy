@@ -27,7 +27,7 @@ interface UserStats {
 
 export default function HomePage() {
   const { setFrameReady, isFrameReady, context } = useMiniKit()
-  const { isAuthenticated, user } = useAuthenticate()
+  const { signIn } = useAuthenticate()
   const [stats, setStats] = useState<UserStats | null>(null)
   const [loading, setLoading] = useState(true)
   const [checkingIn, setCheckingIn] = useState(false)
@@ -42,13 +42,13 @@ export default function HomePage() {
   }, [setFrameReady, isFrameReady])
 
   useEffect(() => {
-    if (isAuthenticated && user) {
-      setUserFid(user.fid?.toString() || null)
+    if (context?.user?.fid) {
+      setUserFid(context.user.fid.toString())
     }
-  }, [isAuthenticated, user])
+  }, [context])
 
   useEffect(() => {
-    if (!isAuthenticated || !userFid) {
+    if (!context?.user?.fid || !userFid) {
       setLoading(false)
       return
     }
@@ -86,7 +86,7 @@ export default function HomePage() {
       document.removeEventListener('visibilitychange', handleVisibilityChange)
       clearInterval(interval)
     }
-  }, [isAuthenticated, userFid])
+  }, [context?.user?.fid, userFid])
 
   const handleDailyCheckin = async () => {
     if (checkingIn || checkedInToday || !userFid) return
@@ -142,7 +142,7 @@ export default function HomePage() {
   }, [context])
 
   // Show auth screen if not authenticated
-  if (!isAuthenticated) {
+  if (!context?.user?.fid) {
     return (
       <div className="bg-main min-h-screen">
         <div className="bg-main text-white py-4 px-4">
