@@ -56,21 +56,21 @@ export default function CategoriesPage() {
 
   // Load categories and actions
   useEffect(() => {
-    if (!userFid) {
-      setDataLoading(false)
-      return
-    }
-
     const loadData = async () => {
       try {
-        const [categoriesRes, actionsRes] = await Promise.all([
-          fetch('/api/categories'),
-          fetch(`/api/actions?fid=${userFid}`)
-        ])
+        // Always load categories
+        const categoriesRes = await fetch('/api/categories')
+        
+        // Load actions with FID if available, otherwise load without FID for testing
+        const actionsUrl = userFid ? `/api/actions?fid=${userFid}` : '/api/actions'
+        const actionsRes = await fetch(actionsUrl)
         
         if (categoriesRes.ok && actionsRes.ok) {
           const categoriesData = await categoriesRes.json()
           const actionsData = await actionsRes.json()
+          
+          console.log('Categories loaded:', categoriesData)
+          console.log('Actions loaded:', actionsData)
           
           setCategories(categoriesData)
           setActions(actionsData)
@@ -83,6 +83,11 @@ export default function CategoriesPage() {
             return action.completed ? total + action.points : total
           }, 0)
           setDailyScore(score)
+        } else {
+          console.error('Failed to load data:', {
+            categoriesStatus: categoriesRes.status,
+            actionsStatus: actionsRes.status
+          })
         }
       } catch (error) {
         console.error('Error loading data:', error)
@@ -154,29 +159,34 @@ export default function CategoriesPage() {
     setUserFid(fid)
   }
 
-  // Show auth screen if not authenticated
-  if (!context?.user?.fid) {
-    return (
-      <div className="bg-main min-h-screen">
-        <div className="bg-main text-white py-4 px-4">
-          <div className="flex items-center gap-3">
-            <Link href="/">
-              <Button variant="ghost" size="sm" className="text-white hover:bg-white/20">
-                <ArrowLeft className="h-4 w-4" />
-              </Button>
-            </Link>
-            <div>
-              <h1 className="text-lg font-bold">Categories</h1>
-              <p className="text-xs opacity-90">Connect to access health actions</p>
-            </div>
-          </div>
-        </div>
-        <div className="p-4">
-          <FarcasterAuth onAuthSuccess={handleAuthSuccess} />
-        </div>
-      </div>
-    )
-  }
+  // Debug: Log context state
+  console.log('MiniKit context:', context)
+  console.log('User FID from context:', context?.user?.fid)
+  console.log('UserFid state:', userFid)
+
+  // Show auth screen if not authenticated (temporarily disabled for debugging)
+  // if (!context?.user?.fid) {
+  //   return (
+  //     <div className="bg-main min-h-screen">
+  //       <div className="bg-main text-white py-4 px-4">
+  //         <div className="flex items-center gap-3">
+  //           <Link href="/">
+  //             <Button variant="ghost" size="sm" className="text-white hover:bg-white/20">
+  //               <ArrowLeft className="h-4 w-4" />
+  //             </div>
+  //           </Link>
+  //           <div>
+  //             <h1 className="text-lg font-bold">Categories</h1>
+  //             <p className="text-xs opacity-90">Connect to access health actions</p>
+  //           </div>
+  //         </div>
+  //       </div>
+  //       <div className="p-4">
+  //         <FarcasterAuth onAuthSuccess={handleAuthSuccess} />
+  //       </div>
+  //     </div>
+  //   )
+  // }
   
   if (dataLoading) {
     return (
