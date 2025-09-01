@@ -47,7 +47,7 @@ export default function StatsPage() {
     const fid = user?.fid || context?.user?.fid
     if (fid) {
       try {
-        await viewProfile({ fid })
+        await viewProfile(fid)
       } catch (error) {
         console.error('Failed to view profile:', error)
       }
