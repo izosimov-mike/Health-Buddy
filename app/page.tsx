@@ -6,8 +6,8 @@ import { Badge } from "@/components/ui/badge"
 import { CheckCircle, Trophy, Target, Calendar } from "lucide-react"
 import Link from "next/link"
 import { useEffect, useState } from "react"
-import { useMiniKit } from '@coinbase/onchainkit/minikit'
-import FarcasterAuth from '@/components/FarcasterAuth'
+import { useMiniKit, useAuthenticate } from '@coinbase/onchainkit/minikit'
+import { FarcasterAuth } from '@/components/FarcasterAuth'
 
 interface UserStats {
   globalScore: number;
@@ -26,12 +26,20 @@ interface UserStats {
 }
 
 export default function HomePage() {
-  const { isAuthenticated, user, context } = useMiniKit()
+  const { setFrameReady, isFrameReady, context } = useMiniKit()
+  const { isAuthenticated, user } = useAuthenticate()
   const [stats, setStats] = useState<UserStats | null>(null)
   const [loading, setLoading] = useState(true)
   const [checkingIn, setCheckingIn] = useState(false)
   const [checkedInToday, setCheckedInToday] = useState(false)
   const [userFid, setUserFid] = useState<string | null>(null)
+
+  // Initialize frame readiness
+  useEffect(() => {
+    if (!isFrameReady) {
+      setFrameReady()
+    }
+  }, [setFrameReady, isFrameReady])
 
   useEffect(() => {
     if (isAuthenticated && user) {

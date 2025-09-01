@@ -7,8 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
-import { useMiniKit } from '@coinbase/onchainkit/minikit'
-import FarcasterAuth from '@/components/FarcasterAuth'
+import { useMiniKit, useAuthenticate } from '@coinbase/onchainkit/minikit'
+import { FarcasterAuth } from '@/components/FarcasterAuth'
 
 
 interface StatsData {
@@ -36,10 +36,18 @@ interface StatsData {
 }
 
 export default function StatsPage() {
-  const { isAuthenticated, user } = useMiniKit()
+ const { setFrameReady, isFrameReady } = useMiniKit()
+ const { isAuthenticated, user } = useAuthenticate()
   const [stats, setStats] = useState<StatsData | null>(null)
   const [loading, setLoading] = useState(true)
   const [userFid, setUserFid] = useState<string | null>(null)
+
+  // Initialize frame readiness
+  useEffect(() => {
+    if (!isFrameReady) {
+      setFrameReady()
+    }
+  }, [setFrameReady, isFrameReady])
 
   useEffect(() => {
     if (isAuthenticated && user) {
