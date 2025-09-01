@@ -117,7 +117,7 @@ export default function CategoriesPage() {
     
     setLoading(true)
     try {
-      const requestBody = { actionId, completed: true }
+      const requestBody: { actionId: string; completed: boolean; fid?: string } = { actionId, completed: true }
       if (userFid) {
         requestBody.fid = userFid
       }
