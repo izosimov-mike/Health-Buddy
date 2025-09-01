@@ -43,7 +43,7 @@ export default function LeaderboardPage() {
 
   const handleViewProfile = async (fid: number) => {
     try {
-      await viewProfile({ fid });
+      await viewProfile(fid);
     } catch (error) {
       console.error('Failed to view profile:', error);
     }
