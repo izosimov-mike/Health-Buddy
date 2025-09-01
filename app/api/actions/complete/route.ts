@@ -72,9 +72,10 @@ export async function POST(request: NextRequest) {
       // Update user's global score
       const currentUser = await db.select().from(users).where(eq(users.id, userId)).limit(1);
       if (currentUser.length > 0) {
+        const currentGlobalScore = currentUser[0].globalScore ?? 0;
         await db.update(users)
           .set({ 
-            globalScore: currentUser[0].globalScore + pointsChange,
+            globalScore: currentGlobalScore + pointsChange,
             updatedAt: new Date()
           })
           .where(eq(users.id, userId));
