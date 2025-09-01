@@ -13,10 +13,6 @@ const mockUsers = [
     longestStreak: 10,
     level: 2,
     farcasterFid: '12345',
-    fid: 12345,
-    farcasterUsername: 'johndoe',
-    farcasterDisplayName: 'John Doe',
-    farcasterPfpUrl: 'https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/12345/original',
     createdAt: new Date(),
     updatedAt: new Date()
   }
@@ -76,9 +72,7 @@ export async function POST(request: NextRequest) {
         };
         
         if (email) updateData.email = email;
-        if (farcasterUsername) updateData.farcasterUsername = farcasterUsername;
-        if (farcasterDisplayName) updateData.farcasterDisplayName = farcasterDisplayName;
-        if (farcasterPfpUrl) updateData.farcasterPfpUrl = farcasterPfpUrl;
+        // Farcaster profile fields removed from database schema
         
         const updatedUser = await db.update(users)
           .set(updateData)
@@ -103,12 +97,9 @@ export async function POST(request: NextRequest) {
 
     // Add Farcaster data if provided
     if (fid) {
-      userData.fid = fid;
       userData.farcasterFid = fid.toString();
     }
-    if (farcasterUsername) userData.farcasterUsername = farcasterUsername;
-    if (farcasterDisplayName) userData.farcasterDisplayName = farcasterDisplayName;
-    if (farcasterPfpUrl) userData.farcasterPfpUrl = farcasterPfpUrl;
+    // Farcaster profile fields removed from database schema
 
     const newUser = await db.insert(users).values(userData).returning();
 

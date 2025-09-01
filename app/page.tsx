@@ -140,10 +140,7 @@ export default function HomePage() {
           },
           body: JSON.stringify({
             name: userData.displayName || userData.username || `User ${fid}`,
-            fid: parseInt(fid),
-            farcasterUsername: userData.username,
-            farcasterDisplayName: userData.displayName,
-            farcasterPfpUrl: userData.pfpUrl
+            fid: parseInt(fid)
           })
         })
         

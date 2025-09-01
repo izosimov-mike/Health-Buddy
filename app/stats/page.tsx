@@ -105,10 +105,7 @@ export default function StatsPage() {
           },
           body: JSON.stringify({
             name: userData.displayName || userData.username || `User ${fid}`,
-            fid: parseInt(fid),
-            farcasterUsername: userData.username,
-            farcasterDisplayName: userData.displayName,
-            farcasterPfpUrl: userData.pfpUrl
+            fid: parseInt(fid)
           })
         })
         

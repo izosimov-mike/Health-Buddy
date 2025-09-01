@@ -5,6 +5,10 @@ import { getUserLevel } from '@/lib/utils';
 
 export async function GET(request: NextRequest) {
   try {
+    const { searchParams } = new URL(request.url);
+    const limitParam = searchParams.get('limit');
+    const limit = limitParam ? parseInt(limitParam) : 10;
+    
     // Get all users ordered by global score
     const leaderboardData = await db.select({
       id: users.id,
@@ -16,7 +20,7 @@ export async function GET(request: NextRequest) {
     })
     .from(users)
     .orderBy(desc(users.globalScore))
-    .limit(10);
+    .limit(limit);
 
     // Add rank and avatar to each user
     const leaderboard = leaderboardData.map((user: typeof leaderboardData[0], index: number) => {
