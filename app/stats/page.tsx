@@ -38,7 +38,7 @@ interface StatsData {
 export default function StatsPage() {
  const { setFrameReady, isFrameReady, context } = useMiniKit()
   const { user, authenticate } = useAuthenticate()
-  const { viewProfile } = useViewProfile()
+  const viewProfile = useViewProfile();
   const [stats, setStats] = useState<StatsData | null>(null)
   const [loading, setLoading] = useState(true)
   const [userFid, setUserFid] = useState<string | null>(null)
