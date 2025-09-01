@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/db';
-import { users, dailyProgress } from '@/lib/db/schema';
+import { db, users, dailyProgress } from '@/lib/db';
 import { eq, and } from 'drizzle-orm';
 import { getStreakBonus } from '@/lib/utils';
 

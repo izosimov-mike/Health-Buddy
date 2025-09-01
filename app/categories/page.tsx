@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { CheckCircle, Circle, Dumbbell, Apple, Brain, Heart, Users, ArrowLeft, Sparkles, Moon } from "lucide-react"
 import Link from "next/link"
-import { useMiniKit } from '@coinbase/onchainkit/minikit'
+import { sdk } from '@farcaster/miniapp-sdk'
 import { FarcasterAuth } from '@/components/FarcasterAuth'
 
 interface HealthAction {
@@ -37,7 +37,6 @@ const categoryConfig: Record<string, { icon: any; gradient: string }> = {
 }
 
 export default function CategoriesPage() {
-  const { context } = useMiniKit()
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [categories, setCategories] = useState<HealthCategory[]>([])
   const [actions, setActions] = useState<HealthAction[]>([])
@@ -46,13 +45,25 @@ export default function CategoriesPage() {
   const [loading, setLoading] = useState(false)
   const [dataLoading, setDataLoading] = useState(true)
   const [userFid, setUserFid] = useState<string | null>(null)
+  const [context, setContext] = useState<any>(null)
 
-  // Get user FID from context
+  // Initialize frame readiness and get context
   useEffect(() => {
-    if (context?.user?.fid) {
-      setUserFid(context.user.fid.toString())
+    const initializeApp = async () => {
+      try {
+        await sdk.actions.ready()
+        const userContext = await sdk.context
+        setContext(userContext)
+        if (userContext?.user?.fid) {
+          setUserFid(userContext.user.fid.toString())
+        }
+      } catch (error) {
+        console.error('Failed to initialize app:', error)
+      }
     }
-  }, [context])
+    
+    initializeApp()
+  }, [])
 
   // Load categories and actions
   useEffect(() => {
@@ -196,7 +207,7 @@ export default function CategoriesPage() {
   console.log('UserFid state:', userFid)
 
   // Show auth screen if not authenticated
-  if (!context?.user?.fid) {
+  if (!userFid || !context?.user?.fid) {
     return (
       <div className="bg-main min-h-screen">
         <div className="bg-main text-white py-4 px-4">

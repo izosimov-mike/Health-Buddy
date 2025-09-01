@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Trophy, Medal, Award, ArrowLeft, Crown, User } from "lucide-react"
 import Link from "next/link"
 import { useEffect, useState } from "react"
-import { useViewProfile, useMiniKit } from '@coinbase/onchainkit/minikit'
+import { sdk } from '@farcaster/miniapp-sdk'
 
 interface LeaderboardUser {
   id: string;
@@ -40,18 +40,30 @@ export default function LeaderboardPage() {
   const [leaderboardData, setLeaderboardData] = useState<LeaderboardUser[]>([]);
   const [currentUserRank, setCurrentUserRank] = useState<LeaderboardUser | null>(null);
   const [loading, setLoading] = useState(true);
-  const { context } = useMiniKit();
-  const viewProfile = useViewProfile();
+  const [context, setContext] = useState<any>(null);
 
   const handleViewProfile = async (fid: number) => {
     try {
-      await viewProfile(fid);
+      await sdk.actions.openUrl(`https://warpcast.com/~/profiles/${fid}`);
     } catch (error) {
       console.error('Failed to view profile:', error);
     }
   };
 
   useEffect(() => {
+    // Initialize frame readiness and get context
+    const initializeApp = async () => {
+      try {
+        await sdk.actions.ready()
+        const userContext = await sdk.context
+        setContext(userContext)
+      } catch (error) {
+        console.error('Failed to initialize app:', error)
+      }
+    }
+    
+    initializeApp()
+
     const fetchLeaderboard = async () => {
       try {
         const response = await fetch('/api/leaderboard');
