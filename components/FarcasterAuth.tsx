@@ -1,15 +1,14 @@
 'use client';
 
-import { useAuthenticate, useMiniKit } from '@coinbase/onchainkit/minikit';
+import { useAuthenticate } from '@coinbase/onchainkit/minikit';
 import { useEffect, useState } from 'react';
 
 interface FarcasterAuthProps {
   onAuthSuccess: (userData: any) => void;
 }
 
-export default function FarcasterAuth({ onAuthSuccess }: FarcasterAuthProps) {
-  const { isAuthenticated, user } = useMiniKit();
-  const { authenticate, isLoading, error } = useAuthenticate();
+export function FarcasterAuth({ onAuthSuccess }: FarcasterAuthProps) {
+  const { isAuthenticated, user, authenticate, isLoading, error } = useAuthenticate();
   const [isAuthenticating, setIsAuthenticating] = useState(false);
 
   useEffect(() => {
