@@ -222,22 +222,22 @@ export default function HomePage() {
 
   return (
     <div className="bg-main min-h-screen">
-      <div className="p-4 space-y-4">
+      <div className="p-4 space-y-2">
         {/* User Info Frame */}
         <Card className="border-0" style={{ backgroundColor: '#180a34' }}>
-          <CardContent className="p-4">
+          <CardContent className="p-3">
             <div className="flex items-center gap-3">
               {/* Profile Picture */}
               <div className="relative">
                 {context?.user?.pfpUrl ? (
                   <img 
                     src={context.user.pfpUrl} 
-                    alt={context.user.displayName || context.user.username || 'User'}
+                    alt={context.user.username || 'User'}
                     className="w-12 h-12 rounded-full object-cover border-2 border-purple-300"
                   />
                 ) : (
                   <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white font-bold text-lg">
-                    {(context?.user?.displayName || context?.user?.username || 'U')[0].toUpperCase()}
+                    {(context?.user?.username || 'U')[0].toUpperCase()}
                   </div>
                 )}
               </div>
@@ -245,7 +245,7 @@ export default function HomePage() {
               {/* User Info */}
               <div className="flex-1">
                 <h3 className="text-white font-semibold text-base">
-                  {context?.user?.displayName || context?.user?.username || 'Farcaster User'}
+                  {context?.user?.username || 'Farcaster User'}
                 </h3>
                 <div className="text-sm text-white/70">
                   {context?.user?.username && `@${context.user.username}`}
@@ -267,7 +267,7 @@ export default function HomePage() {
 
         {/* Score and Streak Frame */}
         <Card className="border-0" style={{ backgroundColor: '#241f53' }}>
-          <CardContent className="p-4 space-y-3">
+          <CardContent className="p-3 space-y-3">
             <div className="flex justify-between items-center">
               <span className="text-white font-medium">Score</span>
               <span className="text-white font-bold text-lg">{stats?.globalScore || 0}</span>
@@ -283,6 +283,12 @@ export default function HomePage() {
         <Card className="section-primary border-0">
           <CardContent className="p-4">
             <div className="text-center space-y-4">
+              {/* App Title */}
+              <div className="mb-4">
+                <h3 className="text-white text-2xl font-bold mb-1">Health Buddy</h3>
+                <p className="text-purple-200 text-sm">Your daily wellness companion</p>
+              </div>
+              
               {/* Level Image */}
               <div className="flex justify-center">
                 <img 
@@ -317,27 +323,6 @@ export default function HomePage() {
         <Card className="section-primary border-0">
           <CardContent className="p-4">
             <div className="text-center space-y-3">
-              <div className="flex items-center justify-center gap-2">
-                <h3 className="text-sm font-medium text-white">Daily Check-in</h3>
-                <Calendar className="h-4 w-4 text-purple-400" />
-              </div>
-              
-              <div className="bg-black/20 backdrop-blur-sm rounded-lg p-3 space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-xs font-medium text-white opacity-90">Current Streak:</span>
-                  <span className="text-sm font-bold text-primary">{stats?.currentStreak || 0} days</span>
-                </div>
-                
-                <div className="text-xs text-white opacity-90 space-y-1">
-                  <div>• Check-in: +1 point</div>
-                  {(stats?.currentStreak ?? 0) >= 7 ? (
-                    <div className="text-green-400 font-medium">• Streak bonus: +{stats?.streakBonus || 0} points</div>
-                  ) : (
-                    <div>• Streak bonus starts at 7+ days</div>
-                  )}
-                </div>
-              </div>
-              
               <Button 
                 className={`w-full ${checkedInToday ? 'bg-[#241f53] text-white' : 'btn-gradient'}`} 
                 size="lg" 
