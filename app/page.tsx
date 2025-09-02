@@ -224,8 +224,8 @@ export default function HomePage() {
     <div className="bg-main min-h-screen">
       <div className="p-4 space-y-2">
         {/* User Info Frame */}
-        <Card className="border-0" style={{ backgroundColor: '#180a34' }}>
-          <CardContent className="p-1">
+        <Card className="py-2 border-0" style={{ backgroundColor: '#180a34' }}>
+          <CardContent className="px-3" style={{ paddingTop: '4px', paddingBottom: '4px' }}>
             <div className="flex items-center gap-3">
               {/* Profile Picture */}
               <div className="relative">
@@ -277,8 +277,8 @@ export default function HomePage() {
         </Card>
 
         {/* Level Image and Progress Frame */}
-        <Card className="section-primary border-0">
-          <CardContent className="p-1">
+        <Card className="py-2 section-primary border-0">
+          <CardContent className="px-3" style={{ paddingTop: '4px', paddingBottom: '4px' }}>
             <div className="text-center space-y-2">
               {/* App Title */}
               <div className="mb-2">
@@ -317,8 +317,8 @@ export default function HomePage() {
         </Card>
 
         {/* Check-in Frame */}
-        <Card className="section-primary border-0">
-          <CardContent className="p-1">
+        <Card className="py-2 section-primary border-0">
+          <CardContent className="px-3" style={{ paddingTop: '4px', paddingBottom: '4px' }}>
             <div className="text-center">
               <Button 
                 className={`w-full ${checkedInToday ? 'bg-[#241f53] text-white' : 'btn-gradient'}`} 
@@ -335,8 +335,8 @@ export default function HomePage() {
         </Card>
 
         {/* Daily Health Actions Frame */}
-        <Card className="section-primary border-0">
-          <CardContent className="p-4">
+        <Card className="py-2 section-primary border-0">
+          <CardContent className="px-3" style={{ paddingTop: '4px', paddingBottom: '4px' }}>
             <Link href="/categories">
               <Button className="w-full btn-gradient" size="lg">
                 <CheckCircle className="mr-2 h-4 w-4" />

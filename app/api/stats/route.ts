@@ -98,18 +98,26 @@ export async function GET(request: NextRequest) {
     const levelProgress = getProgressToNextLevel(globalScore);
     const streakBonus = getStreakBonus(currentStreak);
 
-    // Create full week data (7 days) with proper day names
+    // Create full week data with static day names (Mon-Sun)
+    const staticDayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     const fullWeekData = [];
-    for (let i = 6; i >= 0; i--) {
-      const date = new Date();
-      date.setDate(date.getDate() - i);
+    
+    // Get current week's Monday
+    const today = new Date();
+    const currentDay = today.getDay(); // 0 = Sunday, 1 = Monday, etc.
+    const mondayOffset = currentDay === 0 ? -6 : 1 - currentDay; // Adjust for Sunday being 0
+    const monday = new Date(today);
+    monday.setDate(today.getDate() + mondayOffset);
+    
+    for (let i = 0; i < 7; i++) {
+      const date = new Date(monday);
+      date.setDate(monday.getDate() + i);
       const dateStr = date.toISOString().split('T')[0];
-      const dayName = date.toLocaleDateString('en', { weekday: 'short' });
       
       const dayData = weeklyProgress.find((d: typeof weeklyProgress[0]) => d.date === dateStr);
       fullWeekData.push({
         date: dateStr,
-        day: dayName,
+        day: staticDayNames[i],
         points: dayData?.totalScore || 0,
         actions: dayData?.completedActions || 0,
       });
