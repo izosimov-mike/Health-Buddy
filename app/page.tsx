@@ -59,6 +59,14 @@ export default function HomePage() {
 
     const syncUserData = async () => {
       try {
+        // Log SDK context data for debugging
+        console.log('SDK Context User Data:', {
+          fid: context.user.fid,
+          username: context.user.username,
+          displayName: context.user.displayName,
+          pfpUrl: context.user.pfpUrl
+        });
+
         // First, sync user data from SDK to database
         await fetch('/api/stats', {
           method: 'POST',
