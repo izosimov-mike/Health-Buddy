@@ -70,6 +70,22 @@ export default function LeaderboardPage() {
         if (response.ok) {
           const data = await response.json();
           
+          // Enhance leaderboard data with SDK info for current user
+          const enhancedData = data.map((user: LeaderboardUser) => {
+            if (context?.user?.fid && user.fid === context.user.fid.toString()) {
+              return {
+                ...user,
+                farcasterUsername: context.user.username,
+                farcasterPfpUrl: context.user.pfpUrl
+              };
+            }
+            return {
+              ...user,
+              farcasterUsername: user.name, // Use name as fallback for username
+              farcasterPfpUrl: null // No pfp for other users
+            };
+          });
+          
           // Find current user in leaderboard if authenticated
           let currentUser = null;
           if (context?.user?.fid) {
@@ -108,7 +124,7 @@ export default function LeaderboardPage() {
           }
           
           setCurrentUserRank(currentUser);
-          setLeaderboardData(data.slice(0, 10)); // Limit to TOP-10
+          setLeaderboardData(enhancedData.slice(0, 10)); // Limit to TOP-10
         }
       } catch (error) {
         console.error('Failed to fetch leaderboard:', error);
@@ -150,35 +166,33 @@ export default function LeaderboardPage() {
                 Your Profile
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="relative">
+              {/* Rank in top right corner */}
+              {currentUserRank && (
+                <div className="absolute top-2 right-2 text-2xl font-bold text-primary">
+                  #{currentUserRank.rank}
+                </div>
+              )}
+              
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <div className="relative">
                     {context.user.pfpUrl ? (
                       <img 
                         src={context.user.pfpUrl} 
-                        alt={context.user.displayName || context.user.username || 'User'}
+                        alt={context.user.username || 'User'}
                         className="w-16 h-16 rounded-full object-cover border-3 border-primary/30"
                       />
                     ) : (
                       <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center text-white font-bold text-xl">
-                        {context.user.displayName ? context.user.displayName[0].toUpperCase() : 'U'}
+                        {context.user.username ? context.user.username[0].toUpperCase() : 'U'}
                       </div>
                     )}
-                    <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-primary rounded-full flex items-center justify-center">
-                      <User className="w-3 h-3 text-white" />
-                    </div>
                   </div>
                   
                   <div>
                     <div className="font-bold text-xl">
-                      {context.user.displayName || context.user.username || 'User'}
-                    </div>
-                    <div className="text-base text-muted-foreground">
-                      @{context.user.username || 'username'}
-                    </div>
-                    <div className="text-sm text-primary font-medium">
-                      FID: {context.user.fid}
+                      {context.user.username || 'User'}
                     </div>
                   </div>
                 </div>
@@ -190,10 +204,7 @@ export default function LeaderboardPage() {
                         {currentUserRank.globalScore}
                       </div>
                       <div className="text-sm text-muted-foreground">
-                        Total Score
-                      </div>
-                      <div className="text-xs text-primary font-medium mt-1">
-                        Rank #{currentUserRank.rank}
+                        Points
                       </div>
                     </>
                   )}
@@ -236,30 +247,25 @@ export default function LeaderboardPage() {
                       </div>
                       
                       <div className="relative">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white font-bold text-xs">
-                          {user.name[0].toUpperCase()}
-                        </div>
-                        {user.fid && (
-                          <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-purple-500 rounded-full flex items-center justify-center">
-                            <User className="w-1.5 h-1.5 text-white" />
+                        {user.farcasterPfpUrl ? (
+                          <img 
+                            src={user.farcasterPfpUrl} 
+                            alt={user.farcasterUsername || user.name}
+                            className="w-8 h-8 rounded-full object-cover border-2 border-purple-300"
+                          />
+                        ) : (
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white font-bold text-xs">
+                            {(user.farcasterUsername || user.name)[0].toUpperCase()}
                           </div>
                         )}
                       </div>
                       
                       <div>
-                        <div className="text-sm font-medium flex items-center gap-1">
-                          {user.name}
-                          {user.fid && (
-                            <Badge variant="outline" className="text-xs px-1 py-0 text-purple-600 border-purple-200">
-                              FC
-                            </Badge>
-                          )}
+                        <div className="text-sm font-medium">
+                          {user.farcasterUsername || user.name}
                         </div>
                         <div className="text-xs text-muted-foreground">
                           {user.levelName}
-                          {user.fid && (
-                            <span className="ml-1 text-purple-500">FID: {user.fid}</span>
-                          )}
                         </div>
                       </div>
                     </div>
