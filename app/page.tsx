@@ -264,14 +264,14 @@ export default function HomePage() {
 
         {/* Score and Streak Frame */}
         <Card className="border-0" style={{ backgroundColor: '#241f53' }}>
-          <CardContent className="p-1 space-y-1">
-            <div className="flex justify-between items-center">
-              <span className="text-white font-medium">Score</span>
-              <span className="text-white font-bold text-lg">{stats?.globalScore || 0}</span>
+          <CardContent className="px-3 py-1">
+            <div className="flex justify-between items-center py-1">
+              <span className="text-white font-medium text-sm">Score</span>
+              <span className="text-white font-bold text-base">{stats?.globalScore || 0}</span>
             </div>
-            <div className="flex justify-between items-center">
-              <span className="text-white font-medium">Streak</span>
-              <span className="text-white font-bold text-lg">{stats?.currentStreak || 0}</span>
+            <div className="flex justify-between items-center py-1">
+              <span className="text-white font-medium text-sm">Streak</span>
+              <span className="text-white font-bold text-base">{stats?.currentStreak || 0}</span>
             </div>
           </CardContent>
         </Card>
