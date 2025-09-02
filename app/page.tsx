@@ -57,6 +57,26 @@ export default function HomePage() {
       return
     }
 
+    const syncUserData = async () => {
+      try {
+        // First, sync user data from SDK to database
+        await fetch('/api/stats', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            fid: context.user.fid,
+            username: context.user.username,
+            displayName: context.user.displayName,
+            pfpUrl: context.user.pfpUrl
+          })
+        })
+      } catch (error) {
+        console.error('Failed to sync user data:', error)
+      }
+    }
+
     const fetchStats = async () => {
       try {
         const response = await fetch(`/api/stats?fid=${userFid}`)
@@ -72,7 +92,13 @@ export default function HomePage() {
       }
     }
 
-    fetchStats()
+    // Sync user data first, then fetch stats
+    const initializeUserData = async () => {
+      await syncUserData()
+      await fetchStats()
+    }
+
+    initializeUserData()
 
     // Refresh stats when page becomes visible
     const handleVisibilityChange = () => {
