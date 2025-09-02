@@ -225,7 +225,7 @@ export default function HomePage() {
       <div className="p-4 space-y-2">
         {/* User Info Frame */}
         <Card className="border-0" style={{ backgroundColor: '#180a34' }}>
-          <CardContent className="p-3">
+          <CardContent className="p-1">
             <div className="flex items-center gap-3">
               {/* Profile Picture */}
               <div className="relative">
@@ -247,9 +247,6 @@ export default function HomePage() {
                 <h3 className="text-white font-semibold text-base">
                   {context?.user?.username || 'Farcaster User'}
                 </h3>
-                <div className="text-sm text-white/70">
-                  {context?.user?.username && `@${context.user.username}`}
-                </div>
               </div>
               
               {/* Current Level */}
@@ -267,7 +264,7 @@ export default function HomePage() {
 
         {/* Score and Streak Frame */}
         <Card className="border-0" style={{ backgroundColor: '#241f53' }}>
-          <CardContent className="p-3 space-y-3">
+          <CardContent className="p-1 space-y-1">
             <div className="flex justify-between items-center">
               <span className="text-white font-medium">Score</span>
               <span className="text-white font-bold text-lg">{stats?.globalScore || 0}</span>
@@ -281,10 +278,10 @@ export default function HomePage() {
 
         {/* Level Image and Progress Frame */}
         <Card className="section-primary border-0">
-          <CardContent className="p-4">
-            <div className="text-center space-y-4">
+          <CardContent className="p-1">
+            <div className="text-center space-y-2">
               {/* App Title */}
-              <div className="mb-4">
+              <div className="mb-2">
                 <h3 className="text-white text-2xl font-bold mb-1">Health Buddy</h3>
                 <p className="text-purple-200 text-sm">Your daily wellness companion</p>
               </div>
@@ -321,8 +318,8 @@ export default function HomePage() {
 
         {/* Check-in Frame */}
         <Card className="section-primary border-0">
-          <CardContent className="p-4">
-            <div className="text-center space-y-3">
+          <CardContent className="p-1">
+            <div className="text-center">
               <Button 
                 className={`w-full ${checkedInToday ? 'bg-[#241f53] text-white' : 'btn-gradient'}`} 
                 size="lg" 
