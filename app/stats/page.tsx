@@ -222,8 +222,8 @@ export default function StatsPage() {
       <div className="p-2 space-y-3">
         {/* Farcaster Profile Section */}
         {context?.user?.fid && (
-          <Card className="section-primary border-0">
-            <CardContent className="p-3">
+          <Card className="py-2 section-primary border-0">
+            <CardContent className="px-3" style={{ paddingTop: '4px', paddingBottom: '4px' }}>
               <div className="flex items-center gap-3">
                 {/* Profile Picture */}
                 <div className="relative">
@@ -249,9 +249,6 @@ export default function StatsPage() {
                     <h3 className="text-white font-semibold text-base">
                       {context?.user?.displayName || context?.user?.username || 'Farcaster User'}
                     </h3>
-                    <Badge variant="outline" className="text-xs text-purple-300 border-purple-300">
-                      FC
-                    </Badge>
                   </div>
                   <div className="text-sm text-white/70">
                     {context?.user?.username && `@${context.user.username}`}
@@ -265,16 +262,7 @@ export default function StatsPage() {
                     </div>
                   )}
                 </div>
-                
-                {/* View Profile Button */}
-                <Button
-                  onClick={handleViewProfile}
-                  variant="outline"
-                  size="sm"
-                  className="text-purple-300 border-purple-300 hover:bg-purple-300 hover:text-purple-900"
-                >
-                  View Profile
-                </Button>
+
               </div>
             </CardContent>
           </Card>
@@ -282,8 +270,8 @@ export default function StatsPage() {
         
         {/* Key Metrics */}
         <div className="grid grid-cols-2 gap-2">
-          <Card className="section-primary text-white border-0">
-            <CardContent className="px-1.5 py-1 text-center">
+          <Card className="py-2 section-primary text-white border-0">
+            <CardContent className="px-3 text-center" style={{ paddingTop: '4px', paddingBottom: '4px' }}>
               <div className="flex items-center justify-center gap-1.5 mb-0">
                 <Award className="h-3 w-3 text-yellow-300" />
                 <span className="text-base font-bold leading-tight">{stats.globalScore}</span>
@@ -291,8 +279,8 @@ export default function StatsPage() {
               <div className="text-xs opacity-90 leading-tight">Total Points</div>
             </CardContent>
           </Card>
-          <Card className="section-primary text-white border-0">
-            <CardContent className="px-1.5 py-1 text-center">
+          <Card className="py-2 section-primary text-white border-0">
+            <CardContent className="px-3 text-center" style={{ paddingTop: '4px', paddingBottom: '4px' }}>
               <div className="flex items-center justify-center gap-1.5 mb-0">
                 <Flame className="h-3 w-3 text-orange-300" />
                 <span className="text-base font-bold leading-tight">{stats.currentStreak}</span>
@@ -303,14 +291,14 @@ export default function StatsPage() {
         </div>
 
         {/* Weekly Progress Chart */}
-        <Card className="section-primary border-0">
-          <CardHeader className="pb-1">
+        <Card className="py-2 section-primary border-0">
+          <CardHeader className="px-3" style={{ paddingTop: '4px', paddingBottom: '2px' }}>
             <CardTitle className="flex items-center gap-1.5 text-sm text-white">
               <TrendingUp className="h-3 w-3 text-purple-400" />
               Weekly Progress
             </CardTitle>
           </CardHeader>
-          <CardContent className="pt-0">
+          <CardContent className="px-3" style={{ paddingTop: '2px', paddingBottom: '4px' }}>
             <div className="space-y-3">
               {stats.weeklyProgress && stats.weeklyProgress.length > 0 && (
                 <>
@@ -343,15 +331,15 @@ export default function StatsPage() {
         </Card>
 
         {/* Category Progress */}
-        <Card className="section-primary border-0">
-          <CardHeader className="pb-1">
+        <Card className="py-2 section-primary border-0">
+          <CardHeader className="px-3" style={{ paddingTop: '4px', paddingBottom: '2px' }}>
             <CardTitle className="flex items-center gap-1.5 text-sm text-white">
               <Target className="h-3 w-3 text-purple-400" />
               Category Progress
             </CardTitle>
             <p className="text-xs text-white opacity-90 leading-tight">Weekly completion rate by category</p>
           </CardHeader>
-          <CardContent className="space-y-2">
+          <CardContent className="px-3 space-y-2" style={{ paddingTop: '2px', paddingBottom: '4px' }}>
             {stats.categoryStats?.map((category, index) => {
               // Define different colors for category markers
               const categoryColors = {
