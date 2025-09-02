@@ -6,6 +6,9 @@ import { getUserLevel, getProgressToNextLevel, getStreakBonus } from '@/lib/util
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const fid = searchParams.get('fid');
+  const username = searchParams.get('username');
+  const displayName = searchParams.get('displayName');
+  const pfpUrl = searchParams.get('pfpUrl');
 
   if (!fid) {
     return NextResponse.json({ error: 'Farcaster ID is required' }, { status: 400 });
@@ -15,10 +18,13 @@ export async function GET(request: NextRequest) {
     // Get user basic stats by Farcaster ID
     const userData = await db.select().from(users).where(eq(users.farcasterFid, fid)).limit(1);
     if (userData.length === 0) {
-      // Create new user if not exists
+      // Create new user if not exists with SDK data
       const newUser = await db.insert(users).values({
         id: `user_${fid}`,
-        name: `User ${fid}`,
+        name: displayName || username || `User ${fid}`,
+        username: username,
+        displayName: displayName,
+        pfpUrl: pfpUrl,
         farcasterFid: fid
       }).returning();
       
@@ -182,6 +188,54 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error('Database error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { fid, username, displayName, pfpUrl } = body;
+
+    if (!fid) {
+      return NextResponse.json({ error: 'Farcaster ID is required' }, { status: 400 });
+    }
+
+    // Check if user exists
+    const userData = await db.select().from(users).where(eq(users.farcasterFid, fid.toString())).limit(1);
+    
+    if (userData.length === 0) {
+      // Create new user with SDK data
+      const newUser = await db.insert(users).values({
+        id: `user_${fid}`,
+        name: displayName || username || `User ${fid}`,
+        farcasterFid: fid.toString(),
+        pfpUrl: pfpUrl || null
+      }).returning();
+      
+      return NextResponse.json({ message: 'User created successfully', user: newUser[0] }, { status: 201 });
+    } else {
+      // Update existing user with fresh SDK data
+      const updateData: any = {
+        updatedAt: new Date()
+      };
+      
+      if (displayName || username) {
+        updateData.name = displayName || username;
+      }
+      if (pfpUrl) {
+        updateData.pfpUrl = pfpUrl;
+      }
+      
+      const updatedUser = await db.update(users)
+        .set(updateData)
+        .where(eq(users.farcasterFid, fid.toString()))
+        .returning();
+        
+      return NextResponse.json({ message: 'User updated successfully', user: updatedUser[0] }, { status: 200 });
+    }
+  } catch (error) {
+    console.error('Error updating user data:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

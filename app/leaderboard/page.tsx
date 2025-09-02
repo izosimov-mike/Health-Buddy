@@ -53,8 +53,8 @@ export default function LeaderboardPage() {
     }
   };
 
+  // Initialize SDK and get context once
   useEffect(() => {
-    // Initialize frame readiness and get context
     const initializeApp = async () => {
       try {
         await sdk.actions.ready()
@@ -66,6 +66,11 @@ export default function LeaderboardPage() {
     }
     
     initializeApp()
+  }, [])
+
+  // Fetch leaderboard data when context is available
+  useEffect(() => {
+    if (!context) return
 
     const fetchLeaderboard = async () => {
       try {
@@ -142,10 +147,8 @@ export default function LeaderboardPage() {
       }
     };
 
-    if (context) {
-      fetchLeaderboard()
-    }
-  }, [context]);
+    fetchLeaderboard()
+  }, [context])
 
   return (
     <div className="min-h-screen bg-main pb-20">
