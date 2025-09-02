@@ -1,8 +1,8 @@
 {
   "accountAssociation": {
-    "header": "",
-    "payload": "",
-    "signature": ""
+    "header": "eyJmaWQiOjM2MjEsInR5cGUiOiJjdXN0b2R5Iiwia2V5IjoiMHgyY2Q4NWEwOTMyNjFmNTkyNzA4MDRBNkVBNjk3Q2VBNENlQkVjYWZFIn0",
+    "payload": "eyJkb21haW4iOiJoZWFsdGgtYnVkZHktc2V2ZW4udmVyY2VsLmFwcCJ9",
+    "signature": "MHgwZmJiYWIwODg3YTU2MDFiNDU3MzVkOTQ5MDRjM2Y1NGUxMzVhZTQxOGEzMWQ5ODNhODAzZmZlYWNlZWMyZDYzNWY4ZTFjYWU4M2NhNTAwOTMzM2FmMTc1NDlmMDY2YTVlOWUwNTljNmZiNDUxMzg0Njk1NzBhODNiNjcyZWJjZTFi"
   },
   "baseBuilder": {
     "allowedAddresses": ["0x459f852E759D4aC09Dfd7e310E7075801A2580C9"]
@@ -23,5 +23,5 @@
     "ogTitle": "Your Daily Wellness Buddy",
     "ogDescription": "Turn wellness into a game! Check in daily, complete healthy actions, and see your progress grow. Stay motivated, stay healthy, stay happy!",
     "ogImageUrl": "https://health-buddy-seven.vercel.app/images/promo.png"
-  },
+  }
 }
