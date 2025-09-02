@@ -21,7 +21,7 @@
     "tags": ["fitness", "miniapp", "baseapp", "health", "wellness"],
     "tagline": "Grow Strong, Stay Happy",
     "ogTitle": "Your Daily Wellness Buddy",
-    "ogDescription": "Turn wellness into a game! Check in daily, complete healthy actions, and see your progress grow. Stay motivated, stay healthy, stay happy!",
+    "ogDescription": "Turn wellness into a game! Check in daily, complete healthy actions, and see your progress grow.",
     "ogImageUrl": "https://health-buddy-seven.vercel.app/images/promo.png"
   }
 }
