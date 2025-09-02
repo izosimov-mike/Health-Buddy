@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     
     const userId = userData[0].id;
     const userRecord = userData[0];
-    const lastCheckinDate = userData.lastCheckinDate;
+    const lastCheckinDate = userData[0].lastCheckinDate;
     
     // Check if user already checked in today
     if (lastCheckinDate === today) {
@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
       
       if (daysDiff === 1) {
         // Consecutive day - increment streak
-        newCurrentStreak = (userData.currentStreak ?? 0) + 1;
+        newCurrentStreak = (userData[0].currentStreak ?? 0) + 1;
       } else if (daysDiff > 1) {
         // Streak broken - reset to 1
         newCurrentStreak = 1;
@@ -53,8 +53,8 @@ export async function POST(request: NextRequest) {
     const streakBonus = getStreakBonus(newCurrentStreak);
 
     const totalPoints = 1 + streakBonus; // 1 base point + streak bonus
-    const newGlobalScore = (userData.globalScore ?? 0) + totalPoints;
-    const newLongestStreak = Math.max(userData.longestStreak ?? 0, newCurrentStreak);
+    const newGlobalScore = (userData[0].globalScore ?? 0) + totalPoints;
+    const newLongestStreak = Math.max(userData[0].longestStreak ?? 0, newCurrentStreak);
 
     // Update user data
     await db.update(users)
