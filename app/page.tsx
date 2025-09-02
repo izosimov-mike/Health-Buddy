@@ -129,6 +129,21 @@ export default function HomePage() {
     }
   }
 
+  // Function to get level image based on level
+  const getLevelImage = (level: number) => {
+    const levelImages = {
+      1: '/images/1_Beginner.png',
+      2: '/images/2_Apprentice.png',
+      3: '/images/3_Explorer.png',
+      4: '/images/4_Achiever.png',
+      5: '/images/5_Champion.png',
+      6: '/images/6_Master.png',
+      7: '/images/7_Legend.png',
+      8: '/images/8_Mythic.png'
+    }
+    return levelImages[level as keyof typeof levelImages] || '/images/1_Beginner.png'
+  }
+
   const handleAuthSuccess = async (userData: any) => {
     console.log('Authentication successful:', userData)
     const fid = userData.fid?.toString()
@@ -225,9 +240,9 @@ export default function HomePage() {
             {/* Level Image */}
             <div className="flex justify-center">
               <img 
-                src={(stats?.levelName || 'Beginner') === 'Beginner' ? '/images/1_Beginner.png' : '/images/1_Beginner.png'} 
+                src={getLevelImage(stats?.level || 1)} 
                 alt={`${stats?.levelName || 'Beginner'} level`}
-                className="w-16 h-16 object-contain"
+                className="w-24 h-24 object-contain"
               />
             </div>
             
