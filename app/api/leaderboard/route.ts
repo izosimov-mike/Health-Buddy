@@ -17,6 +17,7 @@ export async function GET(request: NextRequest) {
       currentStreak: users.currentStreak,
       level: users.level,
       fid: users.farcasterFid,
+      pfpUrl: users.pfpUrl,
     })
     .from(users)
     .orderBy(desc(users.globalScore))

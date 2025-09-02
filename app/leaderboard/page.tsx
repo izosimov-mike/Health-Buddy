@@ -21,6 +21,9 @@ interface LeaderboardUser {
   farcasterUsername?: string;
   farcasterDisplayName?: string;
   farcasterPfpUrl?: string;
+  pfp?: string;
+  username?: string;
+  pfpUrl?: string;
 }
 
 const getRankIcon = (rank: number) => {
@@ -37,7 +40,7 @@ const getRankIcon = (rank: number) => {
 }
 
 export default function LeaderboardPage() {
-  const [leaderboardData, setLeaderboardData] = useState<LeaderboardUser[]>([]);
+  const [leaderboardData, setLeaderboardData] = useState<any[]>([]);
   const [currentUserRank, setCurrentUserRank] = useState<LeaderboardUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [context, setContext] = useState<any>(null);
@@ -66,25 +69,27 @@ export default function LeaderboardPage() {
 
     const fetchLeaderboard = async () => {
       try {
-        const response = await fetch('/api/leaderboard');
+        const response = await fetch('/api/leaderboard')
         if (response.ok) {
-          const data = await response.json();
+          const data = await response.json()
           
-          // Enhance leaderboard data with SDK info for current user
-          const enhancedData = data.map((user: LeaderboardUser) => {
-            if (context?.user?.fid && user.fid === context.user.fid.toString()) {
+          const enhancedData = data.map((user: any) => {
+            // For current user, use context data
+            if (context?.user?.fid && user.fid === context.user.fid) {
               return {
                 ...user,
                 farcasterUsername: context.user.username,
                 farcasterPfpUrl: context.user.pfpUrl
-              };
+              }
             }
+            
+            // For other users, use database data
             return {
               ...user,
-              farcasterUsername: user.name, // Use name as fallback for username
-              farcasterPfpUrl: null // No pfp for other users
-            };
-          });
+              farcasterUsername: user.name,
+              farcasterPfpUrl: user.pfpUrl || null
+            }
+          })
           
           // Find current user in leaderboard if authenticated
           let currentUser = null;
@@ -98,12 +103,14 @@ export default function LeaderboardPage() {
               const fullLeaderboardResponse = await fetch('/api/leaderboard?limit=1000');
               if (fullLeaderboardResponse.ok) {
                 const fullData = await fullLeaderboardResponse.json();
-                const userIndex = fullData.findIndex((u: LeaderboardUser) => u.fid === userFid);
+                const userIndex = fullData.findIndex((u: any) => u.fid === userFid);
                 if (userIndex !== -1) {
                   currentUser = {
                     ...fullData[userIndex],
                     rank: userIndex + 1,
-                    globalScore: userData.globalScore || 0
+                    globalScore: userData.globalScore || 0,
+                    pfp: context.user.pfpUrl || '/default-avatar.png',
+                    username: context.user.username || context.user.displayName || 'Unknown'
                   };
                 } else {
                   // User not in top leaderboard, create entry with stats data
@@ -116,7 +123,9 @@ export default function LeaderboardPage() {
                     rank: fullData.length + 1,
                     avatar: '',
                     levelName: userData.levelName || 'Beginner',
-                    fid: userFid
+                    fid: userFid,
+                    pfp: context.user.pfpUrl || '/default-avatar.png',
+                    username: context.user.username || context.user.displayName || 'Unknown'
                   };
                 }
               }
@@ -133,8 +142,10 @@ export default function LeaderboardPage() {
       }
     };
 
-    fetchLeaderboard();
-  }, [context?.user?.fid]);
+    if (context) {
+      fetchLeaderboard()
+    }
+  }, [context]);
 
   return (
     <div className="min-h-screen bg-main pb-20">
@@ -159,54 +170,50 @@ export default function LeaderboardPage() {
       <div className="p-4 space-y-4">
         {/* Current User Profile */}
         {context?.user && (
-          <Card className="mb-6 bg-gradient-to-r from-primary/10 to-purple-100 border-primary/20">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Trophy className="w-5 h-5 text-primary" />
-                Your Profile
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="relative">
+          <Card className="py-2 section-primary border-0 mb-4">
+            <CardContent className="px-3 relative" style={{ paddingTop: '4px', paddingBottom: '4px' }}>
               {/* Rank in top right corner */}
               {currentUserRank && (
-                <div className="absolute top-2 right-2 text-2xl font-bold text-primary">
+                <div className="absolute top-2 right-3 text-lg font-bold text-yellow-300">
                   #{currentUserRank.rank}
                 </div>
               )}
               
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="relative">
-                    {context.user.pfpUrl ? (
-                      <img 
-                        src={context.user.pfpUrl} 
-                        alt={context.user.username || 'User'}
-                        className="w-16 h-16 rounded-full object-cover border-3 border-primary/30"
-                      />
-                    ) : (
-                      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center text-white font-bold text-xl">
-                        {context.user.username ? context.user.username[0].toUpperCase() : 'U'}
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div>
-                    <div className="font-bold text-xl">
-                      {context.user.username || 'User'}
+              <div className="flex items-center gap-3">
+                {/* Profile Picture */}
+                <div className="relative">
+                  {context.user.pfpUrl ? (
+                    <img 
+                      src={context.user.pfpUrl} 
+                      alt={context.user.username || 'User'}
+                      className="w-12 h-12 rounded-full object-cover border-2 border-purple-300"
+                    />
+                  ) : (
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white font-bold text-lg">
+                      {context.user.username ? context.user.username[0].toUpperCase() : 'U'}
                     </div>
+                  )}
+                  <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-purple-500 rounded-full flex items-center justify-center">
+                    <Trophy className="w-3 h-3 text-white" />
                   </div>
                 </div>
                 
-                <div className="text-right">
+                {/* Profile Info */}
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h3 className="text-white font-semibold text-base">
+                      {context.user.username || 'User'}
+                    </h3>
+                  </div>
                   {currentUserRank && (
-                    <>
-                      <div className="font-bold text-3xl text-primary">
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg font-bold text-yellow-300">
                         {currentUserRank.globalScore}
-                      </div>
-                      <div className="text-sm text-muted-foreground">
+                      </span>
+                      <span className="text-sm text-white/70">
                         Points
-                      </div>
-                    </>
+                      </span>
+                    </div>
                   )}
                 </div>
               </div>

@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
         };
         
         if (email) updateData.email = email;
-        // Farcaster profile fields removed from database schema
+        if (farcasterPfpUrl) updateData.pfpUrl = farcasterPfpUrl;
         
         const updatedUser = await db.update(users)
           .set(updateData)
@@ -99,7 +99,9 @@ export async function POST(request: NextRequest) {
     if (fid) {
       userData.farcasterFid = fid.toString();
     }
-    // Farcaster profile fields removed from database schema
+    if (farcasterPfpUrl) {
+      userData.pfpUrl = farcasterPfpUrl;
+    }
 
     const newUser = await db.insert(users).values(userData).returning();
 
