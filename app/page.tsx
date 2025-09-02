@@ -221,85 +221,114 @@ export default function HomePage() {
   }
 
   return (
-    <div className="bg-main">
-      {/* Header */}
-      <div className="bg-main text-white py-4 px-4">
-        <div className="text-center max-w-sm mx-auto">
-          <h1 className="text-xl font-bold mb-0.5">Health Buddy</h1>
-          <p className="text-xs opacity-90">Your daily wellness companion</p>
-        </div>
-      </div>
-
-      <div className="p-4 space-y-6">
-        {/* Level Badge */}
-        <div className="text-center space-y-1.5">
-          <Badge variant="secondary" className="text-sm px-3 py-1">
-            Level {stats?.level || 1} - {stats?.levelName || 'Beginner'}
-          </Badge>
-            
-            {/* Level Image */}
-            <div className="flex justify-center">
-              <img 
-                src={getLevelImage(stats?.level || 1)} 
-                alt={`${stats?.levelName || 'Beginner'} level`}
-                className="w-24 h-24 object-contain"
-              />
-            </div>
-            
-            {/* Progress Bar */}
-            <div className="max-w-xs mx-auto">
-              <div className="flex justify-between text-xs text-muted-foreground mb-1">
-                <span>Progress to next level</span>
-                <span>{Math.round(stats?.levelProgress?.progress || 0)}%</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-1.5">
-                <div 
-                  className="bg-primary h-1.5 rounded-full transition-all duration-300" 
-                  style={{ width: `${stats?.levelProgress?.progress || 0}%` }}
-                ></div>
-              </div>
-              <div className="flex justify-between text-xs text-muted-foreground mt-0.5">
-                <span>{stats?.levelProgress?.current || 0}</span>
-                <span>{stats?.levelProgress?.next || 100}</span>
-              </div>
-            </div>
-          </div>
-
-        {/* Stats Grid */}
-        <div className="grid grid-cols-2 gap-3">
-          <Card className="section-primary text-white border-0">
-            <CardContent className="px-1.5 py-0.5 text-center">
-              <Trophy className="h-4 w-4 text-yellow-300 mx-auto mb-0" />
-              <div className="text-base font-bold">{stats?.globalScore || 0}</div>
-              <div className="text-xs opacity-90 leading-tight">Total Score</div>
-            </CardContent>
-          </Card>
-          
-          <Card className="section-primary text-white border-0">
-            <CardContent className="px-1.5 py-0.5 text-center">
-              <Target className="h-4 w-4 text-blue-300 mx-auto mb-0" />
-              <div className="text-base font-bold">{stats?.dailyScore || 0}</div>
-              <div className="text-xs opacity-90 leading-tight">Today Score</div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Daily Check-in Section */}
-        <Card className="section-primary border-0">
-          <CardContent className="px-1.5 py-1">
-            <div className="text-center space-y-1.5">
-              <div className="flex items-center justify-center gap-1">
-                <h3 className="text-sm font-medium leading-tight text-white">Daily Check-in</h3>
-                <Calendar className="h-3 w-3 text-purple-400" />
+    <div className="bg-main min-h-screen">
+      <div className="p-4 space-y-4">
+        {/* User Info Frame */}
+        <Card className="border-0" style={{ backgroundColor: '#180a34' }}>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              {/* Profile Picture */}
+              <div className="relative">
+                {context?.user?.pfpUrl ? (
+                  <img 
+                    src={context.user.pfpUrl} 
+                    alt={context.user.displayName || context.user.username || 'User'}
+                    className="w-12 h-12 rounded-full object-cover border-2 border-purple-300"
+                  />
+                ) : (
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white font-bold text-lg">
+                    {(context?.user?.displayName || context?.user?.username || 'U')[0].toUpperCase()}
+                  </div>
+                )}
               </div>
               
-              <div className="bg-black/20 backdrop-blur-sm rounded-lg p-1.5 space-y-1">
+              {/* User Info */}
+              <div className="flex-1">
+                <h3 className="text-white font-semibold text-base">
+                  {context?.user?.displayName || context?.user?.username || 'Farcaster User'}
+                </h3>
+                <div className="text-sm text-white/70">
+                  {context?.user?.username && `@${context.user.username}`}
+                </div>
+              </div>
+              
+              {/* Current Level */}
+              <div className="text-right">
+                <div className="text-white font-semibold text-sm">
+                  {stats?.levelName || 'Beginner'}
+                </div>
+                <div className="text-white/70 text-xs">
+                  Level {stats?.level || 1}
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Score and Streak Frame */}
+        <Card className="border-0" style={{ backgroundColor: '#241f53' }}>
+          <CardContent className="p-4 space-y-3">
+            <div className="flex justify-between items-center">
+              <span className="text-white font-medium">Score</span>
+              <span className="text-white font-bold text-lg">{stats?.globalScore || 0}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-white font-medium">Streak</span>
+              <span className="text-white font-bold text-lg">{stats?.currentStreak || 0}</span>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Level Image and Progress Frame */}
+        <Card className="section-primary border-0">
+          <CardContent className="p-4">
+            <div className="text-center space-y-4">
+              {/* Level Image */}
+              <div className="flex justify-center">
+                <img 
+                  src={getLevelImage(stats?.level || 1)} 
+                  alt={`${stats?.levelName || 'Beginner'} level`}
+                  className="w-32 h-32 object-contain"
+                />
+              </div>
+              
+              {/* Progress Bar */}
+              <div className="max-w-xs mx-auto">
+                <div className="flex justify-between text-xs text-white/70 mb-2">
+                  <span>Progress to next level</span>
+                  <span>{Math.round(stats?.levelProgress?.progress || 0)}%</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div 
+                    className="bg-primary h-2 rounded-full transition-all duration-300" 
+                    style={{ width: `${stats?.levelProgress?.progress || 0}%` }}
+                  ></div>
+                </div>
+                <div className="flex justify-between text-xs text-white/70 mt-1">
+                  <span>{stats?.levelProgress?.current || 0}</span>
+                  <span>{stats?.levelProgress?.next || 100}</span>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Check-in Frame */}
+        <Card className="section-primary border-0">
+          <CardContent className="p-4">
+            <div className="text-center space-y-3">
+              <div className="flex items-center justify-center gap-2">
+                <h3 className="text-sm font-medium text-white">Daily Check-in</h3>
+                <Calendar className="h-4 w-4 text-purple-400" />
+              </div>
+              
+              <div className="bg-black/20 backdrop-blur-sm rounded-lg p-3 space-y-2">
                 <div className="flex justify-between items-center">
-                  <span className="text-xs font-medium leading-tight text-white opacity-90">Current Streak:</span>
-                  <span className="text-sm font-bold text-primary leading-tight">{stats?.currentStreak || 0} days</span>
+                  <span className="text-xs font-medium text-white opacity-90">Current Streak:</span>
+                  <span className="text-sm font-bold text-primary">{stats?.currentStreak || 0} days</span>
                 </div>
                 
-                <div className="text-xs text-white opacity-90 space-y-0 leading-tight">
+                <div className="text-xs text-white opacity-90 space-y-1">
                   <div>• Check-in: +1 point</div>
                   {(stats?.currentStreak ?? 0) >= 7 ? (
                     <div className="text-green-400 font-medium">• Streak bonus: +{stats?.streakBonus || 0} points</div>
@@ -316,19 +345,19 @@ export default function HomePage() {
                 onClick={handleDailyCheckin}
                 disabled={checkingIn || checkedInToday}
               >
-                <CheckCircle className={`mr-1.5 h-3 w-3 ${checkedInToday ? 'text-green-400' : ''}`} />
+                <CheckCircle className={`mr-2 h-4 w-4 ${checkedInToday ? 'text-green-400' : ''}`} />
                 {checkingIn ? 'Checking in...' : checkedInToday ? '✓ Checked in' : 'Check-in'}
               </Button>
             </div>
           </CardContent>
         </Card>
 
-        {/* Quick Actions */}
+        {/* Daily Health Actions Frame */}
         <Card className="section-primary border-0">
-          <CardContent className="px-1.5 py-1">
+          <CardContent className="p-4">
             <Link href="/categories">
               <Button className="w-full btn-gradient" size="lg">
-                <CheckCircle className="mr-1.5 h-3 w-3" />
+                <CheckCircle className="mr-2 h-4 w-4" />
                 Daily Health Actions
               </Button>
             </Link>
