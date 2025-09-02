@@ -10,26 +10,9 @@
   "miniapp": {
     "version": "1",
     "name": "Health Buddy",
-    "iconUrl": "https://health-buddy-seven.vercel.app/images/icon.png",
-    "homeUrl": "https://health-buddy-seven.vercel.app/",
-    "imageUrl": "https://health-buddy-seven.vercel.app/images/promo.png",
-    "buttonTitle": "Your Daily Wellness Buddy",
-    "splashImageUrl": "https://health-buddy-seven.vercel.app/images/promo.png",
-    "splashBackgroundColor": "#241f53",
-    "requiredChains": [
-      "eip155:8453"
-    ],
-    "requiredCapabilities": [
-      "actions.signIn",
-      "wallet.getEthereumProvider"
-    ]
-  },
-  "frame": {
-    "version": "1",
-    "name": "Health Buddy",
     "homeUrl": "https://health-buddy-seven.vercel.app/",
     "iconUrl": "https://health-buddy-seven.vercel.app/images/icon.png",
-    "splashImageUrl": "https://health-buddy-seven.vercel.app/images/promo.png",
+    "splashImageUrl": "https://health-buddy-seven.vercel.app/images/splash.png",
     "heroImageUrl": "https://health-buddy-seven.vercel.app/images/promo.png",
     "splashBackgroundColor": "#241f53",
     "subtitle": "Your Daily Wellness Buddy",
@@ -40,9 +23,5 @@
     "ogTitle": "Your Daily Wellness Buddy",
     "ogDescription": "Turn wellness into a game! Check in daily, complete healthy actions, and see your progress grow. Stay motivated, stay healthy, stay happy!",
     "ogImageUrl": "https://health-buddy-seven.vercel.app/images/promo.png"
-  }
+  },
 }
-
-
-
-
