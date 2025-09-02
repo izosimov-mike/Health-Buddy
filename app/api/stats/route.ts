@@ -13,21 +13,14 @@ export async function GET(request: NextRequest) {
 
   try {
     // Get user basic stats by Farcaster ID
-    const user = await db.select().from(users).where(eq(users.farcasterFid, fid)).limit(1);
-    if (user.length === 0) {
+    const userData = await db.select().from(users).where(eq(users.farcasterFid, fid)).limit(1);
+    if (userData.length === 0) {
       // Create new user if not exists
-      const newUserId = `farcaster-${fid}`;
-      await db.insert(users).values({
-        id: newUserId,
-        farcasterFid: fid,
+      const newUser = await db.insert(users).values({
+        id: `user_${fid}`,
         name: `User ${fid}`,
-        globalScore: 0,
-        currentStreak: 0,
-        longestStreak: 0,
-        level: 1,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
+        farcasterFid: fid
+      }).returning();
       
       // Return default stats for new user
       return NextResponse.json({
@@ -47,7 +40,7 @@ export async function GET(request: NextRequest) {
       });
     }
     
-    const userId = user[0].id;
+    const userId = userData[0].id;
 
     const today = new Date().toISOString().split('T')[0];
     
@@ -94,13 +87,13 @@ export async function GET(request: NextRequest) {
     .groupBy(categories.id, categories.name, categories.color);
 
     // Get streak values from user data (managed by daily check-in)
-    const currentStreak = user[0].currentStreak ?? 0;
-    const longestStreak = user[0].longestStreak ?? 0;
+    const currentStreak = userData[0].currentStreak ?? 0;
+    const longestStreak = userData[0].longestStreak ?? 0;
     
     // Check if user has checked in today
-    const checkedInToday = user[0].lastCheckinDate === today;
+    const checkedInToday = userData[0].lastCheckinDate === today;
 
-    const globalScore = user[0].globalScore ?? 0;
+    const globalScore = userData[0].globalScore ?? 0;
     const userLevel = getUserLevel(globalScore);
     const levelProgress = getProgressToNextLevel(globalScore);
     const streakBonus = getStreakBonus(currentStreak);
@@ -143,9 +136,9 @@ export async function GET(request: NextRequest) {
     .groupBy(categories.id, categories.name, categories.color);
 
     return NextResponse.json({
-      ...user[0],
+      ...userData[0],
       // Farcaster profile data
-      fid: user[0].farcasterFid,
+      fid: userData[0].farcasterFid,
       // Level and progress data
       level: userLevel.id,
       levelName: userLevel.name,
