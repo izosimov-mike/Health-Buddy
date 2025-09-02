@@ -17,7 +17,7 @@ interface LeaderboardUser {
   rank: number;
   avatar: string;
   levelName: string;
-  fid?: number;
+  fid?: string;
   farcasterUsername?: string;
   farcasterDisplayName?: string;
   farcasterPfpUrl?: string;
@@ -42,7 +42,7 @@ export default function LeaderboardPage() {
   const [loading, setLoading] = useState(true);
   const [context, setContext] = useState<any>(null);
 
-  const handleViewProfile = async (fid: number) => {
+  const handleViewProfile = async (fid: string) => {
     try {
       await sdk.actions.openUrl(`https://warpcast.com/~/profiles/${fid}`);
     } catch (error) {
@@ -82,7 +82,7 @@ export default function LeaderboardPage() {
               const fullLeaderboardResponse = await fetch('/api/leaderboard?limit=1000');
               if (fullLeaderboardResponse.ok) {
                 const fullData = await fullLeaderboardResponse.json();
-                const userIndex = fullData.findIndex((u: LeaderboardUser) => u.fid?.toString() === userFid);
+                const userIndex = fullData.findIndex((u: LeaderboardUser) => u.fid === userFid);
                 if (userIndex !== -1) {
                   currentUser = {
                     ...fullData[userIndex],
@@ -100,7 +100,7 @@ export default function LeaderboardPage() {
                     rank: fullData.length + 1,
                     avatar: '',
                     levelName: userData.levelName || 'Beginner',
-                    fid: parseInt(userFid)
+                    fid: userFid
                   };
                 }
               }
