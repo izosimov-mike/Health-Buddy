@@ -59,7 +59,7 @@ export default function LeaderboardPage() {
       try {
         await sdk.actions.ready()
         // According to Farcaster docs, context is available synchronously after ready()
-        const userContext = sdk.context
+        const userContext = await sdk.context
         setContext(userContext)
       } catch (error) {
         console.error('Failed to initialize app:', error)

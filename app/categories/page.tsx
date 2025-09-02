@@ -53,7 +53,7 @@ export default function CategoriesPage() {
       try {
         await sdk.actions.ready()
         // According to Farcaster docs, context is available synchronously after ready()
-        const userContext = sdk.context
+        const userContext = await sdk.context
         setContext(userContext)
         if (userContext?.user?.fid) {
           setUserFid(userContext.user.fid.toString())

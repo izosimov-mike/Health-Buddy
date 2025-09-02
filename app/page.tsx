@@ -39,7 +39,7 @@ export default function HomePage() {
       try {
         await sdk.actions.ready()
         // According to Farcaster docs, context is available synchronously after ready()
-        const userContext = sdk.context
+        const userContext = await sdk.context
         console.log('Full SDK Context:', userContext)
         setContext(userContext)
         if (userContext?.user?.fid) {
