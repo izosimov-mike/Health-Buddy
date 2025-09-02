@@ -103,11 +103,11 @@ export async function GET(request: NextRequest) {
     const fullWeekData = [];
     
     // Get current week's Monday
-    const today = new Date();
-    const currentDay = today.getDay(); // 0 = Sunday, 1 = Monday, etc.
+    const currentDate = new Date();
+    const currentDay = currentDate.getDay(); // 0 = Sunday, 1 = Monday, etc.
     const mondayOffset = currentDay === 0 ? -6 : 1 - currentDay; // Adjust for Sunday being 0
-    const monday = new Date(today);
-    monday.setDate(today.getDate() + mondayOffset);
+    const monday = new Date(currentDate);
+    monday.setDate(currentDate.getDate() + mondayOffset);
     
     for (let i = 0; i < 7; i++) {
       const date = new Date(monday);
