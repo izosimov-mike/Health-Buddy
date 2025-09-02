@@ -58,7 +58,8 @@ export default function StatsPage() {
     const initializeApp = async () => {
       try {
         await sdk.actions.ready()
-        const userContext = await sdk.context
+        // According to Farcaster docs, context is available synchronously after ready()
+        const userContext = sdk.context
         setContext(userContext)
         if (userContext?.user?.fid) {
           setUserFid(userContext.user.fid.toString())

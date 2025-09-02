@@ -38,7 +38,9 @@ export default function HomePage() {
     const initializeApp = async () => {
       try {
         await sdk.actions.ready()
-        const userContext = await sdk.context
+        // According to Farcaster docs, context is available synchronously after ready()
+        const userContext = sdk.context
+        console.log('Full SDK Context:', userContext)
         setContext(userContext)
         if (userContext?.user?.fid) {
           setUserFid(userContext.user.fid.toString())
@@ -64,20 +66,30 @@ export default function HomePage() {
           fid: context.user.fid,
           username: context.user.username,
           displayName: context.user.displayName,
-          pfpUrl: context.user.pfpUrl
+          pfpUrl: context.user.pfpUrl,
+          pfpUrlType: typeof context.user.pfpUrl,
+          pfpUrlExists: context.user.pfpUrl !== undefined,
+          pfpUrlNotNull: context.user.pfpUrl !== null,
+          pfpUrlLength: context.user.pfpUrl ? context.user.pfpUrl.length : 0
         });
 
+        // Prepare user data for API, ensuring pfpUrl is properly handled
+        const userData = {
+          fid: context.user.fid,
+          username: context.user.username,
+          displayName: context.user.displayName,
+          pfpUrl: context.user.pfpUrl && context.user.pfpUrl.trim() !== '' ? context.user.pfpUrl : null
+        };
+        
+        console.log('Prepared user data for API:', userData);
+        
         // First, sync user data from SDK to database
         await fetch('/api/stats', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            fid: context.user.fid,
-            username: context.user.username,
-            displayName: context.user.displayName,
-            pfpUrl: context.user.pfpUrl
+          body: JSON.stringify(userData
           })
         })
       } catch (error) {

@@ -200,8 +200,13 @@ export async function POST(request: NextRequest) {
       fid,
       username,
       displayName,
-      pfpUrl
+      pfpUrl,
+      pfpUrlType: typeof pfpUrl,
+      pfpUrlValue: pfpUrl
     });
+    
+    // Log database connection
+    console.log('Database URL configured:', !!process.env.DATABASE_URL);
 
     if (!fid) {
       return NextResponse.json({ error: 'Farcaster ID is required' }, { status: 400 });
@@ -212,12 +217,18 @@ export async function POST(request: NextRequest) {
     
     if (userData.length === 0) {
       // Create new user with SDK data
-      const newUser = await db.insert(users).values({
+      const insertData = {
         id: `user_${fid}`,
         name: displayName || username || `User ${fid}`,
         farcasterFid: fid.toString(),
         pfpUrl: pfpUrl || null
-      }).returning();
+      };
+      
+      console.log('Creating new user with data:', insertData);
+      
+      const newUser = await db.insert(users).values(insertData).returning();
+      
+      console.log('New user created in database:', newUser[0]);
       
       return NextResponse.json({ message: 'User created successfully', user: newUser[0] }, { status: 201 });
     } else {
@@ -232,10 +243,15 @@ export async function POST(request: NextRequest) {
       // Always update pfpUrl, even if it's null or undefined
       updateData.pfpUrl = pfpUrl || null;
       
+      console.log('Updating existing user with data:', updateData);
+      console.log('Current user data before update:', userData[0]);
+      
       const updatedUser = await db.update(users)
         .set(updateData)
         .where(eq(users.farcasterFid, fid.toString()))
         .returning();
+      
+      console.log('User updated in database:', updatedUser[0]);
         
       return NextResponse.json({ message: 'User updated successfully', user: updatedUser[0] }, { status: 200 });
     }
