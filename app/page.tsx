@@ -89,8 +89,8 @@ export default function HomePage() {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(userData
-          })
+          body: JSON.stringify(userData)
+        })
         })
       } catch (error) {
         console.error('Failed to sync user data:', error)
