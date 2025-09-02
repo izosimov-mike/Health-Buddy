@@ -22,8 +22,6 @@ export async function GET(request: NextRequest) {
       const newUser = await db.insert(users).values({
         id: `user_${fid}`,
         name: displayName || username || `User ${fid}`,
-        username: username,
-        displayName: displayName,
         pfpUrl: pfpUrl,
         farcasterFid: fid
       }).returning();
@@ -217,7 +215,7 @@ export async function POST(request: NextRequest) {
     } else {
       // Update existing user with fresh SDK data
       const updateData: any = {
-        updatedAt: new Date()
+        updatedAt: new Date().toISOString()
       };
       
       if (displayName || username) {
