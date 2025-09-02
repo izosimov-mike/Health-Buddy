@@ -14,15 +14,14 @@ export async function POST(request: NextRequest) {
     const today = new Date().toISOString().split('T')[0];
     
     // Get user data by Farcaster ID
-    const user = await db.select().from(users).where(eq(users.farcasterFid, fid));
+    const userData = await db.select().from(users).where(eq(users.farcasterFid, fid)).limit(1);
     
-    if (user.length === 0) {
+    if (userData.length === 0) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
     
-    const userId = user[0].id;
-
-    const userData = user[0];
+    const userId = userData[0].id;
+    const userRecord = userData[0];
     const lastCheckinDate = userData.lastCheckinDate;
     
     // Check if user already checked in today

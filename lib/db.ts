@@ -14,13 +14,8 @@ export const db = drizzle(client);
 // Schema definitions
 export const users = pgTable('users', {
   id: text('id').primaryKey(),
-  name: text('name').notNull(),
-  email: text('email').unique(),
   farcasterFid: text('farcaster_fid').unique(),
-  fid: integer('fid').unique(),
-  farcasterUsername: text('farcaster_username'),
-  farcasterDisplayName: text('farcaster_display_name'),
-  farcasterPfpUrl: text('farcaster_pfp_url'),
+  name: text('name').notNull(),
   globalScore: integer('global_score').default(0),
   currentStreak: integer('current_streak').default(0),
   longestStreak: integer('longest_streak').default(0),
