@@ -91,7 +91,6 @@ export default function HomePage() {
           },
           body: JSON.stringify(userData)
         })
-        })
       } catch (error) {
         console.error('Failed to sync user data:', error)
       }
