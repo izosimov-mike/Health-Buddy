@@ -195,6 +195,14 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { fid, username, displayName, pfpUrl } = body;
 
+    // Log incoming data for debugging
+    console.log('POST /api/stats - Incoming data:', {
+      fid,
+      username,
+      displayName,
+      pfpUrl
+    });
+
     if (!fid) {
       return NextResponse.json({ error: 'Farcaster ID is required' }, { status: 400 });
     }
@@ -221,9 +229,8 @@ export async function POST(request: NextRequest) {
       if (displayName || username) {
         updateData.name = displayName || username;
       }
-      if (pfpUrl) {
-        updateData.pfpUrl = pfpUrl;
-      }
+      // Always update pfpUrl, even if it's null or undefined
+      updateData.pfpUrl = pfpUrl || null;
       
       const updatedUser = await db.update(users)
         .set(updateData)
