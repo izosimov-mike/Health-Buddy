@@ -263,7 +263,7 @@ export default function HomePage() {
         </Card>
 
         {/* Score and Streak Frame */}
-        <Card className="border-0" style={{ backgroundColor: '#241f53' }}>
+        <Card className="py-2 border-0" style={{ backgroundColor: '#241f53' }}>
           <CardContent className="px-3" style={{ paddingTop: '4px', paddingBottom: '4px' }}>
             <div className="flex justify-between items-center">
               <span className="text-white font-medium text-sm">Score</span>
