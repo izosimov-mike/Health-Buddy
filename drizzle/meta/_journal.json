@@ -15,6 +15,13 @@
       "when": 1756724597314,
       "tag": "0001_lumpy_zemo",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1756838815833,
+      "tag": "0002_fancy_pixie",
+      "breakpoints": true
     }
   ]
 }

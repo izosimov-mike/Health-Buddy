@@ -16,6 +16,7 @@ export const users = pgTable('users', {
   id: text('id').primaryKey(),
   farcasterFid: text('farcaster_fid').unique(),
   name: text('name').notNull(),
+  pfpUrl: text('pfp_url'),
   globalScore: integer('global_score').default(0),
   currentStreak: integer('current_streak').default(0),
   longestStreak: integer('longest_streak').default(0),
