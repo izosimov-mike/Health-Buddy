@@ -264,7 +264,7 @@ export default function HomePage() {
 
         {/* Score and Streak Frame */}
         <Card className="border-0" style={{ backgroundColor: '#241f53' }}>
-          <CardContent className="px-3" style={{ paddingTop: '4px', paddingBottom: '4px' }}>
+          <CardContent className="px-3" style={{ paddingTop: '4px', paddingBottom: '4px' }} sx={{ "&:last-child": { paddingBottom: '4px' } }}>
             <div className="flex justify-between items-center">
               <span className="text-white font-medium text-sm">Score</span>
               <span className="text-white font-bold text-base">{stats?.globalScore || 0}</span>
