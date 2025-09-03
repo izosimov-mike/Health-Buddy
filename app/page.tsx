@@ -75,8 +75,15 @@ export default function HomePage() {
 
         // Prepare user data for API, ensuring pfpUrl is properly handled
         const cleanPfpUrl = context.user.pfpUrl 
-          ? context.user.pfpUrl.trim().replace(/[`'"]/g, '') // Remove backticks, quotes
+          ? context.user.pfpUrl.trim().replace(/[`'"\s]/g, '').replace(/^https?:\/\//, 'https://') // Remove backticks, quotes, extra spaces
           : null;
+        
+        console.log('pfpUrl cleaning process:', {
+          original: context.user.pfpUrl,
+          afterTrim: context.user.pfpUrl ? context.user.pfpUrl.trim() : null,
+          afterClean: cleanPfpUrl,
+          isValid: cleanPfpUrl && cleanPfpUrl.startsWith('https://')
+        });
         
         const userData = {
           fid: context.user.fid,
@@ -201,6 +208,11 @@ export default function HomePage() {
     // Автоматически создаем/обновляем пользователя в базе данных
     if (fid && userData) {
       try {
+        // Clean pfpUrl similar to syncUserData function
+        const cleanPfpUrl = userData.pfpUrl 
+          ? userData.pfpUrl.trim().replace(/[`'"\s]/g, '').replace(/^https?:\/\//, 'https://') 
+          : null;
+        
         const response = await fetch('/api/users', {
           method: 'POST',
           headers: {
@@ -208,7 +220,8 @@ export default function HomePage() {
           },
           body: JSON.stringify({
             name: userData.displayName || userData.username || `User ${fid}`,
-            fid: parseInt(fid)
+            fid: parseInt(fid),
+            farcasterPfpUrl: cleanPfpUrl && cleanPfpUrl !== '' ? cleanPfpUrl : null
           })
         })
         

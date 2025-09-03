@@ -191,6 +191,8 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  let cleanedPfpUrl = null; // Declare at function scope
+  
   try {
     const body = await request.json();
     const { fid, username, displayName, pfpUrl } = body;
@@ -215,12 +217,24 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Farcaster ID is required' }, { status: 400 });
     }
 
-    // Clean pfpUrl from any unwanted characters
-    const cleanedPfpUrl = pfpUrl 
-      ? pfpUrl.trim().replace(/[`'"]/g, '') 
-      : null;
+    // Clean pfpUrl from any unwanted characters more thoroughly
+    if (pfpUrl && typeof pfpUrl === 'string') {
+      cleanedPfpUrl = pfpUrl
+        .trim() // Remove leading/trailing spaces
+        .replace(/[`'"\s]/g, '') // Remove backticks, quotes, and all spaces
+        .replace(/^https?:\/\//, 'https://'); // Ensure proper protocol
+      
+      // Validate URL format
+      if (!cleanedPfpUrl.startsWith('https://') || cleanedPfpUrl.length < 10) {
+        cleanedPfpUrl = null;
+      }
+    }
     
-    console.log('Cleaned pfpUrl:', { original: pfpUrl, cleaned: cleanedPfpUrl });
+    console.log('pfpUrl cleaning in API:', { 
+      original: pfpUrl, 
+      cleaned: cleanedPfpUrl,
+      isValid: cleanedPfpUrl !== null
+    });
 
     // Check if user exists
     const userData = await db.select().from(users).where(eq(users.farcasterFid, fid.toString())).limit(1);
@@ -267,6 +281,15 @@ export async function POST(request: NextRequest) {
     }
   } catch (error) {
     console.error('Error updating user data:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error('Error details:', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : 'No stack trace',
+      pfpUrl: pfpUrl,
+      cleanedPfpUrl: cleanedPfpUrl
+    });
+    return NextResponse.json({ 
+      error: 'Internal server error', 
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, { status: 500 });
   }
 }
