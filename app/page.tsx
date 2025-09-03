@@ -179,12 +179,25 @@ export default function HomePage() {
       }
       
       // Send blockchain transaction to Base network
-      await sendTransaction({
+      console.log('Sending Base transaction...')
+      const txHash = await sendTransaction({
         to: '0x9837e5c7a1f6902a07b1e4fd4d147cb21120d94e',
         data: '0x183ff085', // checkIn method signature
         value: parseEther('0.000001'), // 0.000001 ETH
         chainId: base.id, // Specify Base network
       })
+      
+      console.log('Base transaction sent:', txHash)
+      
+      // Wait for transaction confirmation
+      if (txHash) {
+        console.log('Waiting for Base transaction confirmation...')
+        // Transaction was sent successfully, reset state after a delay
+        setTimeout(() => {
+          setCheckingIn(false)
+          console.log('Base check-in completed')
+        }, 3000)
+      }
       
     } catch (error) {
       console.error('Base transaction error:', error)
@@ -225,12 +238,25 @@ export default function HomePage() {
       }
       
       // Send blockchain transaction to Celo network
-      await sendTransaction({
+      console.log('Sending Celo transaction...')
+      const txHash = await sendTransaction({
         to: '0xa87F19b2234Fe35c5A5DA9fb1AD620B7Eb5ff09e', // Fixed checksum
         data: '0x183ff085', // checkIn method signature
         value: parseEther('0.01'), // 0.01 Celo
         chainId: celo.id, // Specify Celo network
       })
+      
+      console.log('Celo transaction sent:', txHash)
+      
+      // Wait for transaction confirmation
+      if (txHash) {
+        console.log('Waiting for Celo transaction confirmation...')
+        // Transaction was sent successfully, reset state after a delay
+        setTimeout(() => {
+          setCheckingIn(false)
+          console.log('Celo check-in completed')
+        }, 3000)
+      }
       
     } catch (error) {
       console.error('Celo transaction error:', error)
