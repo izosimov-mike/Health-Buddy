@@ -7,7 +7,7 @@ export const wagmiConfig = createConfig({
   chains: [celo, base], // Поддержка сетей Celo и Base
   transports: {
     // Используем официальный Forno RPC для Celo
-    [celo.id]: http('https://forno.celo.org', {
+    [celo.id]: http('https://celo.drpc.org', {
       batch: true,
       fetchOptions: {
         timeout: 30000, // 30 секунд таймаут
