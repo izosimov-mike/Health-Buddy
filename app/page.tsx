@@ -8,7 +8,7 @@ import Link from "next/link"
 import { useEffect, useState } from "react"
 import { sdk } from '@farcaster/miniapp-sdk'
 import { FarcasterAuth } from '@/components/FarcasterAuth'
-import { useAccount, useConnect, useSendTransaction, useWaitForTransactionReceipt } from 'wagmi'
+import { useAccount, useConnect, useSendTransaction, useWaitForTransactionReceipt, useSwitchChain } from 'wagmi'
 import { parseEther } from 'viem'
 import { celo, base } from '@/lib/wagmi-config'
 
@@ -154,6 +154,7 @@ export default function HomePage() {
   // Wagmi hooks for blockchain transactions
   const { isConnected } = useAccount()
   const { connect, connectors } = useConnect()
+  const { switchChain } = useSwitchChain()
   const { sendTransaction, data: hash, isPending: isTransactionPending, error: transactionError } = useSendTransaction()
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
     hash,
@@ -174,12 +175,14 @@ export default function HomePage() {
         return
       }
 
+      // Switch to Base network first
+      await switchChain({ chainId: base.id })
+      
       // Send blockchain transaction to Base network
       await sendTransaction({
         to: '0x9837e5c7a1f6902a07b1e4fd4d147cb21120d94e',
         data: '0x183ff085', // checkIn method signature
         value: parseEther('0.000001'), // 0.000001 ETH
-        chainId: base.id, // Base chain ID
       })
       
     } catch (error) {
@@ -203,12 +206,14 @@ export default function HomePage() {
         return
       }
 
+      // Switch to Celo network first
+      await switchChain({ chainId: celo.id })
+      
       // Send blockchain transaction to Celo network
       await sendTransaction({
         to: '0xa87F19b2234Fe35c5A5DA9fb1Ad620B7Eb5ff09e',
         data: '0x183ff085', // checkIn method signature
         value: parseEther('0.01'), // 0.01 Celo
-        chainId: celo.id, // Celo chain ID
       })
       
     } catch (error) {
