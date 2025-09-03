@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, Trophy, Grid3X3, BarChart3, Wallet } from 'lucide-react'
+import { Home, Trophy, Grid3X3, BarChart3 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const BottomNavigation = () => {
@@ -32,12 +32,6 @@ const BottomNavigation = () => {
       icon: BarChart3,
       label: 'Stats',
       active: pathname === '/stats'
-    },
-    {
-      href: '/wallet',
-      icon: Wallet,
-      label: 'Wallet',
-      active: pathname === '/wallet'
     }
   ]
 
