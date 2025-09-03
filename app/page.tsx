@@ -176,7 +176,16 @@ export default function HomePage() {
       }
 
       // Switch to Base network first
-      await switchChain({ chainId: base.id })
+      try {
+        await switchChain({ chainId: base.id })
+        // Small delay to ensure network switch is complete
+        await new Promise(resolve => setTimeout(resolve, 1000))
+      } catch (switchError) {
+        console.error('Network switch error:', switchError)
+        // Retry once more
+        await new Promise(resolve => setTimeout(resolve, 500))
+        await switchChain({ chainId: base.id })
+      }
       
       // Send blockchain transaction to Base network
       await sendTransaction({
@@ -207,11 +216,20 @@ export default function HomePage() {
       }
 
       // Switch to Celo network first
-      await switchChain({ chainId: celo.id })
+      try {
+        await switchChain({ chainId: celo.id })
+        // Small delay to ensure network switch is complete
+        await new Promise(resolve => setTimeout(resolve, 1000))
+      } catch (switchError) {
+        console.error('Network switch error:', switchError)
+        // Retry once more
+        await new Promise(resolve => setTimeout(resolve, 500))
+        await switchChain({ chainId: celo.id })
+      }
       
       // Send blockchain transaction to Celo network
       await sendTransaction({
-        to: '0xa87F19b2234Fe35c5A5DA9fb1Ad620B7Eb5ff09e',
+        to: '0xa87F19b2234Fe35c5A5DA9fb1AD620B7Eb5ff09e', // Fixed checksum
         data: '0x183ff085', // checkIn method signature
         value: parseEther('0.01'), // 0.01 Celo
       })
