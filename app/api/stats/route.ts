@@ -192,10 +192,12 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   let cleanedPfpUrl = null; // Declare at function scope
+  let pfpUrl = null; // Declare at function scope for error handling
   
   try {
     const body = await request.json();
-    const { fid, username, displayName, pfpUrl } = body;
+    const { fid, username, displayName, pfpUrl: requestPfpUrl } = body;
+    pfpUrl = requestPfpUrl; // Assign to function-scoped variable
 
     // Log incoming data for debugging
     console.log('POST /api/stats - Incoming data:', {
