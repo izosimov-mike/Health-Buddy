@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
       // Create new user if not exists with SDK data
       const newUser = await db.insert(users).values({
         id: `user_${fid}`,
-        name: displayName || username || `User ${fid}`,
+        name: username || displayName || `User ${fid}`,
         pfpUrl: pfpUrl,
         farcasterFid: fid
       }).returning();
@@ -245,7 +245,7 @@ export async function POST(request: NextRequest) {
       // Create new user with SDK data
       const insertData = {
         id: `user_${fid}`,
-        name: displayName || username || `User ${fid}`,
+        name: username || displayName || `User ${fid}`,
         farcasterFid: fid.toString(),
         pfpUrl: cleanedPfpUrl || null
       };
@@ -263,8 +263,8 @@ export async function POST(request: NextRequest) {
         updatedAt: new Date().toISOString()
       };
       
-      if (displayName || username) {
-        updateData.name = displayName || username;
+      if (username || displayName) {
+        updateData.name = username || displayName;
       }
       // Always update pfpUrl, even if it's null or undefined
       updateData.pfpUrl = cleanedPfpUrl || null;

@@ -219,7 +219,7 @@ export default function HomePage() {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            name: userData.displayName || userData.username || `User ${fid}`,
+            name: userData.username || userData.displayName || `User ${fid}`,
             fid: parseInt(fid),
             farcasterPfpUrl: cleanPfpUrl && cleanPfpUrl !== '' ? cleanPfpUrl : null
           })
