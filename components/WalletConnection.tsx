@@ -78,10 +78,10 @@ export function WalletConnection({ onConnectionChange }: WalletConnectionProps) 
           <Button
             key={connector.uid}
             onClick={() => connect({ connector })}
-            disabled={isPending}
+            disabled={status === 'pending'}
             className="w-full"
           >
-            {isPending ? 'Подключение...' : `Подключить ${connector.name}`}
+            {status === 'pending' ? 'Подключение...' : `Подключить ${connector.name}`}
           </Button>
         ))}
       </CardContent>
