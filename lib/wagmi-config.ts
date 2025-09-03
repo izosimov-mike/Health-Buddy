@@ -1,12 +1,13 @@
 import { http, createConfig } from 'wagmi'
-import { celo } from 'wagmi/chains'
+import { celo, base } from 'wagmi/chains'
 import { farcasterMiniApp as miniAppConnector } from '@farcaster/miniapp-wagmi-connector'
 
-// Конфигурация Wagmi для работы с сетью Celo
+// Конфигурация Wagmi для работы с сетями Celo и Base
 export const wagmiConfig = createConfig({
-  chains: [celo], // Основная сеть Celo
+  chains: [celo, base], // Поддержка сетей Celo и Base
   transports: {
     [celo.id]: http(),
+    [base.id]: http(),
   },
   connectors: [
     miniAppConnector() // Farcaster Mini App коннектор
@@ -14,4 +15,4 @@ export const wagmiConfig = createConfig({
 })
 
 // Экспорт цепей для использования в компонентах
-export { celo }
+export { celo, base }

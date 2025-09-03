@@ -10,7 +10,7 @@ import { sdk } from '@farcaster/miniapp-sdk'
 import { FarcasterAuth } from '@/components/FarcasterAuth'
 import { useAccount, useConnect, useSendTransaction, useWaitForTransactionReceipt } from 'wagmi'
 import { parseEther } from 'viem'
-import { celo } from '@/lib/wagmi-config'
+import { celo, base } from '@/lib/wagmi-config'
 
 interface UserStats {
   globalScore: number;
@@ -157,10 +157,9 @@ export default function HomePage() {
   const { sendTransaction, data: hash, isPending: isTransactionPending, error: transactionError } = useSendTransaction()
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
     hash,
-    chainId: celo.id,
   })
 
-  const handleDailyCheckin = async () => {
+  const handleBaseCheckin = async () => {
     if (checkingIn || checkedInToday || !userFid) return
     
     setCheckingIn(true)
@@ -175,19 +174,45 @@ export default function HomePage() {
         return
       }
 
-      // Send blockchain transaction to checkIn method
+      // Send blockchain transaction to Base network
+      await sendTransaction({
+        to: '0x9837e5c7a1f6902a07b1e4fd4d147cb21120d94e',
+        data: '0x183ff085', // checkIn method signature
+        value: parseEther('0.000001'), // 0.000001 ETH
+        chainId: base.id, // Base chain ID
+      })
+      
+    } catch (error) {
+      console.error('Base transaction error:', error)
+      setCheckingIn(false)
+    }
+  }
+
+  const handleCeloCheckin = async () => {
+    if (checkingIn || checkedInToday || !userFid) return
+    
+    setCheckingIn(true)
+    
+    try {
+      // First, ensure wallet is connected
+      if (!isConnected) {
+        if (connectors.length > 0) {
+          connect({ connector: connectors[0] })
+        }
+        setCheckingIn(false)
+        return
+      }
+
+      // Send blockchain transaction to Celo network
       await sendTransaction({
         to: '0xa87F19b2234Fe35c5A5DA9fb1Ad620B7Eb5ff09e',
         data: '0x183ff085', // checkIn method signature
         value: parseEther('0.01'), // 0.01 Celo
-        chainId: celo.id, // Celo Mainnet chain ID
+        chainId: celo.id, // Celo chain ID
       })
-
-      // Note: The database update will happen after transaction confirmation
-      // We'll handle this in the useEffect for transaction confirmation
       
     } catch (error) {
-      console.error('Transaction error:', error)
+      console.error('Celo transaction error:', error)
       setCheckingIn(false)
     }
   }
@@ -440,20 +465,44 @@ export default function HomePage() {
         {/* Check-in Frame */}
         <Card className="py-2 section-primary border-0">
           <CardContent className="px-3" style={{ paddingTop: '4px', paddingBottom: '4px' }}>
-            <div className="text-center">
-              <Button 
-                className={`w-full ${checkedInToday ? 'bg-[#241f53] text-white' : 'btn-gradient'}`} 
-                size="lg" 
-                variant={checkedInToday ? "default" : "outline"}
-                onClick={handleDailyCheckin}
-                disabled={checkingIn || checkedInToday || isTransactionPending || isConfirming}
-              >
-                <CheckCircle className={`mr-2 h-4 w-4 ${checkedInToday ? 'text-green-400' : ''}`} />
-                {isTransactionPending ? 'Sending transaction...' : 
-                 isConfirming ? 'Confirming...' : 
-                 checkingIn ? 'Processing...' : 
-                 checkedInToday ? '✓ Checked in' : 'Check-in'}
-              </Button>
+            <div className="grid grid-cols-2 gap-2">
+              {/* Base Check-in */}
+              <div className="text-center">
+                <Button 
+                  className={`w-full ${checkedInToday ? 'bg-[#241f53] text-white' : 'btn-gradient'}`} 
+                  size="sm" 
+                  variant={checkedInToday ? "default" : "outline"}
+                  onClick={handleBaseCheckin}
+                  disabled={checkingIn || checkedInToday || isTransactionPending || isConfirming}
+                >
+                  <CheckCircle className={`mr-1 h-3 w-3 ${checkedInToday ? 'text-green-400' : ''}`} />
+                  <span className="text-xs">
+                    {isTransactionPending ? 'Sending...' : 
+                     isConfirming ? 'Confirming...' : 
+                     checkingIn ? 'Processing...' : 
+                     checkedInToday ? '✓ Base' : 'Check-In with Base'}
+                  </span>
+                </Button>
+              </div>
+              
+              {/* Celo Check-in */}
+              <div className="text-center">
+                <Button 
+                  className={`w-full ${checkedInToday ? 'bg-[#241f53] text-white' : 'btn-gradient'}`} 
+                  size="sm" 
+                  variant={checkedInToday ? "default" : "outline"}
+                  onClick={handleCeloCheckin}
+                  disabled={checkingIn || checkedInToday || isTransactionPending || isConfirming}
+                >
+                  <CheckCircle className={`mr-1 h-3 w-3 ${checkedInToday ? 'text-green-400' : ''}`} />
+                  <span className="text-xs">
+                    {isTransactionPending ? 'Sending...' : 
+                     isConfirming ? 'Confirming...' : 
+                     checkingIn ? 'Processing...' : 
+                     checkedInToday ? '✓ Celo' : 'Check-In with Celo'}
+                  </span>
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
