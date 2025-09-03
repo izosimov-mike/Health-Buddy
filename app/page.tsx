@@ -74,11 +74,15 @@ export default function HomePage() {
         });
 
         // Prepare user data for API, ensuring pfpUrl is properly handled
+        const cleanPfpUrl = context.user.pfpUrl 
+          ? context.user.pfpUrl.trim().replace(/[`'"]/g, '') // Remove backticks, quotes
+          : null;
+        
         const userData = {
           fid: context.user.fid,
           username: context.user.username,
           displayName: context.user.displayName,
-          pfpUrl: context.user.pfpUrl && context.user.pfpUrl.trim() !== '' ? context.user.pfpUrl : null
+          pfpUrl: cleanPfpUrl && cleanPfpUrl !== '' ? cleanPfpUrl : null
         };
         
         console.log('Prepared user data for API:', userData);
