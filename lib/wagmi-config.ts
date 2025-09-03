@@ -11,7 +11,9 @@ export const wagmiConfig = createConfig({
   },
   connectors: [
     miniAppConnector() // Farcaster Mini App коннектор
-  ]
+  ],
+  ssr: true, // Включаем поддержку SSR для предотвращения ошибок getChainId
+  syncConnectedChain: true, // Синхронизируем подключенную сеть
 })
 
 // Экспорт цепей для использования в компонентах

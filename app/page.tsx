@@ -168,10 +168,14 @@ export default function HomePage() {
       // First, ensure wallet is connected
       if (!isConnected) {
         if (connectors.length > 0) {
-          connect({ connector: connectors[0] })
+          await connect({ connector: connectors[0] })
+          // Wait a bit for connection to stabilize
+          await new Promise(resolve => setTimeout(resolve, 1000))
+        } else {
+          console.error('No connectors available')
+          setCheckingIn(false)
+          return
         }
-        setCheckingIn(false)
-        return
       }
       
       // Send blockchain transaction to Base network
@@ -184,6 +188,19 @@ export default function HomePage() {
       
     } catch (error) {
       console.error('Base transaction error:', error)
+      // Check if error is related to connector
+      if (error instanceof Error && error.message.includes('getChainId')) {
+        console.error('Connector getChainId error detected, trying to reconnect...')
+        // Try to reconnect
+        if (connectors.length > 0) {
+          try {
+            await connect({ connector: connectors[0] })
+            await new Promise(resolve => setTimeout(resolve, 1000))
+          } catch (reconnectError) {
+            console.error('Reconnection failed:', reconnectError)
+          }
+        }
+      }
       setCheckingIn(false)
     }
   }
@@ -197,10 +214,14 @@ export default function HomePage() {
       // First, ensure wallet is connected
       if (!isConnected) {
         if (connectors.length > 0) {
-          connect({ connector: connectors[0] })
+          await connect({ connector: connectors[0] })
+          // Wait a bit for connection to stabilize
+          await new Promise(resolve => setTimeout(resolve, 1000))
+        } else {
+          console.error('No connectors available')
+          setCheckingIn(false)
+          return
         }
-        setCheckingIn(false)
-        return
       }
       
       // Send blockchain transaction to Celo network
@@ -213,6 +234,19 @@ export default function HomePage() {
       
     } catch (error) {
       console.error('Celo transaction error:', error)
+      // Check if error is related to connector
+      if (error instanceof Error && error.message.includes('getChainId')) {
+        console.error('Connector getChainId error detected, trying to reconnect...')
+        // Try to reconnect
+        if (connectors.length > 0) {
+          try {
+            await connect({ connector: connectors[0] })
+            await new Promise(resolve => setTimeout(resolve, 1000))
+          } catch (reconnectError) {
+            console.error('Reconnection failed:', reconnectError)
+          }
+        }
+      }
       setCheckingIn(false)
     }
   }
