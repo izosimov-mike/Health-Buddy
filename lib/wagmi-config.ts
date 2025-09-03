@@ -6,20 +6,10 @@ import { farcasterMiniApp as miniAppConnector } from '@farcaster/miniapp-wagmi-c
 export const wagmiConfig = createConfig({
   chains: [celo, base], // Поддержка сетей Celo и Base
   transports: {
-    // Используем официальный Forno RPC для Celo
-    [celo.id]: http('https://celo.drpc.org', {
-      batch: true,
-      fetchOptions: {
-        timeout: 30000, // 30 секунд таймаут
-      },
-    }),
+    // Используем официальный RPC для Celo
+    [celo.id]: http('https://celo.drpc.org'),
     // Используем официальный RPC для Base
-    [base.id]: http('https://mainnet.base.org', {
-      batch: true,
-      fetchOptions: {
-        timeout: 30000, // 30 секунд таймаут
-      },
-    }),
+    [base.id]: http('https://mainnet.base.org'),
   },
   connectors: [
     miniAppConnector() // Farcaster Mini App коннектор
