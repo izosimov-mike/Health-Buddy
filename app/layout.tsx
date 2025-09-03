@@ -4,6 +4,7 @@ import { GeistMono } from 'geist/font/mono'
 import { Analytics } from '@vercel/analytics/next'
 import BottomNavigation from '@/components/BottomNavigation'
 import { MiniKitContextProvider } from '@/providers/MiniKitProvider'
+import { WagmiContextProvider } from '@/providers/WagmiProvider'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -21,11 +22,13 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable}`}>
         <MiniKitContextProvider>
-          <div className="pb-16">
-            {children}
-          </div>
-          <BottomNavigation />
-          <Analytics />
+          <WagmiContextProvider>
+            <div className="pb-16">
+              {children}
+            </div>
+            <BottomNavigation />
+            <Analytics />
+          </WagmiContextProvider>
         </MiniKitContextProvider>
       </body>
     </html>
