@@ -5,7 +5,7 @@ import { getStreakBonus } from '@/lib/utils';
 
 export async function POST(request: NextRequest) {
   try {
-    const { fid } = await request.json();
+    const { fid, transactionHash } = await request.json();
     
     if (!fid) {
       return NextResponse.json({ error: 'Farcaster ID is required' }, { status: 400 });
@@ -106,7 +106,8 @@ export async function POST(request: NextRequest) {
       streakBonus,
       newCurrentStreak,
       newLongestStreak,
-      newGlobalScore
+      newGlobalScore,
+      transactionHash: transactionHash || null
     });
 
   } catch (error) {

@@ -8,6 +8,8 @@ import Link from "next/link"
 import { useEffect, useState } from "react"
 import { sdk } from '@farcaster/miniapp-sdk'
 import { FarcasterAuth } from '@/components/FarcasterAuth'
+import { useAccount, useConnect, useSendTransaction, useWaitForTransactionReceipt } from 'wagmi'
+import { parseEther } from 'viem'
 
 interface UserStats {
   globalScore: number;
@@ -148,42 +150,96 @@ export default function HomePage() {
     }
   }, [context?.user?.fid, userFid])
 
+  // Wagmi hooks for blockchain transactions
+  const { isConnected } = useAccount()
+  const { connect, connectors } = useConnect()
+  const { sendTransaction, data: hash, isPending: isTransactionPending, error: transactionError } = useSendTransaction()
+  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
+    hash,
+  })
+
   const handleDailyCheckin = async () => {
     if (checkingIn || checkedInToday || !userFid) return
     
     setCheckingIn(true)
+    
     try {
-      const response = await fetch('/api/checkin', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ fid: userFid })
-      })
-      
-      const data = await response.json()
-      
-      if (response.ok) {
-        // Success - refresh stats
-        setCheckedInToday(true)
-        const statsResponse = await fetch(`/api/stats?fid=${userFid}`)
-        if (statsResponse.ok) {
-          const updatedStats = await statsResponse.json()
-          setStats(updatedStats)
-          setCheckedInToday(updatedStats.checkedInToday || true)
+      // First, ensure wallet is connected
+      if (!isConnected) {
+        if (connectors.length > 0) {
+          connect({ connector: connectors[0] })
         }
-      } else if (data.alreadyCheckedIn) {
-        // Already checked in today
-        setCheckedInToday(true)
-      } else {
-        console.error('Check-in failed:', data.error)
+        setCheckingIn(false)
+        return
       }
+
+      // Send blockchain transaction to checkIn method
+      await sendTransaction({
+        to: '0xa87F19b2234Fe35c5A5DA9fb1AD620B7Eb5ff09e',
+        data: '0x183ff085', // checkIn method signature
+        value: parseEther('0.01'), // 0.01 Celo
+      })
+
+      // Note: The database update will happen after transaction confirmation
+      // We'll handle this in the useEffect for transaction confirmation
+      
     } catch (error) {
-      console.error('Check-in error:', error)
-    } finally {
+      console.error('Transaction error:', error)
       setCheckingIn(false)
     }
   }
+
+  // Handle transaction confirmation and database update
+  useEffect(() => {
+    const updateDatabase = async () => {
+      if (isConfirmed && hash && userFid) {
+        try {
+          const response = await fetch('/api/checkin', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+              fid: userFid,
+              transactionHash: hash
+            })
+          })
+          
+          const data = await response.json()
+          
+          if (response.ok) {
+            // Success - refresh stats
+            setCheckedInToday(true)
+            const statsResponse = await fetch(`/api/stats?fid=${userFid}`)
+            if (statsResponse.ok) {
+              const updatedStats = await statsResponse.json()
+              setStats(updatedStats)
+              setCheckedInToday(updatedStats.checkedInToday || true)
+            }
+          } else if (data.alreadyCheckedIn) {
+            // Already checked in today
+            setCheckedInToday(true)
+          } else {
+            console.error('Check-in failed:', data.error)
+          }
+        } catch (error) {
+          console.error('Database update error:', error)
+        } finally {
+          setCheckingIn(false)
+        }
+      }
+    }
+
+    updateDatabase()
+  }, [isConfirmed, hash, userFid])
+
+  // Handle transaction errors
+  useEffect(() => {
+    if (transactionError) {
+      console.error('Transaction failed:', transactionError)
+      setCheckingIn(false)
+    }
+  }, [transactionError])
 
   // Function to get level image based on level
   const getLevelImage = (level: number) => {
@@ -387,10 +443,13 @@ export default function HomePage() {
                 size="lg" 
                 variant={checkedInToday ? "default" : "outline"}
                 onClick={handleDailyCheckin}
-                disabled={checkingIn || checkedInToday}
+                disabled={checkingIn || checkedInToday || isTransactionPending || isConfirming}
               >
                 <CheckCircle className={`mr-2 h-4 w-4 ${checkedInToday ? 'text-green-400' : ''}`} />
-                {checkingIn ? 'Checking in...' : checkedInToday ? '✓ Checked in' : 'Check-in'}
+                {isTransactionPending ? 'Sending transaction...' : 
+                 isConfirming ? 'Confirming...' : 
+                 checkingIn ? 'Processing...' : 
+                 checkedInToday ? '✓ Checked in' : 'Check-in'}
               </Button>
             </div>
           </CardContent>
