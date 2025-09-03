@@ -202,7 +202,10 @@ export async function POST(request: NextRequest) {
       displayName,
       pfpUrl,
       pfpUrlType: typeof pfpUrl,
-      pfpUrlValue: pfpUrl
+      pfpUrlValue: pfpUrl,
+      pfpUrlLength: pfpUrl ? pfpUrl.length : 0,
+      pfpUrlHasBackticks: pfpUrl ? pfpUrl.includes('`') : false,
+      pfpUrlCleaned: pfpUrl ? pfpUrl.trim().replace(/[`'"]/g, '') : null
     });
     
     // Log database connection
@@ -211,6 +214,13 @@ export async function POST(request: NextRequest) {
     if (!fid) {
       return NextResponse.json({ error: 'Farcaster ID is required' }, { status: 400 });
     }
+
+    // Clean pfpUrl from any unwanted characters
+    const cleanedPfpUrl = pfpUrl 
+      ? pfpUrl.trim().replace(/[`'"]/g, '') 
+      : null;
+    
+    console.log('Cleaned pfpUrl:', { original: pfpUrl, cleaned: cleanedPfpUrl });
 
     // Check if user exists
     const userData = await db.select().from(users).where(eq(users.farcasterFid, fid.toString())).limit(1);
@@ -221,7 +231,7 @@ export async function POST(request: NextRequest) {
         id: `user_${fid}`,
         name: displayName || username || `User ${fid}`,
         farcasterFid: fid.toString(),
-        pfpUrl: pfpUrl || null
+        pfpUrl: cleanedPfpUrl || null
       };
       
       console.log('Creating new user with data:', insertData);
@@ -241,7 +251,7 @@ export async function POST(request: NextRequest) {
         updateData.name = displayName || username;
       }
       // Always update pfpUrl, even if it's null or undefined
-      updateData.pfpUrl = pfpUrl || null;
+      updateData.pfpUrl = cleanedPfpUrl || null;
       
       console.log('Updating existing user with data:', updateData);
       console.log('Current user data before update:', userData[0]);
