@@ -10,6 +10,7 @@ import { sdk } from '@farcaster/miniapp-sdk'
 import { FarcasterAuth } from '@/components/FarcasterAuth'
 import { useAccount, useConnect, useSendTransaction, useWaitForTransactionReceipt } from 'wagmi'
 import { parseEther } from 'viem'
+import { celo } from '@/lib/wagmi-config'
 
 interface UserStats {
   globalScore: number;
@@ -156,6 +157,7 @@ export default function HomePage() {
   const { sendTransaction, data: hash, isPending: isTransactionPending, error: transactionError } = useSendTransaction()
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
     hash,
+    chainId: celo.id,
   })
 
   const handleDailyCheckin = async () => {
@@ -175,9 +177,10 @@ export default function HomePage() {
 
       // Send blockchain transaction to checkIn method
       await sendTransaction({
-        to: '0xa87F19b2234Fe35c5A5DA9fb1AD620B7Eb5ff09e',
+        to: '0xa87F19b2234Fe35c5A5DA9fb1Ad620B7Eb5ff09e',
         data: '0x183ff085', // checkIn method signature
         value: parseEther('0.01'), // 0.01 Celo
+        chainId: celo.id, // Celo Mainnet chain ID
       })
 
       // Note: The database update will happen after transaction confirmation
