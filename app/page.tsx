@@ -8,7 +8,7 @@ import Link from "next/link"
 import { useEffect, useState } from "react"
 import { sdk } from '@farcaster/miniapp-sdk'
 import { FarcasterAuth } from '@/components/FarcasterAuth'
-import { useAccount, useConnect, useSendTransaction, useWaitForTransactionReceipt, useSwitchChain } from 'wagmi'
+import { useAccount, useConnect, useSendTransaction, useWaitForTransactionReceipt } from 'wagmi'
 import { parseEther } from 'viem'
 import { celo, base } from '@/lib/wagmi-config'
 
@@ -154,7 +154,6 @@ export default function HomePage() {
   // Wagmi hooks for blockchain transactions
   const { isConnected } = useAccount()
   const { connect, connectors } = useConnect()
-  const { switchChain } = useSwitchChain()
   const { sendTransaction, data: hash, isPending: isTransactionPending, error: transactionError } = useSendTransaction()
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
     hash,
@@ -174,24 +173,13 @@ export default function HomePage() {
         setCheckingIn(false)
         return
       }
-
-      // Switch to Base network first
-      try {
-        await switchChain({ chainId: base.id })
-        // Small delay to ensure network switch is complete
-        await new Promise(resolve => setTimeout(resolve, 1000))
-      } catch (switchError) {
-        console.error('Network switch error:', switchError)
-        // Retry once more
-        await new Promise(resolve => setTimeout(resolve, 500))
-        await switchChain({ chainId: base.id })
-      }
       
       // Send blockchain transaction to Base network
       await sendTransaction({
         to: '0x9837e5c7a1f6902a07b1e4fd4d147cb21120d94e',
         data: '0x183ff085', // checkIn method signature
         value: parseEther('0.000001'), // 0.000001 ETH
+        chainId: base.id, // Specify Base network
       })
       
     } catch (error) {
@@ -214,24 +202,13 @@ export default function HomePage() {
         setCheckingIn(false)
         return
       }
-
-      // Switch to Celo network first
-      try {
-        await switchChain({ chainId: celo.id })
-        // Small delay to ensure network switch is complete
-        await new Promise(resolve => setTimeout(resolve, 1000))
-      } catch (switchError) {
-        console.error('Network switch error:', switchError)
-        // Retry once more
-        await new Promise(resolve => setTimeout(resolve, 500))
-        await switchChain({ chainId: celo.id })
-      }
       
       // Send blockchain transaction to Celo network
       await sendTransaction({
         to: '0xa87F19b2234Fe35c5A5DA9fb1AD620B7Eb5ff09e', // Fixed checksum
         data: '0x183ff085', // checkIn method signature
         value: parseEther('0.01'), // 0.01 Celo
+        chainId: celo.id, // Specify Celo network
       })
       
     } catch (error) {
