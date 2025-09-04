@@ -229,23 +229,51 @@ export default function HomePage() {
   const handleMintNFT = async () => {
     if (isMinting || !userFid || !stats) return
     
-    // First, ensure wallet is connected
-     if (!isConnected) {
-       if (connectors.length > 0) {
-         await connect({ connector: connectors[0] })
-         // Wait a bit for connection to stabilize
-         await new Promise(resolve => setTimeout(resolve, 1000))
-       } else {
-         console.error('No connectors available')
-         setIsMinting(false)
-         return
-       }
-     }
-    
     setIsMinting(true)
-     setLastTransactionType('mint')
-     
-     try {
+    setLastTransactionType('mint')
+    
+    try {
+      // First, ensure wallet is connected and address is available
+      let currentAddress = address
+      
+      if (!isConnected || !currentAddress) {
+        if (connectors.length > 0) {
+          console.log('Connecting wallet...')
+          await connect({ connector: connectors[0] })
+          
+          // Wait for connection and address to be available
+           // According to Farcaster docs, we should wait for the connection to stabilize
+           await new Promise(resolve => setTimeout(resolve, 1500))
+           
+           // Re-check connection state after initial wait
+           currentAddress = address
+           
+           if (!isConnected || !currentAddress) {
+             // Additional wait with polling for address
+             let attempts = 0
+             const maxAttempts = 10
+             
+             while (attempts < maxAttempts && !currentAddress) {
+               await new Promise(resolve => setTimeout(resolve, 500))
+               currentAddress = address // Re-read from hook state
+               attempts++
+               console.log(`Polling for wallet address... Attempt ${attempts}, Address: ${currentAddress}`)
+               
+               if (currentAddress) {
+                 console.log('Wallet address obtained:', currentAddress)
+                 break
+               }
+             }
+           }
+          
+          if (!currentAddress) {
+            throw new Error('Failed to get wallet address after connection')
+          }
+        } else {
+          throw new Error('No wallet connectors available')
+        }
+      }
+      
       // Switch to Base network for NFT minting
       console.log('Switching to Base network for NFT minting...')
       try {
@@ -259,11 +287,9 @@ export default function HomePage() {
       // Wait for network switch to complete
       await new Promise(resolve => setTimeout(resolve, 1000))
       
-      // Check if address is available after connection
-      if (!address) {
-        console.error('Address not available after wallet connection')
-        setIsMinting(false)
-        return
+      // Final check for address availability
+      if (!currentAddress) {
+        throw new Error('Wallet address not available')
       }
       
       // Get contract data for current level
@@ -274,7 +300,7 @@ export default function HomePage() {
       const claimFunctionSignature = '0x57bc3d78'
       
       // Encode parameters according to working example
-      const receiver = address.toLowerCase()
+      const receiver = currentAddress.toLowerCase()
       const tokenId = contractData.tokenId
       const quantity = contractData.quantity
       const currency = contractData.currency.toLowerCase()
