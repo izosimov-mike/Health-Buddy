@@ -189,6 +189,17 @@ export default function HomePage() {
     } finally {
       console.log('Finished mint status check, setting checkingMintStatus to false')
       setCheckingMintStatus(false)
+      // Log button state after status check
+      setTimeout(() => {
+        console.log('Button state after mint check:', {
+          isConnected,
+          isMinting,
+          isTransactionPending,
+          isConfirming,
+          hasMintedCurrentLevel,
+          checkingMintStatus: false
+        })
+      }, 100)
     }
   }
 
@@ -738,6 +749,7 @@ export default function HomePage() {
                   Debug: connected={isConnected.toString()}, minting={isMinting.toString()}, 
                   pending={isTransactionPending.toString()}, confirming={isConfirming.toString()}, 
                   hasMinted={hasMintedCurrentLevel.toString()}, checking={checkingMintStatus.toString()}
+                  <br/>Button disabled: {(!isConnected || isMinting || isTransactionPending || isConfirming || hasMintedCurrentLevel || checkingMintStatus).toString()}
                 </div>
               )}
               
