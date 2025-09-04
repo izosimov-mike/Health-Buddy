@@ -229,11 +229,18 @@ export default function HomePage() {
   const handleMintNFT = async () => {
     if (isMinting || !userFid || !stats) return
     
-    // Check if wallet is connected and address is available
-    if (!isConnected || !address) {
-      console.error('Wallet not connected or address not available')
-      return
-    }
+    // First, ensure wallet is connected
+     if (!isConnected) {
+       if (connectors.length > 0) {
+         await connect({ connector: connectors[0] })
+         // Wait a bit for connection to stabilize
+         await new Promise(resolve => setTimeout(resolve, 1000))
+       } else {
+         console.error('No connectors available')
+         setIsMinting(false)
+         return
+       }
+     }
     
     setIsMinting(true)
      setLastTransactionType('mint')
@@ -251,6 +258,13 @@ export default function HomePage() {
       
       // Wait for network switch to complete
       await new Promise(resolve => setTimeout(resolve, 1000))
+      
+      // Check if address is available after connection
+      if (!address) {
+        console.error('Address not available after wallet connection')
+        setIsMinting(false)
+        return
+      }
       
       // Get contract data for current level
       const contractData = getNFTContractData(stats.level)
