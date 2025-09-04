@@ -260,7 +260,7 @@ export async function POST(request: NextRequest) {
     } else {
       // Update existing user with fresh SDK data
       const updateData: any = {
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date()
       };
       
       if (username || displayName) {

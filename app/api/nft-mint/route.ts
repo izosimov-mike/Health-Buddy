@@ -9,6 +9,8 @@ export async function GET(request: NextRequest) {
     const fid = searchParams.get('fid')
     const level = searchParams.get('level')
 
+    console.log('NFT mint check - FID:', fid, 'Level:', level)
+
     if (!fid || !level) {
       return NextResponse.json(
         { error: 'Missing fid or level parameter' },
@@ -18,6 +20,8 @@ export async function GET(request: NextRequest) {
 
     // Find user by FID
     const user = await db.select().from(users).where(eq(users.farcasterFid, fid)).limit(1)
+    
+    console.log('User found:', user.length > 0 ? user[0].id : 'No user found')
     
     if (user.length === 0) {
       return NextResponse.json(
@@ -37,6 +41,13 @@ export async function GET(request: NextRequest) {
         )
       )
       .limit(1)
+
+    console.log('Existing mint check:', {
+      userId: user[0].id,
+      level: parseInt(level),
+      hasMinted: existingMint.length > 0,
+      mintData: existingMint[0] || null
+    })
 
     return NextResponse.json({
       hasMinted: existingMint.length > 0,
