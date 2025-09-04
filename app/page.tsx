@@ -205,7 +205,6 @@ export default function HomePage() {
         to: '0x9837e5c7a1f6902a07b1e4fd4d147cb21120d94e',
         data: '0x183ff085', // checkIn method signature
         value: parseEther('0.000001'), // 0.000001 ETH
-        gas: 50000n, // Explicit gas limit for Base
       })
       
       console.log('Base transaction sent successfully, hash:', txResult)
@@ -277,11 +276,11 @@ export default function HomePage() {
       // Send blockchain transaction to Celo network
       console.log('Sending Celo transaction...')
       const txResult = await sendTransaction({
-        to: '0xa87F19b2234Fe35c5A5DA9fb1AD620B7Eb5ff09e', // Fixed checksum
-        data: '0x183ff085', // checkIn method signature
-        value: parseEther('0.01'), // 0.01 Celo
-        gas: 100000n, // Explicit gas limit for Celo
-      })
+          to: '0xa87F19b2234Fe35c5A5DA9fb1AD620B7Eb5ff09e', // Fixed checksum
+          data: '0x183ff085', // checkIn method signature
+          value: parseEther('0.01'), // 0.01 Celo
+          gas: BigInt(100000), // Explicit gas limit for Celo
+        })
       
       console.log('Celo transaction sent successfully, hash:', txResult)
       
