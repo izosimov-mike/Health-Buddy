@@ -161,6 +161,91 @@ export default function HomePage() {
     hash,
   })
 
+  // NFT Minting states
+  const [isMinting, setIsMinting] = useState(false)
+
+  // NFT Contract addresses and parameters by level
+  const getNFTContractData = (level: number) => {
+    // For now, all levels use the same contract as requested
+    return {
+      contractAddress: '0xC6a28006dcB33A1fb3b834b961a1cBF81177b400',
+      tokenId: 0,
+      quantity: 1,
+      currency: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
+      pricePerToken: '10000000000000' // 0.00001 ETH in wei
+    }
+  }
+
+  // Handle NFT Minting
+  const handleMintNFT = async () => {
+    if (isMinting || !isConnected || !userFid || !stats) return
+    
+    setIsMinting(true)
+    
+    try {
+      // First, ensure wallet is connected
+      if (!isConnected) {
+        if (connectors.length > 0) {
+          await connect({ connector: connectors[0] })
+          await new Promise(resolve => setTimeout(resolve, 1000))
+        } else {
+          console.error('No connectors available')
+          setIsMinting(false)
+          return
+        }
+      }
+      
+      // Switch to Base network for NFT minting
+      console.log('Switching to Base network for NFT minting...')
+      try {
+        await switchChain({ chainId: base.id })
+        console.log('Successfully switched to Base network')
+      } catch (switchError) {
+        console.error('Failed to switch to Base network:', switchError)
+        throw new Error('Network switch failed')
+      }
+      
+      // Wait for network switch to complete
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
+      // Get contract data for current level
+      const contractData = getNFTContractData(stats.level)
+      
+      // Encode the claim function call
+      // claim(address _receiver, uint256 _tokenId, uint256 _quantity, address _currency, uint256 _pricePerToken)
+      const claimFunctionSignature = '0x57bc3d78'
+      
+      // Encode parameters (address, uint256, uint256, address, uint256)
+      const encodedParams = [
+        address?.slice(2).padStart(64, '0'), // _receiver (remove 0x and pad to 32 bytes)
+        contractData.tokenId.toString(16).padStart(64, '0'), // _tokenId
+        contractData.quantity.toString(16).padStart(64, '0'), // _quantity  
+        contractData.currency.slice(2).padStart(64, '0'), // _currency (remove 0x and pad)
+        parseInt(contractData.pricePerToken).toString(16).padStart(64, '0') // _pricePerToken
+      ].join('')
+      
+      const callData = claimFunctionSignature + encodedParams
+      
+      console.log('Minting NFT for level:', stats.level)
+      console.log('Contract address:', contractData.contractAddress)
+      console.log('Call data:', callData)
+      
+      // Send the mint transaction
+      await sendTransaction({
+        to: contractData.contractAddress as `0x${string}`,
+        data: callData as `0x${string}`,
+        value: BigInt(contractData.pricePerToken), // Send the required payment
+        gas: BigInt(200000), // Higher gas limit for contract interaction
+      })
+      
+      console.log('NFT mint transaction sent successfully')
+      
+    } catch (error) {
+      console.error('NFT minting error:', error)
+      setIsMinting(false)
+    }
+  }
+
   const handleBaseCheckin = async () => {
     if (checkingIn || checkedInToday || !userFid) return
     
@@ -325,6 +410,15 @@ export default function HomePage() {
     const updateDatabase = async () => {
       if (isConfirmed && hash && userFid) {
         try {
+          // Reset minting state if this was a mint transaction
+          if (isMinting) {
+            setIsMinting(false)
+            console.log('NFT minting completed successfully!')
+            console.log('Transaction hash:', hash)
+            console.log('You can check transaction status at: https://basescan.org/tx/' + hash)
+            return // Don't process as check-in if this was a mint transaction
+          }
+          
           const response = await fetch('/api/checkin', {
             method: 'POST',
             headers: {
@@ -362,13 +456,14 @@ export default function HomePage() {
     }
 
     updateDatabase()
-  }, [isConfirmed, hash, userFid])
+  }, [isConfirmed, hash, userFid, isMinting])
 
   // Handle transaction errors
   useEffect(() => {
     if (transactionError) {
       console.error('Transaction failed:', transactionError)
       setCheckingIn(false)
+      setIsMinting(false) // Also reset minting state on error
     }
   }, [transactionError])
 
@@ -526,8 +621,8 @@ export default function HomePage() {
         </Card>
 
         {/* Level Image and Progress Frame */}
-        <Card className="py-2 section-primary border-0">
-          <CardContent className="px-3" style={{ paddingTop: '4px', paddingBottom: '4px' }}>
+        <Card className="py-3 section-primary border-0">
+          <CardContent className="px-3" style={{ paddingTop: '8px', paddingBottom: '12px' }}>
             <div className="text-center space-y-2">
               {/* App Title */}
               <div className="mb-2">
@@ -560,6 +655,23 @@ export default function HomePage() {
                   <span>{stats?.levelProgress?.current || 0}</span>
                   <span>{stats?.levelProgress?.next || 100}</span>
                 </div>
+              </div>
+              
+              {/* Mint NFT Button */}
+              <div className="mt-3">
+                <Button 
+                  className="w-full btn-gradient" 
+                  size="sm"
+                  onClick={handleMintNFT}
+                  disabled={!isConnected || isMinting || isTransactionPending || isConfirming}
+                >
+                  <Trophy className="mr-2 h-4 w-4" />
+                  <span className="text-sm">
+                    {isMinting || isTransactionPending ? 'Minting...' : 
+                     isConfirming ? 'Confirming...' : 
+                     'Mint your Buddy'}
+                  </span>
+                </Button>
               </div>
             </div>
           </CardContent>
