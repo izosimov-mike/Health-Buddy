@@ -233,45 +233,23 @@ export default function HomePage() {
     setLastTransactionType('mint')
     
     try {
-      // First, ensure wallet is connected and address is available
-      let currentAddress = address
-      
-      if (!isConnected || !currentAddress) {
+      // First, ensure wallet is connected
+      if (!isConnected) {
         if (connectors.length > 0) {
           console.log('Connecting wallet...')
           await connect({ connector: connectors[0] })
           
-          // Wait for connection and address to be available
-           // According to Farcaster docs, we should wait for the connection to stabilize
-           await new Promise(resolve => setTimeout(resolve, 1500))
-           
-           // Re-check connection state after initial wait
-           currentAddress = address
-           
-           if (!isConnected || !currentAddress) {
-             // Additional wait with polling for address
-             let attempts = 0
-             const maxAttempts = 10
-             
-             while (attempts < maxAttempts && !currentAddress) {
-               await new Promise(resolve => setTimeout(resolve, 500))
-               currentAddress = address // Re-read from hook state
-               attempts++
-               console.log(`Polling for wallet address... Attempt ${attempts}, Address: ${currentAddress}`)
-               
-               if (currentAddress) {
-                 console.log('Wallet address obtained:', currentAddress)
-                 break
-               }
-             }
-           }
-          
-          if (!currentAddress) {
-            throw new Error('Failed to get wallet address after connection')
-          }
+          // Wait for connection to stabilize according to Farcaster docs
+          await new Promise(resolve => setTimeout(resolve, 1000))
         } else {
           throw new Error('No wallet connectors available')
         }
+      }
+      
+      // Get current address after connection
+      const currentAddress = address
+      if (!currentAddress) {
+        throw new Error('Wallet address not available after connection')
       }
       
       // Switch to Base network for NFT minting
