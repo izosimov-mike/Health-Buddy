@@ -1,6 +1,6 @@
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
-import { pgTable, text, integer, serial, boolean, timestamp } from 'drizzle-orm/pg-core';
+import { pgTable, text, integer, serial, boolean, timestamp, unique } from 'drizzle-orm/pg-core';
 
 // Database connection
 const connectionString = process.env.DATABASE_URL;
@@ -69,6 +69,19 @@ export const levels = pgTable('levels', {
   maxPoints: integer('max_points'),
   createdAt: timestamp('created_at').defaultNow(),
 });
+
+export const nftMints = pgTable('nft_mints', {
+  id: serial('id').primaryKey(),
+  userId: text('user_id').references(() => users.id),
+  level: integer('level').notNull(),
+  transactionHash: text('transaction_hash').notNull(),
+  contractAddress: text('contract_address').notNull(),
+  tokenId: integer('token_id').notNull(),
+  mintedAt: timestamp('minted_at').defaultNow().notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+}, (table) => ({
+  userLevelUnique: unique('user_level_unique').on(table.userId, table.level),
+}));
 
 // Export all tables for convenience
 export { client };
