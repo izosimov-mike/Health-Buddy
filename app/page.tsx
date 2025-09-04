@@ -201,13 +201,13 @@ export default function HomePage() {
       
       // Send blockchain transaction to Base network
       console.log('Sending Base transaction...')
-      const txResult = await sendTransaction({
+      await sendTransaction({
         to: '0x9837e5c7a1f6902a07b1e4fd4d147cb21120d94e',
         data: '0x183ff085', // checkIn method signature
         value: parseEther('0.000001'), // 0.000001 ETH
       })
       
-      console.log('Base transaction sent successfully, hash:', txResult)
+      console.log('Base transaction sent successfully', hash ? ', hash: ' + hash : '')
       
       // Transaction was sent successfully, reset state after a delay
       console.log('Waiting for Base transaction confirmation...')
@@ -275,22 +275,22 @@ export default function HomePage() {
       
       // Send blockchain transaction to Celo network
       console.log('Sending Celo transaction...')
-      const txResult = await sendTransaction({
+      await sendTransaction({
           to: '0xa87F19b2234Fe35c5A5DA9fb1AD620B7Eb5ff09e', // Fixed checksum
           data: '0x183ff085', // checkIn method signature
           value: parseEther('0.01'), // 0.01 Celo
           gas: BigInt(100000), // Explicit gas limit for Celo
         })
       
-      console.log('Celo transaction sent successfully, hash:', txResult)
+      console.log('Celo transaction sent successfully')
       
       // Wait for transaction confirmation with longer timeout for Celo
       console.log('Waiting for Celo transaction confirmation...')
       
       // Add additional diagnostics for Celo transactions
-      if (txResult) {
-        console.log('Celo transaction hash received:', txResult)
-        console.log('You can check transaction status at: https://celoscan.io/tx/' + txResult)
+      if (hash) {
+        console.log('Celo transaction hash received:', hash)
+        console.log('You can check transaction status at: https://celoscan.io/tx/' + hash)
       } else {
         console.warn('No transaction hash received for Celo transaction')
       }
