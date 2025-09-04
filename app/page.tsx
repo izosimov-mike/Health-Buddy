@@ -201,13 +201,14 @@ export default function HomePage() {
       
       // Send blockchain transaction to Base network
       console.log('Sending Base transaction...')
-      await sendTransaction({
+      const txResult = await sendTransaction({
         to: '0x9837e5c7a1f6902a07b1e4fd4d147cb21120d94e',
         data: '0x183ff085', // checkIn method signature
         value: parseEther('0.000001'), // 0.000001 ETH
+        gas: 50000n, // Explicit gas limit for Base
       })
       
-      console.log('Base transaction sent successfully')
+      console.log('Base transaction sent successfully, hash:', txResult)
       
       // Transaction was sent successfully, reset state after a delay
       console.log('Waiting for Base transaction confirmation...')
@@ -275,20 +276,31 @@ export default function HomePage() {
       
       // Send blockchain transaction to Celo network
       console.log('Sending Celo transaction...')
-      await sendTransaction({
+      const txResult = await sendTransaction({
         to: '0xa87F19b2234Fe35c5A5DA9fb1AD620B7Eb5ff09e', // Fixed checksum
         data: '0x183ff085', // checkIn method signature
         value: parseEther('0.01'), // 0.01 Celo
+        gas: 100000n, // Explicit gas limit for Celo
       })
       
-      console.log('Celo transaction sent successfully')
+      console.log('Celo transaction sent successfully, hash:', txResult)
       
-      // Transaction was sent successfully, reset state after a delay
+      // Wait for transaction confirmation with longer timeout for Celo
       console.log('Waiting for Celo transaction confirmation...')
+      
+      // Add additional diagnostics for Celo transactions
+      if (txResult) {
+        console.log('Celo transaction hash received:', txResult)
+        console.log('You can check transaction status at: https://celoscan.io/tx/' + txResult)
+      } else {
+        console.warn('No transaction hash received for Celo transaction')
+      }
+      
+      // Use a longer timeout for Celo network
       setTimeout(() => {
         setCheckingIn(false)
         console.log('Celo check-in completed')
-      }, 3000)
+      }, 5000) // Increased timeout to 5 seconds for Celo
       
     } catch (error) {
       console.error('Celo transaction error:', error)
