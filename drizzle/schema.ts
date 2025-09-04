@@ -85,3 +85,21 @@ export const actionCompletions = pgTable("action_completions", {
 			name: "action_completions_action_id_actions_id_fk"
 		}),
 ]);
+
+export const nftMints = pgTable("nft_mints", {
+	id: serial().primaryKey().notNull(),
+	userId: text("user_id"),
+	level: integer().notNull(),
+	transactionHash: text("transaction_hash").notNull(),
+	contractAddress: text("contract_address").notNull(),
+	tokenId: integer("token_id").notNull(),
+	mintedAt: timestamp("minted_at", { mode: 'string' }).defaultNow().notNull(),
+	createdAt: timestamp("created_at", { mode: 'string' }).defaultNow().notNull(),
+}, (table) => [
+	foreignKey({
+			columns: [table.userId],
+			foreignColumns: [users.id],
+			name: "nft_mints_user_id_users_id_fk"
+		}),
+	unique("user_level_unique").on(table.userId, table.level),
+]);

@@ -163,6 +163,37 @@ export default function HomePage() {
 
   // NFT Minting states
   const [isMinting, setIsMinting] = useState(false)
+  const [hasMintedCurrentLevel, setHasMintedCurrentLevel] = useState(false)
+  const [checkingMintStatus, setCheckingMintStatus] = useState(false)
+
+  // Check NFT mint status for current level
+  const checkMintStatus = async (fid: string, level: number) => {
+    if (!fid || !level) return
+    
+    setCheckingMintStatus(true)
+    try {
+      const response = await fetch(`/api/nft-mint?fid=${fid}&level=${level}`)
+      if (response.ok) {
+        const data = await response.json()
+        setHasMintedCurrentLevel(data.hasMinted)
+      } else {
+        console.error('Failed to check mint status')
+        setHasMintedCurrentLevel(false)
+      }
+    } catch (error) {
+      console.error('Error checking mint status:', error)
+      setHasMintedCurrentLevel(false)
+    } finally {
+      setCheckingMintStatus(false)
+    }
+  }
+
+  // Check mint status when user stats change
+  useEffect(() => {
+    if (userFid && stats?.level) {
+      checkMintStatus(userFid, stats.level)
+    }
+  }, [userFid, stats?.level])
 
   // NFT Contract addresses and parameters by level
   const getNFTContractData = (level: number) => {
@@ -239,12 +270,44 @@ export default function HomePage() {
       })
       
       console.log('NFT mint transaction sent successfully')
-      
-    } catch (error) {
-      console.error('NFT minting error:', error)
-      setIsMinting(false)
-    }
-  }
+       
+     } catch (error) {
+       console.error('NFT minting error:', error)
+       setIsMinting(false)
+     }
+   }
+
+   // Record successful NFT mint in database
+   const recordMintSuccess = async (transactionHash: string, level: number) => {
+     if (!userFid) return
+     
+     try {
+       const contractData = getNFTContractData(level)
+       const response = await fetch('/api/nft-mint', {
+         method: 'POST',
+         headers: {
+           'Content-Type': 'application/json',
+         },
+         body: JSON.stringify({
+           fid: userFid,
+           level: level,
+           transactionHash: transactionHash,
+           contractAddress: contractData.contractAddress,
+           tokenId: contractData.tokenId
+         })
+       })
+       
+       if (response.ok) {
+         console.log('NFT mint recorded successfully in database')
+         setHasMintedCurrentLevel(true)
+       } else {
+         const errorData = await response.json()
+         console.error('Failed to record NFT mint:', errorData.error)
+       }
+     } catch (error) {
+       console.error('Error recording NFT mint:', error)
+     }
+   }
 
   const handleBaseCheckin = async () => {
     if (checkingIn || checkedInToday || !userFid) return
@@ -416,6 +479,12 @@ export default function HomePage() {
             console.log('NFT minting completed successfully!')
             console.log('Transaction hash:', hash)
             console.log('You can check transaction status at: https://basescan.org/tx/' + hash)
+            
+            // Record the successful mint in database
+            if (stats?.level) {
+              await recordMintSuccess(hash, stats.level)
+            }
+            
             return // Don't process as check-in if this was a mint transaction
           }
           
@@ -660,14 +729,16 @@ export default function HomePage() {
               {/* Mint NFT Button */}
               <div className="mt-3">
                 <Button 
-                  className="w-full btn-gradient" 
+                  className={`w-full ${hasMintedCurrentLevel ? 'bg-green-600 hover:bg-green-700' : 'btn-gradient'}`}
                   size="sm"
                   onClick={handleMintNFT}
-                  disabled={!isConnected || isMinting || isTransactionPending || isConfirming}
+                  disabled={!isConnected || isMinting || isTransactionPending || isConfirming || hasMintedCurrentLevel || checkingMintStatus}
                 >
                   <Trophy className="mr-2 h-4 w-4" />
                   <span className="text-sm">
-                    {isMinting || isTransactionPending ? 'Minting...' : 
+                    {checkingMintStatus ? 'Checking...' :
+                     hasMintedCurrentLevel ? 'Minted ✓' :
+                     isMinting || isTransactionPending ? 'Minting...' : 
                      isConfirming ? 'Confirming...' : 
                      'Mint your Buddy'}
                   </span>
