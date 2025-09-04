@@ -165,6 +165,7 @@ export default function HomePage() {
   const [isMinting, setIsMinting] = useState(false)
   const [hasMintedCurrentLevel, setHasMintedCurrentLevel] = useState(false)
   const [checkingMintStatus, setCheckingMintStatus] = useState(false)
+  const [lastTransactionType, setLastTransactionType] = useState<'mint' | 'checkin' | null>(null)
   const [lastCheckedLevel, setLastCheckedLevel] = useState<number | null>(null)
 
   // Check NFT mint status for current level
@@ -228,21 +229,16 @@ export default function HomePage() {
   const handleMintNFT = async () => {
     if (isMinting || !userFid || !stats) return
     
-    setIsMinting(true)
+    // Check if wallet is connected and address is available
+    if (!isConnected || !address) {
+      console.error('Wallet not connected or address not available')
+      return
+    }
     
-    try {
-      // First, ensure wallet is connected
-      if (!isConnected) {
-        if (connectors.length > 0) {
-          await connect({ connector: connectors[0] })
-          await new Promise(resolve => setTimeout(resolve, 1000))
-        } else {
-          console.error('No connectors available')
-          setIsMinting(false)
-          return
-        }
-      }
-      
+    setIsMinting(true)
+     setLastTransactionType('mint')
+     
+     try {
       // Switch to Base network for NFT minting
       console.log('Switching to Base network for NFT minting...')
       try {
@@ -264,7 +260,7 @@ export default function HomePage() {
       const claimFunctionSignature = '0x57bc3d78'
       
       // Encode parameters according to working example
-      const receiver = address?.toLowerCase() || ''
+      const receiver = address.toLowerCase()
       const tokenId = contractData.tokenId
       const quantity = contractData.quantity
       const currency = contractData.currency.toLowerCase()
@@ -350,9 +346,10 @@ export default function HomePage() {
    }
 
   const handleBaseCheckin = async () => {
-    if (checkingIn || checkedInToday || !userFid) return
-    
-    setCheckingIn(true)
+     if (checkingIn || checkedInToday || !userFid) return
+     
+     setCheckingIn(true)
+     setLastTransactionType('checkin')
     
     try {
       // First, ensure wallet is connected
@@ -424,9 +421,10 @@ export default function HomePage() {
   }
 
   const handleCeloCheckin = async () => {
-    if (checkingIn || checkedInToday || !userFid) return
-    
-    setCheckingIn(true)
+     if (checkingIn || checkedInToday || !userFid) return
+     
+     setCheckingIn(true)
+     setLastTransactionType('checkin')
     
     try {
       // First, ensure wallet is connected
@@ -513,9 +511,10 @@ export default function HomePage() {
     const updateDatabase = async () => {
       if (isConfirmed && hash && userFid) {
         try {
-          // Reset minting state if this was a mint transaction
-          if (isMinting) {
+          // Handle mint transactions
+          if (lastTransactionType === 'mint') {
             setIsMinting(false)
+            setLastTransactionType(null)
             console.log('NFT minting completed successfully!')
             console.log('Transaction hash:', hash)
             console.log('You can check transaction status at: https://basescan.org/tx/' + hash)
@@ -528,7 +527,11 @@ export default function HomePage() {
             return // Don't process as check-in if this was a mint transaction
           }
           
-          const response = await fetch('/api/checkin', {
+          // Handle check-in transactions
+          if (lastTransactionType === 'checkin') {
+            setLastTransactionType(null)
+          
+            const response = await fetch('/api/checkin', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -556,6 +559,7 @@ export default function HomePage() {
           } else {
             console.error('Check-in failed:', data.error)
           }
+          }
         } catch (error) {
           console.error('Database update error:', error)
         } finally {
@@ -565,7 +569,7 @@ export default function HomePage() {
     }
 
     updateDatabase()
-  }, [isConfirmed, hash, userFid, isMinting])
+  }, [isConfirmed, hash, userFid, lastTransactionType])
 
   // Handle transaction errors
   useEffect(() => {
@@ -573,6 +577,7 @@ export default function HomePage() {
       console.error('Transaction failed:', transactionError)
       setCheckingIn(false)
       setIsMinting(false) // Also reset minting state on error
+      setLastTransactionType(null) // Reset transaction type on error
     }
   }, [transactionError])
 
