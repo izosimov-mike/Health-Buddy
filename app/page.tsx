@@ -8,7 +8,7 @@ import Link from "next/link"
 import { useEffect, useState } from "react"
 import { sdk } from '@farcaster/miniapp-sdk'
 import { FarcasterAuth } from '@/components/FarcasterAuth'
-import { useAccount, useConnect, useSendTransaction, useWaitForTransactionReceipt } from 'wagmi'
+import { useAccount, useConnect, useSendTransaction, useWaitForTransactionReceipt, useSwitchChain, useBalance } from 'wagmi'
 import { parseEther } from 'viem'
 import { celo, base } from '@/lib/wagmi-config'
 
@@ -152,9 +152,11 @@ export default function HomePage() {
   }, [context?.user?.fid, userFid])
 
   // Wagmi hooks for blockchain transactions
-  const { isConnected } = useAccount()
+  const { isConnected, address } = useAccount()
   const { connect, connectors } = useConnect()
   const { sendTransaction, data: hash, isPending: isTransactionPending, error: transactionError } = useSendTransaction()
+  const { switchChain } = useSwitchChain()
+  const { data: balance } = useBalance({ address })
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
     hash,
   })
@@ -178,13 +180,31 @@ export default function HomePage() {
         }
       }
       
+      // Switch to Base network first
+      console.log('Switching to Base network...')
+      try {
+        await switchChain({ chainId: base.id })
+        console.log('Successfully switched to Base network')
+      } catch (switchError) {
+        console.error('Failed to switch to Base network:', switchError)
+        throw new Error('Network switch failed')
+      }
+      
+      // Wait for network switch to complete
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
+      // Check balance before sending transaction
+      const requiredAmount = parseEther('0.000001')
+      if (balance && balance.value < requiredAmount) {
+        throw new Error(`Insufficient balance. Required: 0.000001 ETH, Available: ${balance.formatted} ${balance.symbol}`)
+      }
+      
       // Send blockchain transaction to Base network
       console.log('Sending Base transaction...')
       await sendTransaction({
         to: '0x9837e5c7a1f6902a07b1e4fd4d147cb21120d94e',
         data: '0x183ff085', // checkIn method signature
         value: parseEther('0.000001'), // 0.000001 ETH
-        chainId: base.id, // Specify Base network
       })
       
       console.log('Base transaction sent successfully')
@@ -234,13 +254,31 @@ export default function HomePage() {
         }
       }
       
+      // Switch to Celo network first
+      console.log('Switching to Celo network...')
+      try {
+        await switchChain({ chainId: celo.id })
+        console.log('Successfully switched to Celo network')
+      } catch (switchError) {
+        console.error('Failed to switch to Celo network:', switchError)
+        throw new Error('Network switch failed')
+      }
+      
+      // Wait for network switch to complete
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
+      // Check balance before sending transaction
+      const requiredAmount = parseEther('0.01')
+      if (balance && balance.value < requiredAmount) {
+        throw new Error(`Insufficient balance. Required: 0.01 CELO, Available: ${balance.formatted} ${balance.symbol}`)
+      }
+      
       // Send blockchain transaction to Celo network
       console.log('Sending Celo transaction...')
       await sendTransaction({
         to: '0xa87F19b2234Fe35c5A5DA9fb1AD620B7Eb5ff09e', // Fixed checksum
         data: '0x183ff085', // checkIn method signature
         value: parseEther('0.01'), // 0.01 Celo
-        chainId: celo.id, // Specify Celo network
       })
       
       console.log('Celo transaction sent successfully')
