@@ -226,7 +226,7 @@ export default function HomePage() {
 
   // Handle NFT Minting
   const handleMintNFT = async () => {
-    if (isMinting || !isConnected || !userFid || !stats) return
+    if (isMinting || !userFid || !stats) return
     
     setIsMinting(true)
     
@@ -259,17 +259,40 @@ export default function HomePage() {
       // Get contract data for current level
       const contractData = getNFTContractData(stats.level)
       
-      // Encode the claim function call
-      // claim(address _receiver, uint256 _tokenId, uint256 _quantity, address _currency, uint256 _pricePerToken)
+      // Encode the claim function call with allowlistProof
+      // claim(address _receiver, uint256 _tokenId, uint256 _quantity, address _currency, uint256 _pricePerToken, AllowlistProof _allowlistProof, bytes _data)
       const claimFunctionSignature = '0x57bc3d78'
       
-      // Encode parameters (address, uint256, uint256, address, uint256)
+      // Encode parameters according to working example
+      const receiver = address?.toLowerCase() || ''
+      const tokenId = contractData.tokenId
+      const quantity = contractData.quantity
+      const currency = contractData.currency.toLowerCase()
+      const pricePerToken = contractData.pricePerToken
+      
+      // AllowlistProof structure: (bytes32[] proof, uint256 quantityLimitPerWallet, uint256 pricePerToken, address currency)
+      const allowlistProof = {
+        proof: [], // Empty array
+        quantityLimitPerWallet: '115792089237316195423570985008687907853269984665640564039457584007913129639935', // Max uint256
+        pricePerToken: '0',
+        currency: '0x0000000000000000000000000000000000000000'
+      }
+      
+      // Build the complete calldata matching the working example
       const encodedParams = [
-        address?.slice(2).padStart(64, '0'), // _receiver (remove 0x and pad to 32 bytes)
-        contractData.tokenId.toString(16).padStart(64, '0'), // _tokenId
-        contractData.quantity.toString(16).padStart(64, '0'), // _quantity  
-        contractData.currency.slice(2).padStart(64, '0'), // _currency (remove 0x and pad)
-        parseInt(contractData.pricePerToken).toString(16).padStart(64, '0') // _pricePerToken
+        receiver.slice(2).padStart(64, '0'), // _receiver
+        tokenId.toString(16).padStart(64, '0'), // _tokenId
+        quantity.toString(16).padStart(64, '0'), // _quantity
+        currency.slice(2).padStart(64, '0'), // _currency
+        parseInt(pricePerToken).toString(16).padStart(64, '0'), // _pricePerToken
+        '00000000000000000000000000000000000000000000000000000000000000e0', // offset to allowlistProof
+        '0000000000000000000000000000000000000000000000000000000000000180', // offset to data
+        '0000000000000000000000000000000000000000000000000000000000000080', // allowlistProof.proof array length offset
+        '0000000000000000000000000000000000000000000000000000000000000000', // allowlistProof.proof array length (0)
+        'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff', // allowlistProof.quantityLimitPerWallet (max uint256)
+        '0000000000000000000000000000000000000000000000000000000000000000', // allowlistProof.pricePerToken (0)
+        '0000000000000000000000000000000000000000000000000000000000000000', // allowlistProof.currency (zero address)
+        '0000000000000000000000000000000000000000000000000000000000000000'  // _data (empty bytes)
       ].join('')
       
       const callData = claimFunctionSignature + encodedParams
@@ -749,7 +772,7 @@ export default function HomePage() {
                   Debug: connected={isConnected.toString()}, minting={isMinting.toString()}, 
                   pending={isTransactionPending.toString()}, confirming={isConfirming.toString()}, 
                   hasMinted={hasMintedCurrentLevel.toString()}, checking={checkingMintStatus.toString()}
-                  <br/>Button disabled: {(!isConnected || isMinting || isTransactionPending || isConfirming || hasMintedCurrentLevel || checkingMintStatus).toString()}
+                  <br/>Button disabled: {(isMinting || isTransactionPending || isConfirming || hasMintedCurrentLevel || checkingMintStatus).toString()}
                 </div>
               )}
               
@@ -759,7 +782,7 @@ export default function HomePage() {
                   className={`w-full ${hasMintedCurrentLevel ? 'bg-green-600 hover:bg-green-700' : 'btn-gradient'}`}
                   size="sm"
                   onClick={handleMintNFT}
-                  disabled={!isConnected || isMinting || isTransactionPending || isConfirming || hasMintedCurrentLevel || checkingMintStatus}
+                  disabled={isMinting || isTransactionPending || isConfirming || hasMintedCurrentLevel || checkingMintStatus}
                 >
                   <Trophy className="mr-2 h-4 w-4" />
                   <span className="text-sm">
