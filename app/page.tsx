@@ -726,6 +726,15 @@ export default function HomePage() {
                 </div>
               </div>
               
+              {/* Debug info for mint button */}
+              {process.env.NODE_ENV === 'development' && (
+                <div className="text-xs text-white/50 mb-2">
+                  Debug: connected={isConnected.toString()}, minting={isMinting.toString()}, 
+                  pending={isTransactionPending.toString()}, confirming={isConfirming.toString()}, 
+                  hasMinted={hasMintedCurrentLevel.toString()}, checking={checkingMintStatus.toString()}
+                </div>
+              )}
+              
               {/* Mint NFT Button */}
               <div className="mt-3">
                 <Button 
