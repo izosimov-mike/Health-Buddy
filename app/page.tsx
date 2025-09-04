@@ -165,16 +165,19 @@ export default function HomePage() {
   const [isMinting, setIsMinting] = useState(false)
   const [hasMintedCurrentLevel, setHasMintedCurrentLevel] = useState(false)
   const [checkingMintStatus, setCheckingMintStatus] = useState(false)
+  const [lastCheckedLevel, setLastCheckedLevel] = useState<number | null>(null)
 
   // Check NFT mint status for current level
   const checkMintStatus = async (fid: string, level: number) => {
     if (!fid || !level) return
     
+    console.log('Starting mint status check for FID:', fid, 'Level:', level)
     setCheckingMintStatus(true)
     try {
       const response = await fetch(`/api/nft-mint?fid=${fid}&level=${level}`)
       if (response.ok) {
         const data = await response.json()
+        console.log('Mint status response:', data)
         setHasMintedCurrentLevel(data.hasMinted)
       } else {
         console.error('Failed to check mint status')
@@ -184,16 +187,19 @@ export default function HomePage() {
       console.error('Error checking mint status:', error)
       setHasMintedCurrentLevel(false)
     } finally {
+      console.log('Finished mint status check, setting checkingMintStatus to false')
       setCheckingMintStatus(false)
     }
   }
 
   // Check mint status when user stats change
   useEffect(() => {
-    if (userFid && stats?.level) {
+    console.log('useEffect triggered - userFid:', userFid, 'stats?.level:', stats?.level, 'lastCheckedLevel:', lastCheckedLevel)
+    if (userFid && stats?.level && !checkingMintStatus && stats.level !== lastCheckedLevel) {
+      setLastCheckedLevel(stats.level)
       checkMintStatus(userFid, stats.level)
     }
-  }, [userFid, stats?.level])
+  }, [userFid, stats?.level, checkingMintStatus, lastCheckedLevel])
 
   // NFT Contract addresses and parameters by level
   const getNFTContractData = (level: number) => {
