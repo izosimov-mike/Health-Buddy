@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, TrendingUp, Calendar, Award, Target, BarChart3, Flame, Activity } from 'lucide-react'
+import { ArrowLeft, TrendingUp, Calendar, Award, Target, BarChart3, Flame, Activity, Share2 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -50,6 +50,37 @@ export default function StatsPage() {
       } catch (error) {
         console.error('Failed to view profile:', error)
       }
+    }
+  }
+
+  const handleShareResults = async () => {
+    if (!stats || !context?.user) {
+      console.error('No stats or user context available for sharing')
+      return
+    }
+
+    try {
+      // Calculate current rank based on level
+      const currentRank = stats.levelName || `Level ${stats.level}`
+      
+      // Prepare share text
+      const shareText = `I have ${currentRank} rank in 'Health Buddy'. Join me and turn wellness into a game! Check in daily, complete healthy actions, and see your progress grow. Stay motivated, stay healthy, stay happy!`
+      
+      // Generate dynamic image URL with current level and total points
+      const username = context?.user?.displayName || context?.user?.username || 'Health Buddy User'
+      const imageUrl = `/api/share-image?level=${stats.level}&levelName=${encodeURIComponent(stats.levelName || 'Beginner')}&totalPoints=${stats.globalScore}&username=${encodeURIComponent(username)}`
+      
+      // Use Farcaster SDK composeCast function
+      await sdk.actions.composeCast({
+        text: shareText,
+        embeds: [{
+          url: imageUrl
+        }]
+      })
+      
+      console.log('Share cast composed successfully')
+    } catch (error) {
+      console.error('Failed to compose cast:', error)
     }
   }
 
@@ -268,6 +299,17 @@ export default function StatsPage() {
             </CardContent>
           </Card>
         )}
+        
+        {/* Share Results Button */}
+        <div className="px-1">
+          <Button 
+            onClick={handleShareResults}
+            className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-3 rounded-lg flex items-center justify-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl"
+          >
+            <Share2 className="h-4 w-4" />
+            Share my results
+          </Button>
+        </div>
         
         {/* Key Metrics */}
         <div className="grid grid-cols-2 gap-2">
