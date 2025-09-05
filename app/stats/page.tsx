@@ -73,7 +73,7 @@ export default function StatsPage() {
       // Use Farcaster SDK composeCast function
       await sdk.actions.composeCast({
         text: shareText,
-        embeds: [imageUrl]
+        embeds: [imageUrl, window.location.origin]
       })
       
       console.log('Share cast composed successfully')
