@@ -215,13 +215,32 @@ export default function HomePage() {
 
   // NFT Contract addresses and parameters by level
   const getNFTContractData = (level: number) => {
-    // For now, all levels use the same contract as requested
-    return {
-      contractAddress: '0xC6a28006dcB33A1fb3b834b961a1cBF81177b400',
-      tokenId: 0,
-      quantity: 1,
-      currency: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
-      pricePerToken: '10000000000000' // 0.00001 ETH in wei
+    switch (level) {
+      case 1:
+        return {
+          contractAddress: '0xC6a28006dcB33A1fb3b834b961a1cBF81177b400',
+          tokenId: 0,
+          quantity: 1,
+          currency: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
+          pricePerToken: '10000000000000' // 0.00001 ETH in wei
+        }
+      case 2:
+        return {
+          contractAddress: '0x3B4dC6e4b06502e72042a11e7895DFDFDCc9AE7f',
+          tokenId: 0,
+          quantity: 1,
+          currency: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
+          pricePerToken: '10000000000000' // 0.00001 ETH in wei
+        }
+      default:
+        // For levels 3+ use Level 1 contract for now
+        return {
+          contractAddress: '0xC6a28006dcB33A1fb3b834b961a1cBF81177b400',
+          tokenId: 0,
+          quantity: 1,
+          currency: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
+          pricePerToken: '10000000000000' // 0.00001 ETH in wei
+        }
     }
   }
 
