@@ -762,11 +762,11 @@ export default function HomePage() {
           <CardContent className="px-3" style={{ paddingTop: '4px', paddingBottom: '4px' }}>
             <div className="flex justify-between items-center">
               <span className="text-white font-medium text-sm">Score</span>
-              <span className="text-white font-bold text-base">{stats?.globalScore || 0}</span>
+              <span className="text-lg font-bold text-yellow-300">{stats?.globalScore || 0}</span>
             </div>
             <div className="flex justify-between items-center mt-1">
               <span className="text-white font-medium text-sm">Streak</span>
-              <span className="text-white font-bold text-base">{stats?.currentStreak || 0}</span>
+              <span className="text-lg font-bold text-yellow-300">{stats?.currentStreak || 0}</span>
             </div>
           </CardContent>
         </Card>
