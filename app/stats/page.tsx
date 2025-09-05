@@ -64,7 +64,7 @@ export default function StatsPage() {
       const currentRank = stats.levelName || `Level ${stats.level}`
       
       // Prepare share text
-      const shareText = `I have ${currentRank} rank in 'Health Buddy'. Join me and turn wellness into a game! Check in daily, complete healthy actions, and see your progress grow. Stay motivated, stay healthy, stay happy!`
+      const shareText = `I have ${currentRank} rank with ${stats.globalScore} points in 'Health Buddy'. Join me and turn wellness into a game! Check in daily, complete healthy actions, and see your progress grow. Stay motivated, stay healthy, stay happy!`
       
       // Generate dynamic image URL with current level and total points
       const username = context?.user?.displayName || context?.user?.username || 'Health Buddy User'
