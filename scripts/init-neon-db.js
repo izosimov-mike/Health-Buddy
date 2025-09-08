@@ -3,7 +3,7 @@ const postgres = require('postgres');
 const { sql } = require('drizzle-orm');
 
 // Подключение к Neon PostgreSQL
-const connectionString = process.env.DATABASE_URL || 'postgresql://neondb_owner:REDACTED@ep-solitary-thunder-adeni4wp-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require';
+const connectionString = process.env.DATABASE_URL || 'postgresql://neondb_owner:npg_N70WAuJGPxEz@ep-solitary-thunder-adeni4wp-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require';
 
 const client = postgres(connectionString);
 const db = drizzle(client);
