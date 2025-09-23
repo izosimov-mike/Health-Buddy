@@ -8,7 +8,8 @@ if (!connectionString) {
   throw new Error('DATABASE_URL environment variable is required');
 }
 
-const client = postgres(connectionString);
+// Neon requires TLS; Vercel serverless benefits from a tiny pool
+const client = postgres(connectionString, { ssl: 'require', max: 1 });
 export const db = drizzle(client);
 
 // Schema definitions
