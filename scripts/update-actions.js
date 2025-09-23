@@ -4,7 +4,11 @@ const { sql } = require('drizzle-orm');
 
 require('dotenv').config({ path: '.env.local' });
 
-const connectionString = process.env.DATABASE_URL || 'postgresql://neondb_owner:npg_N70WAuJGPxEz@ep-solitary-thunder-adeni4wp-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require';
+const connectionString = process.env.DATABASE_URL;
+if (!connectionString) {
+  console.error('❌ DATABASE_URL environment variable is required');
+  process.exit(1);
+}
 
 const client = postgres(connectionString);
 const db = drizzle(client);
