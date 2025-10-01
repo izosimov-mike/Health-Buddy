@@ -16,6 +16,8 @@ export async function GET(request: NextRequest) {
 
     // Отправка персонального уведомления пользователю FID 507376
     // Используем publishCast для отправки сообщения с упоминанием пользователя
+    // Примечание: publishCast публикует в общий фид, но упоминание @507376 уведомит пользователя
+    
     const message = {
       signerUuid: process.env.NEYNAR_SIGNER_UUID!,
       text: `@507376 Don't forget to log your daily health activities! 💪 Check your progress at https://health-buddy.vercel.app`,

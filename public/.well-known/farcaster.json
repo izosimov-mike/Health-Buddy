@@ -22,7 +22,7 @@
     "tagline": "Grow Strong, Stay Happy",
     "ogTitle": "Your Daily Wellness Buddy",
     "ogDescription": "Turn wellness into a game! Check in daily, complete healthy actions, and see your progress grow.",
-    "ogImageUrl": "https://health-buddy-seven.vercel.app/images/promo.png"
-	"webhookUrl": "https://api.neynar.com/f/app/a112a700-47c1-4e52-9644-356390b8f62a/event"
+    "ogImageUrl": "https://health-buddy-seven.vercel.app/images/promo.png",
+    "webhookUrl": "https://api.neynar.com/f/app/a112a700-47c1-4e52-9644-356390b8f62a/event"
   }
 }
