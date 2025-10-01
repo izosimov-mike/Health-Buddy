@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
     const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
     
     await client.publishFrameNotifications({
-      targetFids: [507376], // отправляем конкретному пользователю
+      targetFids: [507376,358574], // отправляем конкретному пользователю
       notification: {
         title: "Daily health activities reminder",
         body: "Don't forget to log your daily health activities! 💪",
