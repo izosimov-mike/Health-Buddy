@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { NeynarAPIClient } from '@neynar/nodejs-sdk';
+import { NeynarAPIClient, Configuration } from '@neynar/nodejs-sdk';
 
 export async function GET(request: NextRequest) {
   // Проверка авторизации cron job
@@ -9,29 +9,40 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // Инициализация Neynar SDK
-    const client = new NeynarAPIClient({
+    // Инициализация Neynar SDK v3
+    const config = new Configuration({
       apiKey: process.env.NEYNAR_API_KEY!,
+      baseOptions: {
+        headers: {
+          "x-neynar-experimental": true,
+        },
+      },
     });
+    const client = new NeynarAPIClient(config);
 
     // Отправка персонального уведомления пользователю FID 507376
-    // Используем publishCast для отправки сообщения с упоминанием пользователя
-    // Примечание: publishCast публикует в общий фид, но упоминание @507376 уведомит пользователя
+    // Используем publishFrameNotifications - правильный метод для Mini-App уведомлений
     
-    const message = {
-      signerUuid: process.env.NEYNAR_SIGNER_UUID!,
-      text: `@507376 Don't forget to log your daily health activities! 💪 Check your progress at https://health-buddy.vercel.app`,
-      embeds: [{
-        url: "https://health-buddy.vercel.app"
-      }]
-    };
-
-    await client.publishCast(message);
+    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+    
+    await client.publishFrameNotifications({
+      targetFids: [507376], // отправляем конкретному пользователю
+      notification: {
+        title: "Daily health activities reminder",
+        body: "Don't forget to log your daily health activities! 💪",
+        target_url: "https://health-buddy.vercel.app"
+      }
+    });
+    
+    console.log(`📢 Daily reminder sent to user FID 507376 via publishFrameNotifications`);
+    console.log(`Notification ID: daily-reminder-${today}`);
 
     return NextResponse.json({ 
       success: true, 
-      message: 'Notification sent successfully',
+      message: 'Daily reminder sent successfully via publishFrameNotifications',
       targetFid: 507376,
+      method: 'publishFrameNotifications',
+      notificationId: `daily-reminder-${today}`,
       timestamp: new Date().toISOString()
     });
   } catch (error) {
