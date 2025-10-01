@@ -15,17 +15,17 @@ export async function GET(request: NextRequest) {
     });
 
     // Отправка уведомления пользователю FID 507376
-    const notification = {
-      target_fids: [507376],
-      notification: {
-        title: "Health Buddy Daily Reminder",
-        body: "Don't forget to log your daily health activities! 💪",
-        target_url: "https://health-buddy.vercel.app",
-        uuid: `daily-reminder-${Date.now()}`
+    const message = {
+      body: {
+        signer_uuid: process.env.NEYNAR_SIGNER_UUID!,
+        text: "Don't forget to log your daily health activities! 💪 Check your progress at https://health-buddy.vercel.app",
+        embeds: [{
+          url: "https://health-buddy.vercel.app"
+        }]
       }
     };
 
-    await client.sendNotificationToUsers(notification);
+    await client.publishMessageToFarcaster(message);
 
     return NextResponse.json({ 
       success: true, 
