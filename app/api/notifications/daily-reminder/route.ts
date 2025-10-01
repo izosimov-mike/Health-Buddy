@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
       notification: {
         title: "Daily health activities reminder",
         body: "Don't forget to log your daily health activities! 💪",
-        target_url: "https://health-buddy.vercel.app"
+        target_url: "https://health-buddy-seven.vercel.app/"
       }
     });
     
