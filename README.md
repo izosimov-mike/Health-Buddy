@@ -210,11 +210,11 @@ pnpm db:init      # Initialize database
 ## 🎮 Game Mechanics
 
 ### **Point System**
-- **Physical Health**: 10-25 points per action
-- **Nutrition**: 10-20 points per action  
-- **Mental Health**: 15-25 points per action
-- **Hygiene**: 10 points per action
-- **Sleep**: 10-30 points per action
+- **Physical Health**: 1 point per action
+- **Nutrition**: 1 point per action  
+- **Mental Health**: 1 point per action
+- **Hygiene**: 1 point per action
+- **Sleep**: 1 point per action
 
 ### **Level Progression**
 1. **Beginner** (0-99 points)
@@ -279,7 +279,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - **Issues**: [GitHub Issues](https://github.com/izosimov-mike/Health-Buddy/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/izosimov-mike/Health-Buddy/discussions)
-- **Farcaster**: [@izosimov-mike](https://warpcast.com/izosimov-mike)
+- **Farcaster**: [@kinglizard](https://farcaster.xyz/kinglizard)
 
 ---
 
