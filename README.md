@@ -60,6 +60,11 @@
 - **Neynar API** - Farcaster data and notifications
 - **Farcaster Auth** - Seamless user authentication
 
+### **Referral & Analytics**
+- **Divvi SDK** - On-chain referral tracking
+- **Referral Attribution** - Track transaction referrals automatically
+- **Consumer Address**: ``
+
 ## 🛠️ Getting Started
 
 ### Prerequisites
@@ -253,6 +258,32 @@ NEYNAR_API_KEY="your_neynar_api_key"
 CRON_SECRET="your_secure_cron_secret"
 NEXT_PUBLIC_APP_URL="https://your-domain.com"
 ```
+
+## 🔗 Divvi Referral Integration
+
+Health Buddy integrates **Divvi SDK** for on-chain referral tracking. Every state-changing transaction automatically includes referral attribution data.
+
+### **How It Works**
+
+1. **Referral Tag Generation**: Each transaction gets a unique referral tag based on the user's address
+2. **Tag Appended to Calldata**: The tag is automatically appended to transaction data
+3. **Transaction Submission**: After confirmation, transaction is registered with Divvi
+4. **On-Chain Attribution**: Divvi decodes referral metadata and records it on-chain
+
+### **Integrated Transactions**
+
+- ✅ **NFT Minting** - Achievement NFTs include referral tracking
+- ✅ **Base Check-ins** - Daily check-in transactions tracked
+- ✅ **Celo Check-ins** - Cross-chain check-ins tracked
+- ✅ **Token Transfers** - All CELO transfers include tracking
+
+### **Consumer Address**
+
+```
+
+```
+
+This consumer address is used across all transactions for consistent referral attribution. View our referral analytics on the Divvi dashboard.
 
 ## 🤝 Contributing
 

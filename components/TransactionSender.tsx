@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react'
-import { useSendTransaction, useWaitForTransactionReceipt, useAccount } from 'wagmi'
+import { useSendTransaction, useWaitForTransactionReceipt, useAccount, useChainId } from 'wagmi'
 import { parseEther, formatEther } from 'viem'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -11,6 +11,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Send, CheckCircle, AlertCircle, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
+import { appendReferralTag, submitDivviReferral } from '@/lib/divvi-utils'
 
 interface TransactionSenderProps {
   onTransactionSuccess?: (txHash: string) => void
@@ -19,6 +20,7 @@ interface TransactionSenderProps {
 
 export function TransactionSender({ onTransactionSuccess, onTransactionError }: TransactionSenderProps) {
   const { isConnected, address } = useAccount()
+  const chainId = useChainId()
   const [recipient, setRecipient] = useState('')
   const [amount, setAmount] = useState('')
   const [isValidAddress, setIsValidAddress] = useState(true)
@@ -39,10 +41,15 @@ export function TransactionSender({ onTransactionSuccess, onTransactionError }: 
   })
 
   React.useEffect(() => {
-    if (isConfirmed && hash && onTransactionSuccess) {
-      onTransactionSuccess(hash)
+    if (isConfirmed && hash) {
+      // Submit transaction to Divvi for referral tracking
+      submitDivviReferral(hash, chainId)
+      
+      if (onTransactionSuccess) {
+        onTransactionSuccess(hash)
+      }
     }
-  }, [isConfirmed, hash, onTransactionSuccess])
+  }, [isConfirmed, hash, chainId, onTransactionSuccess])
 
   React.useEffect(() => {
     if (sendError && onTransactionError) {
@@ -71,15 +78,24 @@ export function TransactionSender({ onTransactionSuccess, onTransactionError }: 
       return
     }
 
+    if (!address) {
+      toast.error('Кошелек не подключен')
+      return
+    }
+
     try {
       const value = parseEther(amount)
+      
+      // Add Divvi referral tag to transaction data
+      const dataWithReferral = appendReferralTag(undefined, address)
       
       sendTransaction({
         to: recipient as `0x${string}`,
         value: value,
+        data: dataWithReferral,
       })
       
-      toast.success('Транзакция отправлена!')
+      toast.success('Транзакция отправлена с Divvi tracking!')
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Неизвестная ошибка'
       toast.error(`Ошибка отправки: ${errorMessage}`)
@@ -91,12 +107,11 @@ export function TransactionSender({ onTransactionSuccess, onTransactionError }: 
   React.useEffect(() => {
     if (isConfirmed && hash) {
       toast.success('Транзакция подтверждена!')
-      onTransactionSuccess?.(hash)
       // Очищаем форму
       setRecipient('')
       setAmount('')
     }
-  }, [isConfirmed, hash, onTransactionSuccess])
+  }, [isConfirmed, hash])
 
   // Обработка ошибок
   React.useEffect(() => {

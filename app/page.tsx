@@ -8,9 +8,10 @@ import Link from "next/link"
 import { useEffect, useState } from "react"
 import { sdk } from '@farcaster/miniapp-sdk'
 import { FarcasterAuth } from '@/components/FarcasterAuth'
-import { useAccount, useConnect, useSendTransaction, useWaitForTransactionReceipt, useSwitchChain, useBalance } from 'wagmi'
+import { useAccount, useConnect, useSendTransaction, useWaitForTransactionReceipt, useSwitchChain, useBalance, useChainId } from 'wagmi'
 import { parseEther } from 'viem'
 import { celo, base } from '@/lib/wagmi-config'
+import { appendReferralTag, submitDivviReferral } from '@/lib/divvi-utils'
 
 interface UserStats {
   globalScore: number;
@@ -157,6 +158,7 @@ export default function HomePage() {
   const { sendTransaction, data: hash, isPending: isTransactionPending, error: transactionError } = useSendTransaction()
   const { switchChain } = useSwitchChain()
   const { data: balance } = useBalance({ address })
+  const chainId = useChainId()
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
     hash,
   })
@@ -312,16 +314,19 @@ export default function HomePage() {
         '0000000000000000000000000000000000000000000000000000000000000000'  // _data (empty bytes)
       ].join('')
       
-      const callData = claimFunctionSignature + encodedParams
+      const baseCallData = (claimFunctionSignature + encodedParams) as `0x${string}`
+      
+      // Add Divvi referral tag to transaction data for referral tracking
+      const callDataWithReferral = appendReferralTag(baseCallData, currentAddress)
       
       console.log('Minting NFT for level:', stats.level)
       console.log('Contract address:', contractData.contractAddress)
-      console.log('Call data:', callData)
+      console.log('Call data with Divvi tracking:', callDataWithReferral)
       
       // Send the mint transaction
       await sendTransaction({
         to: contractData.contractAddress as `0x${string}`,
-        data: callData as `0x${string}`,
+        data: callDataWithReferral,
         value: BigInt(contractData.pricePerToken), // Send the required payment
         gas: BigInt(200000), // Higher gas limit for contract interaction
       })
@@ -405,11 +410,20 @@ export default function HomePage() {
         throw new Error(`Insufficient balance. Required: 0.000001 ETH, Available: ${balance.formatted} ${balance.symbol}`)
       }
       
-      // Send blockchain transaction to Base network
+      // Send blockchain transaction to Base network with Divvi tracking
       console.log('Sending Base transaction...')
+      
+      if (!address) {
+        throw new Error('Wallet address not available')
+      }
+      
+      // Add Divvi referral tag to check-in transaction
+      const baseCheckInData = '0x183ff085' as `0x${string}` // checkIn method signature
+      const dataWithReferral = appendReferralTag(baseCheckInData, address)
+      
       await sendTransaction({
         to: '0x9837e5c7a1f6902a07b1e4fd4d147cb21120d94e',
-        data: '0x183ff085', // checkIn method signature
+        data: dataWithReferral,
         value: parseEther('0.000001'), // 0.000001 ETH
       })
       
@@ -480,11 +494,20 @@ export default function HomePage() {
         throw new Error(`Insufficient balance. Required: 0.01 CELO, Available: ${balance.formatted} ${balance.symbol}`)
       }
       
-      // Send blockchain transaction to Celo network
+      // Send blockchain transaction to Celo network with Divvi tracking
       console.log('Sending Celo transaction...')
+      
+      if (!address) {
+        throw new Error('Wallet address not available')
+      }
+      
+      // Add Divvi referral tag to check-in transaction
+      const celoCheckInData = '0x183ff085' as `0x${string}` // checkIn method signature
+      const celoDataWithReferral = appendReferralTag(celoCheckInData, address)
+      
       await sendTransaction({
           to: '0xa87F19b2234Fe35c5A5DA9fb1AD620B7Eb5ff09e', // Fixed checksum
-          data: '0x183ff085', // checkIn method signature
+          data: celoDataWithReferral,
           value: parseEther('0.01'), // 0.01 Celo
           gas: BigInt(100000), // Explicit gas limit for Celo
         })
@@ -532,6 +555,9 @@ export default function HomePage() {
     const updateDatabase = async () => {
       if (isConfirmed && hash && userFid) {
         try {
+          // Submit transaction to Divvi for referral tracking
+          await submitDivviReferral(hash, chainId)
+          
           // Handle mint transactions
           if (lastTransactionType === 'mint') {
             setIsMinting(false)
@@ -590,7 +616,7 @@ export default function HomePage() {
     }
 
     updateDatabase()
-  }, [isConfirmed, hash, userFid, lastTransactionType])
+  }, [isConfirmed, hash, userFid, lastTransactionType, chainId])
 
   // Handle transaction errors
   useEffect(() => {

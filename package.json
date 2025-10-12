@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@coinbase/onchainkit": "^0.38.19",
+    "@divvi/referral-sdk": "^2.3.0",
     "@farcaster/miniapp-sdk": "^0.1.9",
     "@farcaster/miniapp-wagmi-connector": "^1.0.0",
     "@hookform/resolvers": "^3.10.0",
