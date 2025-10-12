@@ -17,7 +17,7 @@ export const DIVVI_CONSUMER_ADDRESS = '0xE27d9E71A92eb928D033194987be22998b33606
 export function generateDivviReferralTag(userAddress: string): Hex {
   try {
     const referralTag = getReferralTag({
-      user: userAddress,
+      user: userAddress as Hex,
       consumer: DIVVI_CONSUMER_ADDRESS,
     });
     
@@ -40,7 +40,7 @@ export async function submitDivviReferral(
 ): Promise<void> {
   try {
     await submitReferral({
-      txHash,
+      txHash: txHash as Hex,
       chainId,
     });
     
