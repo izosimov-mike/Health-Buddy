@@ -405,9 +405,9 @@ export default function HomePage() {
       await new Promise(resolve => setTimeout(resolve, 1000))
       
       // Check balance before sending transaction
-      const requiredAmount = parseEther('0.000001')
+      const requiredAmount = parseEther('0.00001')
       if (balance && balance.value < requiredAmount) {
-        throw new Error(`Insufficient balance. Required: 0.000001 ETH, Available: ${balance.formatted} ${balance.symbol}`)
+        throw new Error(`Insufficient balance. Required: 0.00001 ETH, Available: ${balance.formatted} ${balance.symbol}`)
       }
       
       // Send blockchain transaction to Base network with Divvi tracking
@@ -422,9 +422,9 @@ export default function HomePage() {
       const dataWithReferral = appendReferralTag(baseCheckInData, address)
       
       await sendTransaction({
-        to: '0x9837e5c7a1f6902a07b1e4fd4d147cb21120d94e',
+        to: '0x7c0081897298c59E1251E920bD1F07674eDeF503',
         data: dataWithReferral,
-        value: parseEther('0.000001'), // 0.000001 ETH
+        value: parseEther('0.00001'), // 0.00001 ETH
       })
       
       console.log('Base transaction sent successfully', hash ? ', hash: ' + hash : '')
